@@ -1,0 +1,5 @@
+# Copy to upstream.local.ps1 (gitignored) and adjust.
+$UpstreamBranch = 'main'   # upstream's stable branch name; check on GitHub in m0
+$Databases = @('auth', 'characters', 'world', 'playerbots')   # your actual DB names
+$MySqlDump = 'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump.exe'
+$BuildConfig = 'RelWithDebInfo'

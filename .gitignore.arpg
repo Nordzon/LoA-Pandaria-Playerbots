@@ -1,0 +1,7 @@
+# Append to the repo's .gitignore
+arpg/scripts/soap.local.ps1
+arpg/scripts/upstream.local.ps1
+arpg/scripts/mysql.local.cnf
+arpg/backups/
+arpg/tools/bin/
+arpg/client-patch/build/

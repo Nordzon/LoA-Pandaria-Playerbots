@@ -1,0 +1,3 @@
+# Copy to soap.local.ps1 (gitignored). A GM account (level 3) used by gm.ps1 and run-gmtests.ps1.
+$SoapUser = 'ADMIN'
+$SoapPass = 'change-me'

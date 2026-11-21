@@ -1,0 +1,19 @@
+schema: spec-driven
+context: |
+  Single-player World of Warcraft: Mists of Pandaria 5.4.8 (build 18414) server, forked from
+  LoA-Pandaria-Playerbots (TrinityCore-family C++ core with a playerbots module).
+  We add a Diablo-style layer in modules/mod_arpg: affix loot, upward-only per-creature level scaling,
+  Champions and Superuniques, Paragon after 90, party-size dungeon scaling, a Dungeon Finder hook.
+  Build: native Windows, MSVC Build Tools 2022, CMake, VS Code. DB: MySQL 8.0.
+  Tunables in arpg.conf and arpg_* SQL tables; debug and test via `.arpg` GM commands over SOAP.
+  Read CLAUDE.md and docs/CODEMAP.md before proposing or applying a change.
+rules:
+  proposal:
+    - State which milestone (m0-m6) the change belongs to.
+    - List config keys and SQL tables the change adds.
+  specs:
+    - Requirements use SHALL; every requirement has at least one Scenario with WHEN/THEN.
+    - Numbers in scenarios name the config key they come from.
+  tasks:
+    - Every scenario maps to a test task (unit, .gmtest, bot scenario, or manual playtest step).
+    - Last tasks are always: update docs/CODEMAP.md, update docs/PROGRESS.md.

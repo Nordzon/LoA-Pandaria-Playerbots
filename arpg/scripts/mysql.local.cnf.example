@@ -1,0 +1,6 @@
+# Copy to mysql.local.cnf (gitignored). Used by update-upstream.ps1 for backups.
+[client]
+user=root
+password=change-me
+host=127.0.0.1
+port=3306

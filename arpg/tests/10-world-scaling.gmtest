@@ -1,0 +1,22 @@
+# World scaling (change m1-world-scaling). Uses a fixed test character "Arpgtest" that
+# `.arpg test setup` creates if needed, sets to a level and parks at a named test spot.
+# Test spots live in arpg_test_spot (SQL), so they're easy to add.
+
+> .arpg test setup Arpgtest 85 elwynn-northshire
+? ok
+
+# Low-level mobs near an 85 must report scaled=85 (offset 0).
+> .arpg scale probe Arpgtest nearest
+? scaled=85\b
+
+# Scaling only goes up: Jade Forest mobs keep their own level for a level-80 character.
+> .arpg test setup Arpgtest 80 jadeforest-dawnsblossom
+> .arpg scale probe Arpgtest nearest
+? scaled=none
+
+# Kill switch turns scaling off.
+> .arpg config set Arpg.Scale.Enabled 0
+> .arpg test setup Arpgtest 85 elwynn-northshire
+> .arpg scale probe Arpgtest nearest
+? scaled=none
+> .arpg config set Arpg.Scale.Enabled 1

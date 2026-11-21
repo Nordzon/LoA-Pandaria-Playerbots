@@ -1,0 +1,8 @@
+# Smoke test: server is up, SOAP works, our module is loaded.
+> .server info
+? uptime
+? update time
+
+# Added in change m1-module-skeleton
+> .arpg version
+? mod_arpg
