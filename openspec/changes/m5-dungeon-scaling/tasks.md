@@ -16,8 +16,8 @@
 - [x] 3.5 `.arpg dungeon info|level <char>`; AutoBalance on in the confs (`write-confs.ps1`)
 
 ## 4. Tests
-- [ ] 4.1 Unit: table, interpolation, tiers, roles, gate
-- [ ] 4.2 `50-dungeons.gmtest`: solo in a 5-man -> 30%/40% (× role), 3 bots -> 80%/85%; level selector changes creature level;
+- [x] 4.1 Unit: table, interpolation, tiers, roles, gate
+- [x] 4.2 `50-dungeons.gmtest` (solo Deadmines, level selector, Molten Core raid, Ascended tiers; 3-bot party not covered headless): solo in a 5-man -> 30%/40% (× role), 3 bots -> 80%/85%; level selector changes creature level;
   a raid map -> raid table × tier
 - [ ] 4.3 Playtest: solo a 5-man as tank, DPS and healer (BALANCE §5 targets)
 

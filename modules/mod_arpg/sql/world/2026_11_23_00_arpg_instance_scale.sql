@@ -36,3 +36,7 @@ REPLACE INTO `arpg_raid_tier` VALUES
 -- Test spot inside the Deadmines (map 36, 5-player instance) for 50-dungeons.gmtest.
 REPLACE INTO `arpg_test_spot` (`name`, `map`, `x`, `y`, `z`, `o`, `comment`)
 SELECT 'deadmines-inside', map, position_x, position_y, position_z, orientation, 'game_tele Deadmines (instance map 36)' FROM game_tele WHERE name = 'Deadmines';
+
+-- Test spot inside Molten Core (map 409, raid tier 1) for 50-dungeons.gmtest.
+REPLACE INTO `arpg_test_spot` (`name`, `map`, `x`, `y`, `z`, `o`, `comment`)
+SELECT 'molten-core-inside', map, position_x, position_y, position_z, orientation, 'game_tele MC (raid map 409, tier 1)' FROM game_tele WHERE name = 'MC';

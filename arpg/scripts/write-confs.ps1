@@ -84,6 +84,7 @@ $overrides = @{
       'SkillChance.Yellow'     = '100'                # default 75
       'SkillChance.Green'      = '50'                 # default 25
       'AutoBalance.Enable.Global' = '1'             # m5: dungeon/raid scaling (mod_arpg replaces the player-count curve)
+      'Instance.IgnoreRaid'    = '1'                # m5: raids are soloable (SPEC 4.6) - no raid group needed to enter
     }
   }
   'playerbots.conf' = @{
