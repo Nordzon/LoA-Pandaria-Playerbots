@@ -1,0 +1,70 @@
+# Crafting wheel (SPEC 4.8, m1b tasks 2b.1/2b.2/2b.4). Needs Arpgtest online. Rules, not rates: the skill is overridden per
+# craft and the crafted-Unique pity is set so it must (or must not) fire.
+# Recipe: Copper Battle Axe (spell 3293, Blacksmithing 164, green two-hander, yellow at 75, green at 95, grey at 115).
+# Level 20 in Northshire = loot level 20 = T2 max; the only two-hand Unique is Keg-Breaker's Burden (1).
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg pity set Arpgtest craft 164 0
+? ok craft_misses skill_line=164 = 0
+
+# Orange recipe: +1 tier (T3 at most), may become a Unique.
+> .arpg test craft Arpgtest 3293 skill 60
+? ok Arpgtest spell=3293 item=3488 .*quality=2 affixes=[1-4] craft colour=orange skill=60 yellow=75 grey=115 max_skill=0 catalyst=0 tier_bonus=1 extra=0 cap=0 unique_eligible=1 skill_line=164
+> .arpg loot last Arpgtest
+! T[45]=
+
+# Green recipe: plain roll, never a Unique (even with a full pity counter).
+> .arpg pity set Arpgtest craft 164 200
+? ok craft_misses skill_line=164 = 200
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test craft Arpgtest 3293 skill 100
+? colour=green .* tier_bonus=0 extra=0 cap=0 unique_eligible=0
+> .arpg loot last Arpgtest
+! unique=
+> .arpg test events Arpgtest
+! craft unique
+
+# Grey recipe: T1 only, and no extra affix even at max skill.
+> .arpg test craft Arpgtest 3293 skill 600
+? colour=grey .* max_skill=1 catalyst=0 tier_bonus=0 extra=0 cap=1 unique_eligible=0
+> .arpg loot last Arpgtest
+? T1=
+! T[2-5]=
+
+# Catalyst: +1 tier on top of orange (T4 at most).
+> .arpg pity set Arpgtest craft 164 0
+? ok
+> .arpg test craft Arpgtest 3293 skill 60 catalyst
+? colour=orange .* catalyst=1 tier_bonus=2\b
+> .arpg loot last Arpgtest
+! T5=
+
+# Max skill (lowered for the test): one extra affix, never past the quality's max -> a green always rolls 2.
+> .arpg config set Arpg.Craft.MaxSkill 70
+? ok
+> .arpg test craft Arpgtest 3293 skill 70
+? affixes=2 craft colour=orange skill=70 .* max_skill=1 .* extra=1\b
+> .arpg config set Arpg.Craft.MaxSkill 600
+? ok
+
+# Crafted Unique: the pity counter is past 100% -> this orange craft becomes the Unique of its slot; the counter resets.
+> .arpg pity set Arpgtest craft 164 200
+? ok craft_misses skill_line=164 = 200
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test craft Arpgtest 3293 skill 60
+? affixes=[1-4]\b
+> .arpg loot last Arpgtest
+? unique=1 "Keg-Breaker's Burden" tier=II\b
+> .arpg test events Arpgtest
+? craft unique won skill_line=164 misses=0
+> .arpg pity set Arpgtest craft 164 0
+? ok
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

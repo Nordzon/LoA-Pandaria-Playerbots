@@ -6,3 +6,8 @@
 # Added in change m1-module-skeleton
 > .arpg version
 ? mod_arpg
+
+# No random Champions during the test run (fixed spawn probes must stay plain); 30-champions ends with .arpg reload,
+# which brings the conf value back for play.
+> .arpg config set Arpg.Champion.Chance 0
+? ok

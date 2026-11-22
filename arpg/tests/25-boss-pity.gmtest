@@ -1,0 +1,45 @@
+# Boss loot rules (m2-affix-loot task 4.4, BALANCE §13). Needs Arpgtest online.
+# Lady Anacondra (3671) is a Wailing Caverns boss (instance_encounters); the Blackrock Battle Worg (49871) is not.
+
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg loot isboss 3671
+? boss=yes
+> .arpg loot isboss 49871
+? boss=no
+
+# Every boss kill counts towards god-roll pity (every 3rd kill without a 5-affix item owes one).
+> .arpg pity set Arpgtest godroll 0
+? ok pity godroll_kills=0 every=3 pending=no
+> .arpg test pack Arpgtest 3671 1 kill
+? killed=1
+> .arpg pity info Arpgtest
+? godroll_kills=1 every=3 pending=no
+
+# A normal monster does not count.
+> .arpg test pack Arpgtest 49871 1 kill
+? killed=1
+> .arpg pity info Arpgtest
+? godroll_kills=1\b
+
+# The 3rd kill owes a god roll: the next epic from boss loot rolls 5 affixes, and the counter resets.
+> .arpg pity set Arpgtest godroll 2
+? ok
+> .arpg test pack Arpgtest 3671 1 kill
+? killed=1
+> .arpg pity info Arpgtest
+? godroll_kills=3 every=3 pending=yes
+> .arpg test give Arpgtest 82437 boss 3671
+? quality=4 affixes=5\b
+> .arpg pity info Arpgtest
+? godroll_kills=0 every=3 pending=no
+
+# Boss loot rolls at the highest tier the loot level allows: level 60 in Northshire = loot level 20 = T2 (unlock 15).
+> .arpg test give Arpgtest 2317 boss 3671
+? quality=2 affixes=[12]\b
+> .arpg loot last Arpgtest
+? T2=
+! T1=
+! T[3-5]=

@@ -1,0 +1,108 @@
+# Champions (m3 tasks 3.1/3.3, BALANCE §14). Needs Arpgtest online. Rules, not rates: the Champion is made by command (the
+# same code the 2% first-sight roll calls); the blue chance is forced to 100% so the loot floor is fully checked.
+# Level 20 in Northshire: band 15 (+1 level, 2.5x health, 1.3x damage, 1-2 affixes, 2-3 minions); zone cap 20 -> level 21.
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg config set Arpg.Champion.LootBlueChance 100
+? ok
+
+> .arpg champion make Arpgtest 49871
+# Tagged: its own creature type "Champion <name>" (Rare portrait in the client).
+? ok Arpgtest champion entry=49871 tag=Champion Blackrock Battle Worg level=21 band=15 hp=\d+ minions=[23] affixes=[12] \[
+# Only soft affixes or the Enchanted ones (unlocked at 15); Arcane Caster needs 25.
+! Arcane Caster
+
+# The scaling tick leaves a Champion alone (pinned).
+~ 2500
+> .arpg champion info Arpgtest
+? champion entry=49871 tag=Champion Blackrock Battle Worg level=21 .* alive=1 pinned=1
+
+# Kill: health orb (from 50% health), loot floor = a green + a blue added to its loot.
+> .arpg test events Arpgtest clear
+? ok
+> .arpg champion kill Arpgtest
+? ok Arpgtest killed champion entry=49871 health_pct=([6-9]\d|100) loot_items=([2-9]|\d\d)
+> .arpg test events Arpgtest
+? champion killed entry=49871 orb_health=[1-9]\d* orb_power=\d+ floor_green=[1-9]\d* floor_blue=[1-9]\d*
+# Rolled at the kill: each corpse item carries its final name (suffix id) before anyone loots it.
+? loot plan item=\d+ rp=-30\d\d\d n=[1-5] unique=0 champion
+
+# Items looted from the Champion roll with +1 tier (event marked "champion").
+> .arpg champion loot Arpgtest
+? ok Arpgtest looted=([2-9]|\d\d)
+> .arpg test events Arpgtest
+? affix item=\d+ guid=\d+ q=2 n=\d+ champion
+? affix item=\d+ guid=\d+ q=3 n=\d+ champion
+
+# --- Monster affixes (m3 task 3.2). Forced ids: 4 Fire, 5 Cold, 6 Lightning Enchanted, 7 Arcane Caster. Damage is a % of
+# max health (band 15: 15%), never a kill. Forced procs make Lightning spark on every hit.
+> .arpg config set Arpg.Test.ForceProcs 1
+? ok
+> .arpg champion make Arpgtest 49871 affix 5,6
+? affixes=2 \[Cold Enchanted,Lightning Enchanted\]
+> .arpg test events Arpgtest clear
+? ok
+> .arpg champion strike Arpgtest 6
+? ok struck by champion
+> .arpg test events Arpgtest
+? champion chill spell=6136
+? champion sparks dmg=[1-9]
+> .arpg champion kill Arpgtest
+? ok .* killed champion
+
+# Fire Enchanted: the blast goes off 1.5 s after the kill at the corpse (the character stands 4 yards away: hit).
+> .arpg champion make Arpgtest 49871 affix 4
+? affixes=1 \[Fire Enchanted\]
+> .arpg test events Arpgtest clear
+? ok
+> .arpg champion kill Arpgtest
+? ok .* killed champion
+> .arpg test events Arpgtest
+? champion explosion pending dmg=[1-9]
+! champion explosion dmg=
+~ 2500
+> .arpg test events Arpgtest
+? champion explosion dmg=[1-9]
+
+# Arcane Caster: starts an interruptible cast at its target; the hit is a % of max health.
+> .arpg champion make Arpgtest 49871 affix 7
+? \[Arcane Caster\]
+> .arpg test events Arpgtest clear
+? ok
+> .arpg champion strike Arpgtest 1
+? in_combat=1
+~ 5000
+> .arpg test events Arpgtest
+? champion nuke cast entry=49871 casting=1
+? champion nuke dmg=[1-9]
+> .arpg champion kill Arpgtest
+? ok .* killed champion
+> .arpg config set Arpg.Test.ForceProcs 0
+? ok
+
+# --- Other bands (BALANCE §14): a fresh character gets an easy one; at 90 the full numbers.
+> .arpg test setup Arpgtest 5 elwynn-northshire
+? ok .*\(online\)
+> .arpg champion make Arpgtest 49871
+? champion entry=49871 tag=Champion Blackrock Battle Worg level=5 band=1 hp=\d+ minions=1 affixes=1 \[(Extra Strong|Extra Fast|Stoneskin)\]
+> .arpg champion kill Arpgtest
+? ok .* killed champion
+> .arpg test setup Arpgtest 90 jadeforest-dawnsblossom
+? ok .*\(online\)
+~ 6000
+> .arpg champion make Arpgtest 49871
+? champion entry=49871 tag=Champion Blackrock Battle Worg level=90 band=60 hp=\d+ minions=[2-4] affixes=2 \[
+> .arpg champion kill Arpgtest
+? ok .* killed champion
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 6000
+
+# Back to the conf values (Champion chance was set to 0 by 00-smoke for the test run).
+> .arpg reload
+? ok .*monster bands

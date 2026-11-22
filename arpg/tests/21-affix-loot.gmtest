@@ -1,0 +1,48 @@
+# Affixes roll when a real player gets an item (m2-affix-loot task 4.1c). Rules, not rates (docs/TESTING.md §3c).
+# Needs Arpgtest online (held by the headless client). Items: 2317 green leather chest, 1489 blue chest, 82437 epic robe,
+# 6266 green chest WITH Blizzard random stats (must be left alone).
+
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+# Empty bags first: every run gives items.
+> .arpg test clearbags Arpgtest
+? ok Arpgtest destroyed=\d+
+
+# Green: 1-2 affixes, saved to the database (loot last reads them back from item_instance_arpg_affix).
+> .arpg test give Arpgtest 2317
+? quality=2 affixes=[12]\b
+> .arpg loot last Arpgtest
+? affixes=[12] item guid=\d+ .*\| .+ T[1-4]=\d+
+# Vendor value (task 4.5): template 689 copper + affixes x level 15 x 200 -> 3689 (1 affix) or 6689 (2). Same for buyback.
+? affixes=1 .*sell=3689\b|affixes=2 .*sell=6689\b
+
+# Blue: 2-3. Epic: 3-5. Level 60 -> tiers up to T4 only.
+> .arpg test give Arpgtest 1489
+? quality=3 affixes=[23]\b
+> .arpg test give Arpgtest 82437
+? quality=4 affixes=[345]\b
+> .arpg loot last Arpgtest
+? affixes=[345]
+! T5=
+# 5 lines + D2-style name (task 4.10): the item carries a random-suffix id named after its highest-tier affix.
+? name="of 
+
+# Items with Blizzard random stats keep them: no affixes.
+> .arpg test give Arpgtest 6266
+? affixes=0 \(has Blizzard random stats\)
+
+# Kill switch.
+> .arpg config set Arpg.Loot.Enabled 0
+? ok
+> .arpg test give Arpgtest 2317
+? affixes=0 \(loot disabled\)
+> .arpg config set Arpg.Loot.Enabled 1
+? ok
+
+# Unknown item is refused.
+> .arpg test give Arpgtest 999999999
+? error: unknown item
+
+# Client-patch probe item (m2 4.6): created without affixes, probe enchant in slot 0 (unknown to the server on purpose).
+> .arpg test probeitem Arpgtest 2317
+? ok Arpgtest item=2317 guid=\d+ enchant=60000 \(server knows it: no\)

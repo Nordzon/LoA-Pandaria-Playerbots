@@ -1,22 +1,93 @@
-# World scaling (change m1-world-scaling). Uses a fixed test character "Arpgtest" that
-# `.arpg test setup` creates if needed, sets to a level and parks at a named test spot.
-# Test spots live in arpg_test_spot (SQL), so they're easy to add.
+# World scaling (change m1-world-scaling). Uses the test character "Arpgtest", which must be online:
+# the overnight pipeline creates it and holds it in the world with the headless client
+# (contrib\headless-client\headless.py --cmd play --char <guid> --hold 420) while the tests run.
+# Test spots live in arpg_test_spot (SQL). Probes use fixed spawns: Blackrock Spy 178359 (Northshire, level 1-2) and
+# Defias Pillager 308244 (Westfall, 13-14) - "nearest" can be a wandering critter.
 
-> .arpg test setup Arpgtest 85 elwynn-northshire
+> .arpg version
+? mod_arpg
+
+# The sections below test the scaling rules without the zone cap (task 4.9), which is tested at the end.
+> .arpg config set Arpg.Scale.ZoneCapAbove 100
 ? ok
 
-# Low-level mobs near an 85 must report scaled=85 (offset 0).
-> .arpg scale probe Arpgtest nearest
+# --- Level choices: low zone rises to the player's level ---------------------------------
+> .arpg test setup Arpgtest 85 elwynn-northshire
+? ok .*\(online\)
+# teleport + grid load + one scaling tick (Arpg.Scale.TickMs)
+~ 6000
+> .arpg scale probe Arpgtest 178359
 ? scaled=85\b
 
-# Scaling only goes up: Jade Forest mobs keep their own level for a level-80 character.
-> .arpg test setup Arpgtest 80 jadeforest-dawnsblossom
-> .arpg scale probe Arpgtest nearest
+> .arpg test setup Arpgtest 30 elwynn-northshire
+? ok .*\(online\)
+~ 4000
+> .arpg scale probe Arpgtest 178359
+? scaled=30\b
+
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+~ 4000
+> .arpg scale probe Arpgtest 178359
+? scaled=60\b
+
+# --- Level offset (Arpg.Scale.LevelOffset) ----------------------------------------------
+> .arpg config set Arpg.Scale.LevelOffset 2
+? ok
+~ 4000
+> .arpg scale probe Arpgtest 178359
+? scaled=62\b
+> .arpg config set Arpg.Scale.LevelOffset -2
+? ok
+~ 4000
+> .arpg scale probe Arpgtest 178359
+? scaled=58\b
+
+# Level cap: 90 + offset 5 is clamped to the server cap (90).
+> .arpg config set Arpg.Scale.LevelOffset 5
+? ok
+> .arpg test setup Arpgtest 90 elwynn-northshire
+? ok .*\(online\)
+~ 4000
+> .arpg scale probe Arpgtest 178359
+? scaled=90\b
+> .arpg config set Arpg.Scale.LevelOffset 0
+? ok
+
+# --- Upward only: Westfall mobs (10-18) keep their own level for a level-5 character ------
+# (same continent on purpose: the far teleport to Pandaria sometimes leaves the headless client mid-transfer)
+> .arpg test setup Arpgtest 5 westfall-sentinelhill
+? ok .*\(online\)
+~ 8000
+> .arpg scale probe Arpgtest 308244
 ? scaled=none
 
-# Kill switch turns scaling off.
+# --- Kill switch turns scaling off (and reverts what was scaled) -------------------------
 > .arpg config set Arpg.Scale.Enabled 0
+? ok
 > .arpg test setup Arpgtest 85 elwynn-northshire
-> .arpg scale probe Arpgtest nearest
+? ok .*\(online\)
+~ 15000
+> .arpg scale probe Arpgtest 178359
 ? scaled=none
 > .arpg config set Arpg.Scale.Enabled 1
+? ok
+
+# --- Zone cap (task 4.9, owner 2026-11-22): monsters scale to at most zone max + 15 -------------
+# Northshire's normal range is 1-5 (area 9 in arpg_zone_level), so a level-60 character meets level-20 monsters there.
+> .arpg config set Arpg.Scale.ZoneCapAbove 15
+? ok
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+~ 10000
+> .arpg scale probe Arpgtest 178359
+? scaled=20\b
+
+# Zones in Arpg.Scale.UncappedZones scale to any level (the Vale of Eternal Blossoms in play; Northshire here as a stand-in).
+> .arpg config set Arpg.Scale.UncappedZones 5840,6170,9
+? ok
+~ 3000
+> .arpg scale probe Arpgtest 178359
+? scaled=60\b
+> .arpg config set Arpg.Scale.UncappedZones 5840
+? ok

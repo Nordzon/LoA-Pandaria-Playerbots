@@ -1,0 +1,23 @@
+# B = epic stat budget for an item's slot at a player level (m2-affix-loot task 4.2). No character needed.
+# 82437 Spelltwister's Grand Robe (chest, robe), 1714 Necklace of Calisea (neck).
+
+# Level 90 -> epic item level 463 (Arpg.Loot.EpicIlvlCurve); a chest has a real budget.
+> .arpg loot budget 90 82437
+? ilvl=463 slot=0 B=[1-9]\d{2,}
+
+# Level 20 -> ilvl 25; still a budget, much smaller.
+> .arpg loot budget 20 82437
+? ilvl=25 slot=0 B=[1-9]\d?\b
+
+# A necklace uses another budget column (smaller slot).
+> .arpg loot budget 90 1714
+? ilvl=463 slot=[1-4] B=[1-9]
+
+# Bad input is refused.
+> .arpg loot budget 90 999999999
+? error: unknown item
+
+# Native display index (m2 4.1b): fixed-amount "+N stat" enchantments exist for the main stats.
+> .arpg loot enchants
+? agi n=[1-9]
+? sta n=[1-9]

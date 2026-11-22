@@ -1,0 +1,44 @@
+# Affix stats count on the character (m2-affix-loot task 4.1d). Needs Arpgtest online (held by the headless client).
+# ".arpg test equip/unequip" measure the character's real stat change (flat main stats, rating fields) and compare it
+# with the expected change (item template stats + its affix lines). match=yes = exact.
+# Items: 82437 epic robe (req 90, chest slot 4), 1489 blue chest (req 16).
+
+> .arpg test setup Arpgtest 90 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+# Start with an empty chest slot (a previous run may have left a robe on).
+> .arpg test unequip Arpgtest 4
+? ok unequipped|slot empty
+> .arpg test clearbags Arpgtest
+? ok
+
+# Level 90: values are far above any native enchant, so mod_arpg applies them.
+> .arpg test equip Arpgtest 82437
+? ok equipped item=82437 .*affixes=[345]\b.* match=yes
+> .arpg loot applied Arpgtest
+? applied items=[01]\b
+
+# Swap for another rolled robe: the old robe's affixes come off, the new ones go on.
+> .arpg test equip Arpgtest 82437
+? match=yes
+> .arpg loot applied Arpgtest
+? applied items=[01]\b
+
+# Unequip: everything comes off.
+> .arpg test unequip Arpgtest 4
+? ok unequipped .* match=yes
+> .arpg loot applied Arpgtest
+? applied items=0
+
+# Low level: small values are mostly shown by native enchant slots (core applies those); still exact.
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg test equip Arpgtest 1489
+? ok equipped item=1489 .* match=yes
+> .arpg test unequip Arpgtest 4
+? match=yes
+> .arpg test clearbags Arpgtest
+? ok

@@ -28,7 +28,10 @@ foreach ($file in Get-ChildItem $Dir -Filter '*.gmtest' | Where-Object { $_.Name
     if ($t -eq '' -or $t.StartsWith('#')) { continue }
     $op = $t.Substring(0, 1); $arg = $t.Substring(1).Trim()
     switch ($op) {
-      '>' { $last = (& $gm $arg 2>&1 | Out-String) }
+      '>' {
+        # A command that throws (bad reply, SOAP down) is a failed check, not the end of the whole run.
+        try { $last = (& $gm $arg 2>&1 | Out-String) } catch { $last = "EXCEPTION: $($_.Exception.Message)"; $fails += "line ${n}: $last" }
+      }
       '?' { if ($last -notmatch $arg) { $fails += "line ${n}: expected /$arg/ in: $($last.Trim())" } }
       '!' { if ($last -match $arg) { $fails += "line ${n}: did not expect /$arg/ in: $($last.Trim())" } }
       '~' { Start-Sleep -Milliseconds ([int]$arg) }

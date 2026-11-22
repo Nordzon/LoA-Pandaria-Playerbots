@@ -1,0 +1,44 @@
+# ARPG potions (change m3b-potions). Needs Arpgtest online. Potions heal a % of max health (healing 10-20% by tier), mana
+# potions restore resource (mana %, energy/focus half, rage/runic power %), any level, stack 999, 10 s shared cooldown.
+# "test potion" drinks from half health/power through the real cast path and reports expected vs measured.
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+
+# Superior Healing Potion (tier 5, 18%) at level 20 - it needed level 35 before.
+> .arpg test potion Arpgtest 3928
+? drink item=3928 ok=1 heal=[1-9]\d* expect=[1-9]\d* match=yes .* cooldown_ms=(9\d\d\d|10000) left=0 stack=999
+
+# The cooldown is shared: another potion right away is refused; after 10 s it works.
+> .arpg test potion Arpgtest 118
+? drink item=118 refused \(cooldown
+~ 10500
+> .arpg test potion Arpgtest 118
+? drink item=118 ok=1 .* match=yes
+
+# Mana potion: no heal, the character's resource goes up (whatever its class uses).
+~ 10500
+> .arpg test potion Arpgtest 6149
+? drink item=6149 ok=1 heal=0 expect=0 match=yes .* power=[1-9]
+> .arpg test events Arpgtest
+? potion drink item=6149 pct=16 heal=0 power=\d+ amount=[1-9]
+
+# Drops: a Champion (tier 3; its 50% forced to 100) drops a tier-3 potion of some kind.
+> .arpg config set Arpg.Potion.DropMult 100
+? ok
+> .arpg champion make Arpgtest 49871
+? ok
+> .arpg test events Arpgtest clear
+? ok
+> .arpg champion kill Arpgtest
+? ok .* killed champion
+> .arpg test events Arpgtest
+? potion drop item=(929|3827|2456) source=2 tier=3
+> .arpg config set Arpg.Potion.DropMult 1
+? ok
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

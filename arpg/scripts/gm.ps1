@@ -55,7 +55,11 @@ try {
 }
 
 if ($Raw) { $text; return }
-$xml = [xml]$text
+# Failed commands may come back as a SOAP fault that is not well-formed XML: fall back to the plain text.
+try { $xml = [xml]$text } catch {
+  $plain = (($text -replace '<[^>]+>', ' ') -replace '&#xD;', '' -replace '\s+', ' ').Trim()
+  Write-Output "FAULT: $plain"; exit 1
+}
 $result = $xml.SelectSingleNode("//*[local-name()='result']")
 $fault = $xml.SelectSingleNode("//*[local-name()='faultstring']")
 if ($result) { $result.InnerText.TrimEnd() }

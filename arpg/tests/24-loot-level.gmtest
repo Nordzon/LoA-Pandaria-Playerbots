@@ -1,0 +1,39 @@
+# Level-appropriate loot with a zone ceiling (m2-affix-loot task 4.8, owner 2026-11-22). Needs Arpgtest online.
+# Northshire (zone 6170; its quests - the range source - are filed under area 9 "Northshire Valley", range 1-5) and
+# Arpg.Loot.ZoneCeilingMargin 15: loot level there = min(level, 20).
+# Item 2317 = Dark Leather Tunic (green leather chest, requires 15).
+
+# Level 20 in Northshire: loot level 20; the tunic (15) is within the 5-level gap -> kept.
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 4000
+> .arpg loot substitute Arpgtest 2317
+? kept item=2317 req=15 zone=\d+ area=\d+ \(close enough to loot level 20\)
+
+# Level 60 in Northshire: still loot level 20 (zone ceiling) -> the tunic is kept: farming here stops paying.
+# Level 60 one zone over (Westfall, range 10-18 -> ceiling 33): swapped for a green leather chest of level 28-33, never higher.
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+~ 4000
+> .arpg loot substitute Arpgtest 2317
+? kept item=2317 req=15 .*\(close enough to loot level 20\)
+> .arpg test setup Arpgtest 60 westfall-sentinelhill
+? ok .*\(online\)
+~ 6000
+> .arpg loot substitute Arpgtest 2317
+? substitute item=2317 req=15 -> item=\d+ req=(2[89]|3[0-3]) quality=2 .*\(loot level 33\)
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+~ 6000
+
+# Affix values follow the same loot level: a level-60 character's epic in Northshire rolls level-20 tiers (T2 max).
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg test give Arpgtest 82437
+? quality=4
+> .arpg loot last Arpgtest
+! T[3-5]=
+
+# Not equipment / not a drop candidate: kept.
+> .arpg loot substitute Arpgtest 6948
+? kept item=6948

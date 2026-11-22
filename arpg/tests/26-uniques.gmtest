@@ -1,0 +1,57 @@
+# Uniques (m3 tasks 2.3/3.6, BALANCE §8b): a named power with a tier and two rolled numbers + up to 4 random affixes on a
+# droppable base of the Unique's slot. Needs Arpgtest online. Rules, not rates: tier ranges from arpg_unique_power_tier.
+
+> .arpg test setup Arpgtest 90 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+
+# Stormcaller's Band (ring, power 5 "Static Field") at tier V: chance 25-30%, 145-180% of Power in 5% steps, max 4 affixes.
+> .arpg test unique Arpgtest 5 5
+? ok Arpgtest base=\d+ guid=\d+ affixes=[0-4] unique=5 "Stormcaller's Band" tier=V trigger=(2[5-9]|30) magnitude=(14[5]|1[5-7][05]|180)\b
+> .arpg loot last Arpgtest
+? unique=5 "Stormcaller's Band" tier=V
+
+# Twin Fangs (one-hander, power 3 "Venom Burst", every Nth hit) at tier I: N = 7-8, 60-90% of Power.
+> .arpg test unique Arpgtest 3 1
+? unique=3 "Twin Fangs of Venomspite" tier=I trigger=[78] magnitude=([6-8][05]|90)\b
+
+# Tier VIII exists (Ascended); a tier past it and an unknown Unique are refused.
+> .arpg test unique Arpgtest 1 8
+? unique=1 "Keg-Breaker's Burden" tier=VIII trigger=(3[0-5]) magnitude=(3[4-9][05]|400)\b
+> .arpg test unique Arpgtest 1 9
+? error: power 1 has no tier 9
+> .arpg test unique Arpgtest 99 1
+? error: unknown unique 99
+
+# --- Powers fire in combat (m3 task 3.6 step 2). Forced procs; events show what fired.
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg config set Arpg.Test.ForceProcs 1
+? ok
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg test unique Arpgtest 5 3 equip
+? ok .* equipped unique=5
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test pack Arpgtest 49871 3
+? spawned=3
+> .arpg test strike Arpgtest 6
+? ok strike
+> .arpg test events Arpgtest
+? fx unique Static Field dmg=\d+ targets=[1-3]
+
+# Boots of the Long Road: +10% movement speed (passive, above the affix cap) as soon as they are worn.
+> .arpg test unique Arpgtest 6 1 equip
+? ok .* equipped unique=6
+~ 3000
+> .arpg loot effects Arpgtest
+# (the boots may also roll the "of Speed" affix: then the aura is 10% + that)
+? aura_move_speed_pct=([1-3]\d|40)\b
+> .arpg config set Arpg.Test.ForceProcs 0
+? ok
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

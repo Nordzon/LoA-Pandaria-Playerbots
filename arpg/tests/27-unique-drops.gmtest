@@ -1,0 +1,36 @@
+# Unique drops (m2 task 4.4 Unique ladder + m3 Uniques, BALANCE §13). Needs Arpgtest online.
+# Lady Anacondra (3671) is a dungeon boss. Ladder: 20% + 20% per kill without the Unique -> 4 misses = guaranteed.
+# Ring of Precision (1491, blue, level 20) is a ring base: the only ring Unique is Stormcaller's Band (5).
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+
+# 4 misses -> the next kill wins the ladder; the next ring from that boss becomes the Unique, the counter resets.
+> .arpg pity set Arpgtest unique 3671 4
+? ok unique_misses boss=3671 = 4
+> .arpg test pack Arpgtest 3671 1 kill
+? killed=1
+> .arpg pity info Arpgtest
+? unique_owed_by=3671
+> .arpg test give Arpgtest 1491 boss 3671
+? quality=3 affixes=[1-4]\b
+> .arpg loot last Arpgtest
+? unique=5 "Stormcaller's Band" tier=II\b
+> .arpg pity info Arpgtest
+? unique_owed_by=0
+> .arpg pity set Arpgtest unique 3671 0
+? ok unique_misses boss=3671 = 0
+
+# A miss counts up (first kill: 20%, so set the roll beyond doubt by checking the counter moves or the ladder wins).
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test pack Arpgtest 3671 1 kill
+? killed=1
+> .arpg test events Arpgtest
+? unique ladder (won misses=0|missed misses=1)
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

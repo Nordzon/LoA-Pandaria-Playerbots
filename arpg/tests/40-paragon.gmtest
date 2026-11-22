@@ -1,0 +1,24 @@
+# Paragon (m4 tasks 3.1/3.4, SPEC 4.5). Needs Arpgtest online. At the max level XP becomes Paragon XP; the curve is
+# XpBase 600000 x XpGrowth 1.04^level; one point per level in rotation Core -> Offense -> Defense -> Utility.
+
+> .arpg test setup Arpgtest 90 elwynn-northshire
+? ok .*\(online\)
+> .arpg paragon set Arpgtest 0 0
+? ok paragon level=0 xp=0/600000 points core=0 offense=0 defense=0 utility=0
+
+# 650000 XP at 90: level 1 (600000) + 50000 into level 1 (next needs 624000).
+> .arpg paragon xp Arpgtest 650000
+? ok paragon level=1 xp=50000/624000 points core=1 offense=0 defense=0 utility=0
+
+# 2000000 more carries over three levels: 624000 + 648960 + 674918 -> level 4 with 102122 left.
+> .arpg paragon xp Arpgtest 2000000
+? ok paragon level=4 xp=102122/701915 points core=1 offense=1 defense=1 utility=1
+
+# Below the max level XP stays normal XP (no Paragon).
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+> .arpg paragon xp Arpgtest 1000
+? ok paragon level=4 xp=102122/
+
+> .arpg paragon set Arpgtest 0 0
+? ok paragon level=0

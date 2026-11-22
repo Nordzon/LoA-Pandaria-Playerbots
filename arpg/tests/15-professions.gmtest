@@ -1,0 +1,5 @@
+# All professions on one character (change m1b-all-professions). Needs MaxPrimaryTradeSkill = 11 (write-confs.ps1)
+# and the test character Arpgtest online (the overnight pipeline holds it in the world with the headless client).
+
+> .arpg test learnall Arpgtest
+? professions=11 of 11

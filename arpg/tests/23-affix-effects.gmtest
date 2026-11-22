@@ -1,0 +1,113 @@
+# Effect affixes (m2-affix-loot task 4.3). Needs Arpgtest online (held by the headless client).
+# Rules, not rates: Arpg.Test.ForceProcs makes every chance-on-hit affix proc; ".arpg test effect" gives the character
+# effect totals without items (items feed the same totals - see 22-affix-stats for the equip path); the event recorder
+# shows what fired. Monsters: Blackrock Battle Worgs (Northshire) spawned next to the character.
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+# No worn gear from earlier tests (a Unique's passive speed would show in the totals).
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg config set Arpg.Test.ForceProcs 1
+? ok
+> .arpg test events Arpgtest clear
+? ok
+
+# --- Offense: lifesteal + every on-hit proc, from real melee swings.
+> .arpg test effect Arpgtest leech_pct 1000
+? ok effects .*leech_pct=1000
+> .arpg test effect Arpgtest proc_fire_nova 100
+? ok
+> .arpg test effect Arpgtest proc_chain_light 100
+? ok
+> .arpg test effect Arpgtest proc_frost_nova 100
+? ok
+> .arpg test effect Arpgtest proc_poison 100
+? ok
+> .arpg test effect Arpgtest proc_bleed 100
+? ok
+> .arpg test effect Arpgtest crushing_blow_pct 100
+? ok
+# "aggro": the pack fights the character. Blackrock Battle Worgs are neutral (faction 7); splash procs only hit hostile or
+# fighting monsters (owner 2026-11-22: no neutral bystanders), so idle ones would rightly be skipped.
+> .arpg test pack Arpgtest 49871 3 aggro
+? spawned=3
+> .arpg test strike Arpgtest 8
+? ok strike
+> .arpg test events Arpgtest
+? fx leech heal=\d+
+? fx proc fire_nova dmg=\d+ targets=[1-9]
+? fx proc chain_lightning dmg=\d+ targets=[1-9]
+? fx proc frost_nova dmg=\d+ targets=[1-9]
+? fx proc poison total=\d+
+? fx proc bleed total=\d+
+? fx proc crushing_blow dmg=\d+
+
+# --- Defense: thorns and "chance when struck" Chain Lightning.
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test effect Arpgtest thorns_pct 1000
+? ok
+> .arpg test effect Arpgtest proc_struck_chain 100
+? ok
+> .arpg test pack Arpgtest 49871 2
+? spawned=2
+> .arpg test struck Arpgtest 8
+? ok struck
+> .arpg test events Arpgtest
+? fx thorns dmg=\d+
+? fx proc struck_chain dmg=\d+
+
+# --- Auras: move speed is one aura with the capped total (30%).
+> .arpg test effect Arpgtest move_speed_pct 1500
+? ok
+> .arpg test effect Arpgtest move_speed_pct 2500
+? ok effects .*move_speed_pct=3000
+~ 3000
+> .arpg loot effects Arpgtest
+? aura_move_speed_pct=30\b
+
+# --- XP: +10% on XP the core gives (same hook as kills and quests).
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test effect Arpgtest xp_pct 1000
+? ok
+> .arpg test xp Arpgtest 100
+? ok xp given=100
+> .arpg test events Arpgtest
+? fx xp extra=10\b
+
+# --- Clean up: remove every test effect (totals back to none, aura gone).
+> .arpg test effect Arpgtest leech_pct -1000
+? ok
+> .arpg test effect Arpgtest proc_fire_nova -100
+? ok
+> .arpg test effect Arpgtest proc_chain_light -100
+? ok
+> .arpg test effect Arpgtest proc_frost_nova -100
+? ok
+> .arpg test effect Arpgtest proc_poison -100
+? ok
+> .arpg test effect Arpgtest proc_bleed -100
+? ok
+> .arpg test effect Arpgtest crushing_blow_pct -100
+? ok
+> .arpg test effect Arpgtest thorns_pct -1000
+? ok
+> .arpg test effect Arpgtest proc_struck_chain -100
+? ok
+> .arpg test effect Arpgtest move_speed_pct -1500
+? ok
+> .arpg test effect Arpgtest move_speed_pct -2500
+? ok
+> .arpg test effect Arpgtest xp_pct -1000
+? ok effects none
+~ 3000
+> .arpg loot effects Arpgtest
+! aura_move_speed_pct
+> .arpg config set Arpg.Test.ForceProcs 0
+? ok
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

@@ -1,0 +1,35 @@
+# Shared test tools (change m2-affix-loot tasks 1.1/1.2): event recorder + test pack.
+# Needs the test character Arpgtest online (held by the headless client).
+
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+# Start from another level (below the Northshire cap of 20): after a server restart the character may log in at 20 in Northshire, and the mobs are then
+# already scaled before the events are cleared.
+> .arpg test setup Arpgtest 15 elwynn-northshire
+? ok .*\(online\)
+~ 3000
+> .arpg test events Arpgtest clear
+? ok
+
+# The scaling code records what it does: a level-20 character in Northshire scales the mobs around it.
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 6000
+> .arpg test events Arpgtest
+? recording=on
+? scale entry=\d+ spawn=\d+ from=\d+ to=20
+
+# Test pack: 3 Blackrock Battle Worgs (Northshire, lootable) spawned next to the character and killed for it.
+> .arpg test pack Arpgtest 49871 3 kill
+? spawned=3 killed=3
+> .arpg test events Arpgtest
+? pack entry=49871 spawned=3 killed=3
+
+# Bad input is refused, not crashed on.
+> .arpg test pack Arpgtest 999999999 3
+? error: unknown creature entry
+> .arpg test pack Arpgtest 49871 0
+? error: n must be 1-40
+
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok
