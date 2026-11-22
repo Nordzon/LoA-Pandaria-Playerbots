@@ -245,6 +245,15 @@ public:
             { "xp",   &HandleParagonXp,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "spend",  &HandleParagonSpend,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "respec", &HandleParagonRespec, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "data",   &HandleParagonData,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+        };
+        // .paragon - the player's own Paragon (ArpgUI addon talks through these); every account has the help permission.
+        static std::vector<ChatCommand> playerParagonTable =
+        {
+            { "data",   &HandleMyParagonData,   rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "info",   &HandleMyParagonInfo,   rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "spend",  &HandleMyParagonSpend,  rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "respec", &HandleMyParagonRespec, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
         };
         static std::vector<ChatCommand> arpgTable =
         {
@@ -262,6 +271,7 @@ public:
         static std::vector<ChatCommand> commandTable =
         {
             { "arpg",    arpgTable,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "paragon", playerParagonTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
         };
         return commandTable;
     }
@@ -1178,6 +1188,59 @@ public:
         return true;
     }
 
+    static Player* Me(ChatHandler* handler)
+    {
+        WorldSession* s = handler->GetSession();
+        return s ? s->GetPlayer() : nullptr;
+    }
+
+    static bool HandleMyParagonData(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        handler->SendSysMessage(Arpg::Paragon::DataLine(p).c_str());
+        return true;
+    }
+
+    static bool HandleMyParagonInfo(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        handler->PSendSysMessage("%s", Arpg::Paragon::Describe(p).c_str());
+        handler->PSendSysMessage("%s", Arpg::Paragon::DescribeApplied(p).c_str());
+        return true;
+    }
+
+    // .paragon spend <core|offense|defense|utility> <stat> [n]
+    static bool HandleMyParagonSpend(ChatHandler* handler, char const* args)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        std::vector<std::string> t = Tokens(args);
+        int tab = 0, stat = 0;
+        if (t.size() < 2 || !Arpg::Paragon::ParseTabStat(t[0], t[1], tab, stat))
+            return Fail(handler, "usage: .paragon spend <core|offense|defense|utility> <stat> [n]");
+        std::string out;
+        if (!Arpg::Paragon::Spend(p, tab, stat, t.size() > 2 ? std::max(1, atoi(t[2].c_str())) : 1, out))
+            handler->PSendSysMessage("%s", out.c_str());
+        Arpg::Paragon::SendData(p);
+        return true;
+    }
+
+    static bool HandleMyParagonRespec(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        Arpg::Paragon::Respec(p);
+        handler->SendSysMessage("Paragon points refunded.");
+        Arpg::Paragon::SendData(p);
+        return true;
+    }
+
     // .arpg paragon spend <char> <tab> <stat> [n]   tab: core|offense|defense|utility; stat: main|stamina, crit|haste|mastery,
     // armor|dodge|parry, speed|magicfind|goldfind (Diablo 3 rotation: only points the tab has earned)
     static bool HandleParagonSpend(ChatHandler* handler, char const* args)
@@ -1196,6 +1259,17 @@ public:
         if (!Arpg::Paragon::Spend(p, tab, stat, t.size() == 4 ? atoi(t[3].c_str()) : 1, out))
             return Fail(handler, out);
         handler->PSendSysMessage("ok %s | %s", out.c_str(), Arpg::Paragon::DescribeApplied(p).c_str());
+        return true;
+    }
+
+    // .arpg paragon data <char>   the addon's data line (tests)
+    static bool HandleParagonData(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg paragon data <char>");
+        if (!p)
+            return false;
+        handler->PSendSysMessage("%s", Arpg::Paragon::DataLine(p).c_str());
         return true;
     }
 

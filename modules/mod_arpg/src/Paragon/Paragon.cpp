@@ -218,7 +218,10 @@ namespace
         {
             Load(player->GetGUID().GetCounter());
             if (sArpgConfig.Get().paragonEnabled)
+            {
                 Reapply(player);   // bonuses from spent points
+                Arpg::Paragon::SendData(player);
+            }
         }
 
         void OnLogout(Player* player) override
@@ -253,7 +256,10 @@ namespace Arpg::Paragon
         Arpg::TestEvents::Record(guid, "paragon xp=" + std::to_string(xp) + " (" + why + ") level=" + std::to_string(p.level) +
             (gained ? " up=" + std::to_string(gained) : ""));
         if (gained && player->GetSession())
+        {
             ChatHandler(player->GetSession()).PSendSysMessage("|cffffd100Paragon level %d!|r", p.level);
+            SendData(player);   // the addon window updates
+        }
         return gained;
     }
 
@@ -370,5 +376,35 @@ namespace Arpg::Paragon
         std::snprintf(buf, sizeof(buf), "applied main_pct=%.1f stamina_pct=%.1f crit=%d haste=%d mastery=%d armor_pct=%.1f dodge=%d parry=%d move=%d mf=%d gf=%d",
             a.mainPct, a.staPct, a.crit, a.haste, a.mastery, a.armorPct, a.dodge, a.parry, a.move, a.mf, a.gf);
         return buf;
+    }
+
+    std::string DataLine(Player* player)
+    {
+        uint32 guid = player->GetGUID().GetCounter();
+        Progress p = Load(guid);
+        auto pts = LoadPoints(guid);
+        auto at = [&](int tab, int stat) { auto it = pts.find({ tab, stat }); return it == pts.end() ? 0 : it->second; };
+        Arpg::Settings const& s = sArpgConfig.Get();
+        std::string out = "ARPGP|" + std::to_string(p.level) + "|" + std::to_string(p.xp) + "|" +
+            std::to_string(Core::ParagonXpToNext(Curve(), p.level)) + "|";
+        for (int t = 0; t < 4; ++t)
+            out += (t ? "," : "") + std::to_string(std::max(0, Core::PointsInTab(p.level, Core::ParagonTab(t)) - SpentInTab(pts, t)));
+        int const counts[4] = { 2, 3, 3, 3 };
+        for (int t = 0; t < 4; ++t)
+        {
+            out += "|";
+            for (int i = 0; i < counts[t]; ++i)
+                out += (i ? "," : "") + std::to_string(at(t, i));
+        }
+        char cfg[128];
+        std::snprintf(cfg, sizeof(cfg), "|%.2f,%d,%.2f,%d,%d,%d,%d", s.paragonStatPctPerPoint, s.paragonRatingPerPoint,
+            s.paragonArmorPctPerPoint, s.paragonMoveSpeedPerPoint, s.paragonMoveSpeedCap, s.paragonFindPerPoint, s.paragonMagicFindCap);
+        return out + cfg;
+    }
+
+    void SendData(Player* player)
+    {
+        if (player && player->GetSession())
+            ChatHandler(player->GetSession()).SendSysMessage(DataLine(player).c_str());
     }
 }

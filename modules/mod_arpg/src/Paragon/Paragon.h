@@ -31,6 +31,13 @@ namespace Arpg::Paragon
     void Respec(Player* player);
     // "applied main_stat_pct=… stamina_pct=… crit=… …"
     std::string DescribeApplied(Player* player);
+
+    // One machine line for the ArpgUI addon (it hides it from chat):
+    // "ARPGP|level|xp|next|free core,offense,defense,utility|core c0,c1|offense o0,o1,o2|defense d0,d1,d2|utility u0,u1,u2|
+    //  statPct,rating,armorPct,movePerPoint,moveCap,findPerPoint,mfCap"
+    std::string DataLine(Player* player);
+    // Sends the data line to the player's chat (login, level-up, after spend/respec).
+    void SendData(Player* player);
 }
 
 #endif
