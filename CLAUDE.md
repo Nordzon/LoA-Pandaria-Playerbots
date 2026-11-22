@@ -2,7 +2,7 @@
 
 Single-player MoP 5.4.8 server (LoA-Pandaria-Playerbots fork) with a Diablo-style layer:
 affix loot, upward-only creature scaling, Champions/Superuniques, Paragon, party-size dungeon scaling.
-Native Windows build (MSVC Build Tools 2022 + CMake + VS Code). Bots stay disabled until milestone m7.
+Native Windows build (MSVC Build Tools 2022 + CMake + VS Code). Bots: on for play (300, `start-stack.ps1`), off for ARPG feature tests (`write-confs.ps1 -Bots off`); bot rules + 1000 bots in m7.
 Spec: `docs/SPEC.md` (canonical). New here? Read `HANDOVER.md` once.
 
 ## Session protocol (so any session can pick up where the last one stopped)
@@ -20,6 +20,23 @@ Don't grep the whole core when CODEMAP answers it. If CODEMAP is wrong or missin
 **End (also before any long-running step or when the user stops):** update PROGRESS **Now** (where we stopped,
 exact next step, blockers) and add one Log line. A stale PROGRESS is the worst failure here — the next session starts from it.
 
+## Autonomous work and the scheduler (owner rule, 2026-11-22: applies to every session)
+The owner wants work to keep going without him. Every session SHALL:
+1. **Long-running steps go through a resumable script, never a foreground command:** builds, extraction, server
+   start/stop, test runs. Use `arpg\scripts\overnight.ps1` (stages with `.done` markers in `D:\WoWMoPProject\ServerData\pipeline\`,
+   `status.json`, `report.md`) or a script in the same style. Launch it detached (`Start-Process pwsh … -WindowStyle Minimized`)
+   so it survives the session and Claude running out of credits.
+2. **Schedule check-ins at the start of any autonomous stretch** with CronCreate (jobs are session-only: re-create them
+   every session; they die when Claude exits). Default: every 30 min at :13/:43 while work runs, plus one wrap-up before the
+   owner is back. A check-in reads status/logs, fixes a failed stage (delete its `.done`, relaunch) and logs one line in PROGRESS;
+   when the run is finished it updates PROGRESS + tasks and deletes its own job. Keep check-ins cheap.
+3. **Don't block on the owner.** Keep moving on work that doesn't need a running build (spec, SQL, `Core/` logic + unit tests),
+   and put open questions in PROGRESS "Blockers" instead of waiting.
+4. **Never run two builds in `build\` at once** (file locks). Wait for a running build; `--target arpg_unittests` is the one
+   exception (separate project, no shared outputs).
+5. The PC sleeps after 10 min idle: scripts that must run unattended call `SetThreadExecutionState` (see `overnight.ps1`).
+   No power-setting changes.
+
 ## Workflow (OpenSpec-style)
 - No feature code without a change folder: `openspec/changes/<id>/` with `proposal.md` (why, scope),
   `tasks.md` (checklist), optional `design.md`, and spec deltas in `specs/<capability>/spec.md`
@@ -28,6 +45,16 @@ exact next step, blockers) and add one Log line. A stale PROGRESS is the worst f
 - When a change is complete and tested: merge its deltas into `openspec/specs/<capability>/spec.md`,
   move the folder to `openspec/changes/archive/YYYY-MM-DD-<id>/`, update PROGRESS.
 - Every scenario gets a test (see `docs/TESTING.md`): unit test, `.gmtest`, or a written manual check.
+
+## Commits (owner 2026-11-22: "a nice commit every so often")
+- Work happens on branch **`arpg`** (never commit to `playerbot`; upstream merges follow "Staying in sync" below).
+- **Commit after every green full run** (`rebuild-and-test.ps1` ends `ALL OK`) that finished a task or a meaningful step, and at
+  the end of a session if the tree is green. Never commit a red tree; if a run fails, fix first.
+- One commit per finished step, message: `<change-id>: <what, in plain words>` + a short body (what/why, tests: "N GM files pass,
+  M unit tests"). Logical splits are welcome (hooks / module / tests / docs) when a step touched many areas.
+- Never commit secrets (`*.local.*`, passwords) or binaries (client patch MPQs, DLLs, DBCs); check `git status` first.
+- **Push after each commit** to the owner's fork: `git push origin arpg` (owner 2026-11-22: "I don't want to lose this").
+  Never push to `upstream` (1LineAtaTime) and never force-push.
 
 ## Code rules
 - Our code lives in `modules/mod_arpg/`. Touch upstream `src/` only to add a missing hook; keep it a tiny,

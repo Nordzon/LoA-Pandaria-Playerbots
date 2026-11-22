@@ -17,6 +17,14 @@
 - [ ] 3.3 Kill hook fills the queue; re-summon on login, zoning, teleport and death
 - [ ] 3.4 `.arpg lootpet on|off|info <char>`; setting persists per character
 
+## 3b. Companion roles
+- [ ] 3b.1 npcflag mask from `Arpg.Companion.*` (VENDOR, REPAIR, BANKER, MAILBOX, REFORGER, TRANSMOGRIFIER, VAULTKEEPER); re-applied on reload
+- [ ] 3b.2 Confirm each native window opens on the summoned pet (core `GetNPCIfCanInteractWith` accepts it); fix with a tiny `// ARPG:` patch only if one refuses
+- [ ] 3b.3 `arpg_companion_vendor` (reagents/consumables) and gossip "Change appearance" from `arpg_companion_model`; choice persists (`character_arpg_companion`)
+- [ ] 3b.4 Roles off in combat (`Arpg.Companion.InCombat` 0): flags cleared on combat start, restored on combat end
+- [ ] 3b.5 `.arpg companion info|model|roles <char> ...`
+- [ ] 3b.6 `arpg/tests/22-companion.gmtest`: flags match config; model change persists; vendor list present
+
 ## 4. Addon
 - [ ] 4.1 ArpgUI: pet toggle button
 - [ ] 4.2 ArpgUI: filter panel (list, add, reorder, delete rules) over addon messages
