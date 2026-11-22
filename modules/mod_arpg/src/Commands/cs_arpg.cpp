@@ -1241,7 +1241,7 @@ public:
         return true;
     }
 
-    // .arpg paragon spend <char> <tab> <stat> [n]   tab: core|offense|defense|utility; stat: main|stamina, crit|haste|mastery,
+    // .arpg paragon spend <char> <tab> <stat> [n]   tab: core|offense|defense|utility; stat: strength|agility|intellect|stamina, crit|haste|mastery,
     // armor|dodge|parry, speed|magicfind|goldfind (Diablo 3 rotation: only points the tab has earned)
     static bool HandleParagonSpend(ChatHandler* handler, char const* args)
     {

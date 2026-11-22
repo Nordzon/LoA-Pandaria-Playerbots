@@ -34,7 +34,7 @@
 > .arpg paragon spend Arpgtest core stamina 2
 ? ok spent tab=0 stat=1 points=2 before=\d+ after=\d+ diff=[12] .* stamina_pct=1\.0
 # The tab has no points left.
-> .arpg paragon spend Arpgtest core main 1
+> .arpg paragon spend Arpgtest core agility 1
 ? not enough points: tab has 0 unspent
 
 # Offense: 2 points in crit = +480 crit rating exactly.
@@ -43,7 +43,7 @@
 
 # The ArpgUI addon's data line: level|xp|next|unspent per tab|points per stat|rule numbers.
 > .arpg paragon data Arpgtest
-? ARPGP\|8\|0\|\d+\|0,0,2,2\|0,2\|2,0,0\|0,0,0\|0,0,0\|0\.50,240,0\.40,100,1000,500,10000
+? ARPGP\|8\|0\|\d+\|0,0,2,2\|0,2,0,0\|2,0,0\|0,0,0\|0,0,0\|0\.50,240,0\.40,100,1000,500,10000
 
 # Utility: 2 points in move speed = +2% above the affix cap.
 > .arpg paragon spend Arpgtest utility speed 2

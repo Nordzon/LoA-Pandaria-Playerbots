@@ -21,7 +21,8 @@ namespace Arpg::Paragon
     // "paragon level=… xp=…/… points core=… offense=… defense=… utility=…"
     std::string Describe(Player* player);
 
-    // Stats inside a tab (Diablo 3 style). Core: 0 main stat, 1 stamina. Offense: 0 crit, 1 haste, 2 mastery.
+    // Stats inside a tab (Diablo 3 style; owner: any stat, no main-stat guess). Core: 0 strength, 1 stamina, 2 agility,
+    // 3 intellect. Offense: 0 crit, 1 haste, 2 mastery.
     // Defense: 0 armour, 1 dodge, 2 parry. Utility: 0 move speed, 1 magic find, 2 gold find.
     bool ParseTabStat(std::string const& tab, std::string const& stat, int& tabOut, int& statOut);
     // Spends n points of the tab on the stat (if the rotation gave the tab that many unspent points) and re-applies the
@@ -33,7 +34,7 @@ namespace Arpg::Paragon
     std::string DescribeApplied(Player* player);
 
     // One machine line for the ArpgUI addon (it hides it from chat):
-    // "ARPGP|level|xp|next|free core,offense,defense,utility|core c0,c1|offense o0,o1,o2|defense d0,d1,d2|utility u0,u1,u2|
+    // "ARPGP|level|xp|next|free core,offense,defense,utility|core str,sta,agi,int|offense o0,o1,o2|defense d0,d1,d2|utility u0,u1,u2|
     //  statPct,rating,armorPct,movePerPoint,moveCap,findPerPoint,mfCap"
     std::string DataLine(Player* player);
     // Sends the data line to the player's chat (login, level-up, after spend/respec).

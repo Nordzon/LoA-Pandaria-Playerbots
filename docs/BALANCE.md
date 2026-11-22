@@ -139,7 +139,7 @@ Loot: raid items keep their base stats, but **affixes roll for your level** (B =
 good affixes is still endgame-useful. Higher tiers: +1 affix tier per 2 raid tiers (cap T5) and higher Unique chances (section 8).
 
 ### 6.1 Paragon power (m4)
-Per Paragon point (4 tabs, SPEC 4.5), proposed: Core +0.5% main stat / +0.5% stamina; Offense +0.4% crit/haste/mastery rating
+Per Paragon point (4 tabs, SPEC 4.5): Core +0.5% strength, agility, intellect or stamina (player's choice, owner 2026-11-22); Offense +0.4% crit/haste/mastery rating
 budget; Defense +0.4% armour/avoidance; Utility as in SPEC. At about 1 point/level, Paragon 60 is roughly +30% main stat in your
 chosen tab: enough to move a tier-5 raid from "wipe" to "farm" over a few weeks of play. **Target pace:** 5+ levels per 2-hour session
 early (SPEC), then slower; a new tier every few sessions.

@@ -6,10 +6,11 @@
 ArpgUIDB = ArpgUIDB or {}
 
 local TABS = {
-    { key = "core",    title = "Core",    stats = { { "main", "Main stat" }, { "stamina", "Stamina" } } },
-    { key = "offense", title = "Offense", stats = { { "crit", "Critical strike" }, { "haste", "Haste" }, { "mastery", "Mastery" } } },
-    { key = "defense", title = "Defense", stats = { { "armor", "Armor" }, { "dodge", "Dodge" }, { "parry", "Parry" } } },
-    { key = "utility", title = "Utility", stats = { { "speed", "Movement speed" }, { "magicfind", "Magic find" }, { "goldfind", "Gold find" } } },
+    -- { command name, label, position in the server's list for this tab }
+    { key = "core",    title = "Core",    n = 4, stats = { { "strength", "Strength", 1 }, { "agility", "Agility", 3 }, { "intellect", "Intellect", 4 }, { "stamina", "Stamina", 2 } } },
+    { key = "offense", title = "Offense", n = 3, stats = { { "crit", "Critical strike", 1 }, { "haste", "Haste", 2 }, { "mastery", "Mastery", 3 } } },
+    { key = "defense", title = "Defense", n = 3, stats = { { "armor", "Armor", 1 }, { "dodge", "Dodge", 2 }, { "parry", "Parry", 3 } } },
+    { key = "utility", title = "Utility", n = 3, stats = { { "speed", "Movement speed", 1 }, { "magicfind", "Magic find", 2 }, { "goldfind", "Gold find", 3 } } },
 }
 
 local data = nil   -- parsed server line
@@ -35,7 +36,7 @@ local function Parse(msg)
     for t = 1, 4 do
         d.pts[t] = {}
         local p = Split(f[5 + t], ",")
-        for i = 1, #TABS[t].stats do d.pts[t][i] = tonumber(p[i]) or 0 end
+        for i = 1, TABS[t].n do d.pts[t][i] = tonumber(p[i]) or 0 end
     end
     local c = Split(f[10], ",")
     d.statPct, d.rating, d.armorPct = tonumber(c[1]) or 0, tonumber(c[2]) or 0, tonumber(c[3]) or 0
@@ -58,7 +59,7 @@ end
 
 -- ---------------------------------------------------------------- window
 local frame = CreateFrame("Frame", "ArpgParagonFrame", UIParent)
-frame:SetSize(420, 470)
+frame:SetSize(420, 490)
 frame:SetPoint("CENTER")
 frame:SetFrameStrata("DIALOG")
 frame:SetBackdrop({
@@ -145,10 +146,11 @@ local function Refresh()
     for t, tab in ipairs(TABS) do
         local free = data.free[t] or 0
         tabHeaders[t]:SetText(tab.title .. (free > 0 and ("  |cff00ff00(" .. free .. " unspent)|r") or ""))
-        for i in ipairs(tab.stats) do
-            local n = data.pts[t][i] or 0
+        for i, stat in ipairs(tab.stats) do
+            local id = stat[3]
+            local n = data.pts[t][id] or 0
             local r = rows[t][i]
-            r.value:SetText(n > 0 and (n .. " pts  |cff00ff00" .. BonusText(t, i, n) .. "|r") or "|cff808080-|r")
+            r.value:SetText(n > 0 and (n .. " pts  |cff00ff00" .. BonusText(t, id, n) .. "|r") or "|cff808080-|r")
             if free > 0 then r.button:Enable() else r.button:Disable() end
         end
     end

@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "QuestDef.h"
 #include "ScriptMgr.h"
+#include "Timer.h"
 #include "World.h"
 #include "WorldSession.h"
 
@@ -28,8 +29,7 @@ namespace
     struct Applied
     {
         bool on = false;
-        UnitMods mainMod = UNIT_MOD_STAT_STRENGTH;
-        float mainPct = 0, staPct = 0, armorPct = 0;
+        float strPct = 0, agiPct = 0, intPct = 0, staPct = 0, armorPct = 0;
         int32 crit = 0, haste = 0, mastery = 0, dodge = 0, parry = 0;
         int32 move = 0, mf = 0, gf = 0;
     };
@@ -108,17 +108,6 @@ namespace
         return n;
     }
 
-    // The main stat: the highest of strength, agility and intellect right now (kept for the removal).
-    UnitMods MainStatMod(Player* p)
-    {
-        float str = p->GetStat(STAT_STRENGTH), agi = p->GetStat(STAT_AGILITY), intel = p->GetStat(STAT_INTELLECT);
-        if (agi >= str && agi >= intel)
-            return UNIT_MOD_STAT_AGILITY;
-        if (intel >= str)
-            return UNIT_MOD_STAT_INTELLECT;
-        return UNIT_MOD_STAT_STRENGTH;
-    }
-
     void Ratings(Player* p, CombatRating const* list, int n, int32 value, bool apply)
     {
         if (value)
@@ -130,8 +119,12 @@ namespace
     {
         if (!a.on)
             return;
-        if (a.mainPct)
-            p->HandleStatModifier(a.mainMod, TOTAL_PCT, a.mainPct, apply);
+        if (a.strPct)
+            p->HandleStatModifier(UNIT_MOD_STAT_STRENGTH, TOTAL_PCT, a.strPct, apply);
+        if (a.agiPct)
+            p->HandleStatModifier(UNIT_MOD_STAT_AGILITY, TOTAL_PCT, a.agiPct, apply);
+        if (a.intPct)
+            p->HandleStatModifier(UNIT_MOD_STAT_INTELLECT, TOTAL_PCT, a.intPct, apply);
         if (a.staPct)
             p->HandleStatModifier(UNIT_MOD_STAT_STAMINA, TOTAL_PCT, a.staPct, apply);
         if (a.armorPct)
@@ -171,9 +164,11 @@ namespace
         auto at = [&](int tab, int stat) { auto it = pts.find({ tab, stat }); return it == pts.end() ? 0 : it->second; };
         Applied a;
         a.on = true;
-        a.mainMod = MainStatMod(p);
-        a.mainPct = s.paragonStatPctPerPoint * at(0, 0);
+        // Core (owner 2026-11-22: any stat, no "main stat" guess): 0 strength, 1 stamina, 2 agility, 3 intellect.
+        a.strPct = s.paragonStatPctPerPoint * at(0, 0);
         a.staPct = s.paragonStatPctPerPoint * at(0, 1);
+        a.agiPct = s.paragonStatPctPerPoint * at(0, 2);
+        a.intPct = s.paragonStatPctPerPoint * at(0, 3);
         a.crit = s.paragonRatingPerPoint * at(1, 0);
         a.haste = s.paragonRatingPerPoint * at(1, 1);
         a.mastery = s.paragonRatingPerPoint * at(1, 2);
@@ -193,6 +188,7 @@ namespace
     {
     public:
         ArpgParagonPlayerScript() : PlayerScript("arpg_paragon") { }
+
 
         // Kill XP at the max level (the core would drop it): it becomes Paragon XP.
         void OnGiveXP(Player* player, uint32& amount, Unit* /*victim*/) override
@@ -287,11 +283,11 @@ namespace Arpg::Paragon
     bool ParseTabStat(std::string const& tab, std::string const& stat, int& tabOut, int& statOut)
     {
         static char const* const tabs[] = { "core", "offense", "defense", "utility" };
-        static char const* const stats[4][3] = { { "main", "stamina", nullptr }, { "crit", "haste", "mastery" },
-                                                 { "armor", "dodge", "parry" }, { "speed", "magicfind", "goldfind" } };
+        static char const* const stats[4][4] = { { "strength", "stamina", "agility", "intellect" }, { "crit", "haste", "mastery", nullptr },
+                                                 { "armor", "dodge", "parry", nullptr }, { "speed", "magicfind", "goldfind", nullptr } };
         for (int t = 0; t < 4; ++t)
             if (tab == tabs[t])
-                for (int i = 0; i < 3; ++i)
+                for (int i = 0; i < 4; ++i)
                     if (stats[t][i] && stat == stats[t][i])
                     {
                         tabOut = t;
@@ -315,16 +311,18 @@ namespace Arpg::Paragon
         // Measure the stat the points go to (before / after).
         auto measure = [&]() -> int64
         {
-            switch (tab * 3 + stat)
+            switch (tab * 10 + stat)
             {
-                case 0: return int64(player->GetStat(Stats(MainStatMod(player) - UNIT_MOD_STAT_START)));
+                case 0: return int64(player->GetStat(STAT_STRENGTH));
                 case 1: return int64(player->GetStat(STAT_STAMINA));
-                case 3: return int64(player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATINGS + CR_CRIT_MELEE));
-                case 4: return int64(player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATINGS + CR_HASTE_MELEE));
-                case 5: return int64(player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATINGS + CR_MASTERY));
-                case 6: return int64(player->GetArmor());
-                case 7: return int64(player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATINGS + CR_DODGE));
-                case 8: return int64(player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATINGS + CR_PARRY));
+                case 2: return int64(player->GetStat(STAT_AGILITY));
+                case 3: return int64(player->GetStat(STAT_INTELLECT));
+                case 10: return int64(player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATINGS + CR_CRIT_MELEE));
+                case 11: return int64(player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATINGS + CR_HASTE_MELEE));
+                case 12: return int64(player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATINGS + CR_MASTERY));
+                case 20: return int64(player->GetArmor());
+                case 21: return int64(player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATINGS + CR_DODGE));
+                case 22: return int64(player->GetUInt32Value(PLAYER_FIELD_COMBAT_RATINGS + CR_PARRY));
                 default: return Arpg::Loot::EffectTotal(player, stat == 1 ? Core::Effect::MagicFindPct : Core::Effect::GoldFindPct);
             }
         };
@@ -373,8 +371,8 @@ namespace Arpg::Paragon
             a = g_applied[player->GetGUID().GetCounter()];
         }
         char buf[256];
-        std::snprintf(buf, sizeof(buf), "applied main_pct=%.1f stamina_pct=%.1f crit=%d haste=%d mastery=%d armor_pct=%.1f dodge=%d parry=%d move=%d mf=%d gf=%d",
-            a.mainPct, a.staPct, a.crit, a.haste, a.mastery, a.armorPct, a.dodge, a.parry, a.move, a.mf, a.gf);
+        std::snprintf(buf, sizeof(buf), "applied str_pct=%.1f agi_pct=%.1f int_pct=%.1f stamina_pct=%.1f crit=%d haste=%d mastery=%d armor_pct=%.1f dodge=%d parry=%d move=%d mf=%d gf=%d",
+            a.strPct, a.agiPct, a.intPct, a.staPct, a.crit, a.haste, a.mastery, a.armorPct, a.dodge, a.parry, a.move, a.mf, a.gf);
         return buf;
     }
 
@@ -389,7 +387,7 @@ namespace Arpg::Paragon
             std::to_string(Core::ParagonXpToNext(Curve(), p.level)) + "|";
         for (int t = 0; t < 4; ++t)
             out += (t ? "," : "") + std::to_string(std::max(0, Core::PointsInTab(p.level, Core::ParagonTab(t)) - SpentInTab(pts, t)));
-        int const counts[4] = { 2, 3, 3, 3 };
+        int const counts[4] = { 4, 3, 3, 3 };   // core: strength, stamina, agility, intellect
         for (int t = 0; t < 4; ++t)
         {
             out += "|";

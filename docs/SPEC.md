@@ -201,7 +201,7 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
 ### 4.5 Paragon (m4)
 - From 90, XP goes to `character_paragon`. XP for next level = `Base × Growth^level` (config).
   **Target: ≥ 5 levels per 2-hour session at the start**, low Growth so it slows gradually.
-- 1 point/level in 4 tabs: Core (main stat, stamina), Offense (crit, haste, mastery), Defense (armour, dodge/parry, avoidance),
+- 1 point/level in 4 tabs: Core (strength, agility, intellect or stamina - **any of them, no main-stat guess**, owner 2026-11-22), Offense (crit, haste, mastery), Defense (armour, dodge/parry, avoidance),
   Utility (move speed cap +10%, magic find cap +100%, gold find). Applied via stat modifiers on login/spend. Free respec at NPC (optional gold cost).
 - ArpgUI draws the Paragon bar + panel (client has no XP bar at 90); `.paragon` commands as fallback.
 - **Decided (owner 2026-11-22):** Diablo 3 rotation (each level's point goes to the next tab, Core -> Offense -> Defense ->
