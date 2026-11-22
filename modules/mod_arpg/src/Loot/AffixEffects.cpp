@@ -55,6 +55,7 @@ namespace
         std::vector<Arpg::Loot::ActivePower> powers;   // equipped Uniques' powers (m3)
         std::map<uint32, uint32> powerReadyAt;          // item guid -> getMSTime() when the power may fire again
         std::map<uint32, int> powerHits;                 // item guid -> hits counted (every Nth hit)
+        int32 paragonMove = 0;                           // Paragon Utility: move speed above the cap (hundredths of %)
     };
 
     std::mutex g_lock;
@@ -577,6 +578,7 @@ namespace
                 for (ActivePower const& a : fx.powers)   // "Long Road": flat move speed ABOVE the affix cap
                     if (a.trigger == PowerTrigger::Passive && a.kind == PowerKind::Flat)
                         move += a.magnitude * 100;
+                move += fx.paragonMove;                  // Paragon Utility, also above the cap
                 cast = fx.totals.Get(Effect::CastSpeedPct);
                 absorb = fx.totals.Get(Effect::CombatAbsorbPct);
                 regenPct = fx.totals.Get(Effect::RegenPct);
@@ -714,6 +716,14 @@ namespace Arpg::Loot
                     if (AuraEffect* eff = a->GetEffect(0))
                         out += std::string(" aura_") + Core::EffectName(e) + "=" + std::to_string(eff->GetAmount());
         return out == "effects" ? out + " none" : out;
+    }
+
+    void SetParagonMoveSpeed(Player* player, int32 hundredths)
+    {
+        std::lock_guard<std::mutex> l(g_lock);
+        PlayerFx& fx = g_fx[player->GetGUID().GetCounter()];
+        fx.paragonMove = std::max(0, hundredths);
+        fx.aurasDirty = true;
     }
 
     bool AddTestEffect(Player* player, std::string const& name, int32 value, std::string& message)

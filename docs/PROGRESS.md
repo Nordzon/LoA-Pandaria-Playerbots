@@ -15,9 +15,9 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
   for every class, drops by monster kind, 999 stacks, level 1, 10 s shared cooldown via item script + Item-sparse hotfixes.
 - **Next step:** owner checks in game (headless can't): Champion/Unique names + silver / winged-silver portraits, loot-window
   names before pickup, potions (999 stack shown, 10 s sweep on all potion buttons, mana potion on a rage class), Superunique
-  casts at a bot tank. m3 left: glow aura + 4.3 playtest (owner). NOW: m4 Paragon (change `m4-paragon`): Core, tables, XP at 90 -> Paragon, `.arpg paragon info|set|xp`, test 40 done; next: point spending + stat bonuses (after owner's rotation answer), world tier in the Vale, `.paragon` player commands. Idea to raise with owner: custom items via Item-sparse
+  casts at a bot tank. m3 left: glow aura + 4.3 playtest (owner). NOW: m4 Paragon (change `m4-paragon`): Core, tables, XP at 90 -> Paragon, `.arpg paragon info|set|xp`, test 40 done; points + bonuses done (D3 rotation, free respec); next: world tier in the Vale (uncapped zones: monster health/damage and Paragon XP x WorldTierMultiplier), `.paragon` player commands, world tier in the Vale, `.paragon` player commands. Idea to raise with owner: custom items via Item-sparse
   hotfixes (typed blank bases, catalysts, essences) before m6. Parked: sell price.
-- **Blockers:** owner (m4): points D3 rotation or free tab? respec free or gold? quest XP full or half? owner: potions (change `m3b-potions` drafted) - cooldown 10 s? carry stack 20 or cap ~10 per type? owner question: catalysts and essences (m1b 2b.3) need item ids - reuse unused existing items or wait for custom items (Item-sparse patch, m6)? Champion glow aura: pick a spell id in game. Client: `Wow-64-all.exe` (unlocked; logs in AND loads our client patch `wow-update-enUS-20000.MPQ`).
+- **Blockers:** owner: potions (change `m3b-potions` drafted) - cooldown 10 s? carry stack 20 or cap ~10 per type? owner question: catalysts and essences (m1b 2b.3) need item ids - reuse unused existing items or wait for custom items (Item-sparse patch, m6)? Champion glow aura: pick a spell id in game. Client: `Wow-64-all.exe` (unlocked; logs in AND loads our client patch `wow-update-enUS-20000.MPQ`).
 - **Bots:** on for play (300) via start-stack / final stage; off for ARPG feature tests. Bot rules in m7.
 
 ## Roadmap (one change folder each; propose the backlog ones from the spec Doc when their turn comes)
@@ -57,6 +57,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-22 22:07 — m4 Paragon points: D3 rotation, spend/respec (free), bonuses Core/Offense/Defense/Utility applied on login and spend; test-unique equip leaves combat first (test 26 flake). **All 17 GM files pass.**
 - 2026-11-22 21:29 — m4 Paragon step 1: kill/quest XP at 90 -> Paragon XP (`Paragon/Paragon`, `character_paragon`), curve rounded (float conf), test 40. **All 17 GM files pass**, 70 unit tests. Commits now on branch `arpg`, pushed to origin (owner).
 - 2026-11-22 20:29 — Superuniques drop their own Unique (`arpg_superunique_unique`, 6 Uniques shared by theme), native copies of pool rares despawn on sight; test 23 pack `aggro` (neutral worgs). **All 16 GM files pass.** Started m4: change folder + `Core/Paragon` (70 unit tests).
 - 2026-11-22 20:15 — m3 3.4 done: Superunique patrol (roam 15 yd) + zone announce; test 30 covers Champion bands 5/20/90. **All 16 GM files pass.**

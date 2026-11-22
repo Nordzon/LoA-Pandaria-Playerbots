@@ -243,6 +243,8 @@ public:
             { "info", &HandleParagonInfo, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "set",  &HandleParagonSet,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "xp",   &HandleParagonXp,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "spend",  &HandleParagonSpend,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "respec", &HandleParagonRespec, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
         };
         static std::vector<ChatCommand> arpgTable =
         {
@@ -768,14 +770,21 @@ public:
         if (!Arpg::Loot::MakeUnique(p, item, uniqueId, tier, msg))
             return Fail(handler, msg);
         p->SendNewItem(item, 1, true, false);
+        std::string equipError;
         if (t.size() == 4)
         {
+            // Test tool: armour can't be changed in combat (a previous test's monsters may still be on the character).
+            if (p->IsInCombat())
+                p->CombatStop(true);
             uint16 equipDest = 0;
-            if (p->CanEquipItem(NULL_SLOT, equipDest, item, true) == EQUIP_ERR_OK)
+            InventoryResult res = p->CanEquipItem(NULL_SLOT, equipDest, item, true);
+            if (res == EQUIP_ERR_OK)
                 p->SwapItem(item->GetPos(), equipDest);
+            else
+                equipError = " equip_error=" + std::to_string(uint32(res));
         }
-        handler->PSendSysMessage("ok %s base=%u guid=%u affixes=%d%s %s", p->GetName().c_str(), base, item->GetGUID().GetCounter(), n,
-            item->IsEquipped() ? " equipped" : "", msg.c_str());
+        handler->PSendSysMessage("ok %s base=%u guid=%u affixes=%d%s%s %s", p->GetName().c_str(), base, item->GetGUID().GetCounter(), n,
+            item->IsEquipped() ? " equipped" : "", equipError.c_str(), msg.c_str());
         return true;
     }
 
@@ -1166,6 +1175,39 @@ public:
             return false;
         Arpg::Paragon::SetParagon(p, atoi(t[1].c_str()), t.size() > 2 ? std::strtoull(t[2].c_str(), nullptr, 10) : 0);
         handler->PSendSysMessage("ok %s", Arpg::Paragon::Describe(p).c_str());
+        return true;
+    }
+
+    // .arpg paragon spend <char> <tab> <stat> [n]   tab: core|offense|defense|utility; stat: main|stamina, crit|haste|mastery,
+    // armor|dodge|parry, speed|magicfind|goldfind (Diablo 3 rotation: only points the tab has earned)
+    static bool HandleParagonSpend(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        char const* usage = "usage: .arpg paragon spend <char> <core|offense|defense|utility> <stat> [n]";
+        if (t.size() < 3 || t.size() > 4)
+            return Fail(handler, usage);
+        Player* p = OnlineChar(handler, t, usage);
+        if (!p)
+            return false;
+        int tab = 0, stat = 0;
+        if (!Arpg::Paragon::ParseTabStat(t[1], t[2], tab, stat))
+            return Fail(handler, usage);
+        std::string out;
+        if (!Arpg::Paragon::Spend(p, tab, stat, t.size() == 4 ? atoi(t[3].c_str()) : 1, out))
+            return Fail(handler, out);
+        handler->PSendSysMessage("ok %s | %s", out.c_str(), Arpg::Paragon::DescribeApplied(p).c_str());
+        return true;
+    }
+
+    // .arpg paragon respec <char>   free (owner): every point back
+    static bool HandleParagonRespec(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg paragon respec <char>");
+        if (!p)
+            return false;
+        Arpg::Paragon::Respec(p);
+        handler->PSendSysMessage("ok respec | %s | %s", Arpg::Paragon::Describe(p).c_str(), Arpg::Paragon::DescribeApplied(p).c_str());
         return true;
     }
 

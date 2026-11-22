@@ -81,6 +81,17 @@ Arpg.Paragon.Enabled = 1
 Arpg.Paragon.XpBase = 600000
 Arpg.Paragon.XpGrowth = 1.04
 Arpg.Paragon.QuestXpPct = 100
+#    Points (owner: Diablo 3 rotation Core -> Offense -> Defense -> Utility, pick the stat inside the tab, free respec):
+#    Core: main stat or stamina +StatPctPerPoint %; Offense: crit / haste / mastery +RatingPerPoint rating; Defense: armour
+#    +ArmorPctPerPoint %, dodge / parry +RatingPerPoint rating; Utility: move speed +MoveSpeedPerPoint (hundredths of %, up to
+#    MoveSpeedCap, above the affix cap), magic find / gold find +FindPerPoint (hundredths of %, magic find up to MagicFindCap).
+Arpg.Paragon.StatPctPerPoint = 0.5
+Arpg.Paragon.RatingPerPoint = 240
+Arpg.Paragon.ArmorPctPerPoint = 0.4
+Arpg.Paragon.MoveSpeedPerPoint = 100
+Arpg.Paragon.MoveSpeedCap = 1000
+Arpg.Paragon.FindPerPoint = 500
+Arpg.Paragon.MagicFindCap = 10000
 
 # --- Potions (change m3b-potions) --------------------------------------------------------
 #    Potions heal / restore a % of max health / resource (arpg_potion), drop by monster kind (arpg_potion_drop: normal 5%,

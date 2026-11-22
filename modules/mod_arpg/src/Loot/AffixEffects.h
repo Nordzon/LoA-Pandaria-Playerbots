@@ -23,6 +23,8 @@ namespace Arpg::Loot
 
     // Called by AffixStats when an item's lines are applied (equip, login) or removed (unequip, break).
     void ApplyEffectLines(Player* player, std::vector<EffectLine> const& lines, bool apply);
+    // Paragon Utility (m4): extra move speed above the affix cap, in hundredths of a percent (set, not added).
+    void SetParagonMoveSpeed(Player* player, int32 hundredths);
     // Called by AffixStats on equip/unequip of a Unique: its power becomes active / inactive (idempotent per item).
     void ApplyUniquePower(Player* player, uint32 itemGuid, bool apply);
 

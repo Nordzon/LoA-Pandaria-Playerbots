@@ -20,5 +20,40 @@
 > .arpg paragon xp Arpgtest 1000
 ? ok paragon level=4 xp=102122/
 
+# --- Points (owner: Diablo 3 rotation, free respec). Paragon 8 = 2 points in every tab.
+> .arpg test setup Arpgtest 90 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg paragon set Arpgtest 8 0
+? ok paragon level=8 .* points core=2 offense=2 defense=2 utility=2
+> .arpg paragon respec Arpgtest
+? ok respec
+
+# Core: 2 points in stamina = +1% stamina (a naked level-90 test character has ~190 stamina: +1-2 measured, 1% applied).
+> .arpg paragon spend Arpgtest core stamina 2
+? ok spent tab=0 stat=1 points=2 before=\d+ after=\d+ diff=[12] .* stamina_pct=1\.0
+# The tab has no points left.
+> .arpg paragon spend Arpgtest core main 1
+? not enough points: tab has 0 unspent
+
+# Offense: 2 points in crit = +480 crit rating exactly.
+> .arpg paragon spend Arpgtest offense crit 2
+? ok spent tab=1 stat=0 points=2 .* diff=480\b
+
+# Utility: 2 points in move speed = +2% above the affix cap.
+> .arpg paragon spend Arpgtest utility speed 2
+? ok spent tab=3 stat=0 points=2 .* move=200\b
+~ 2000
+> .arpg loot effects Arpgtest
+? aura_move_speed_pct=2\b
+
+# Free respec: everything back.
+> .arpg paragon respec Arpgtest
+? ok respec .* stamina_pct=0\.0 crit=0 .* move=0\b
+~ 2000
+> .arpg loot effects Arpgtest
+! aura_move_speed_pct=[1-9]
+
 > .arpg paragon set Arpgtest 0 0
 ? ok paragon level=0
