@@ -1,5 +1,7 @@
 #include "Scaling/WorldScaling.h"
 #include "Loot/ZoneLevels.h"
+#include "Core/Paragon.h"
+#include "Paragon/Paragon.h"
 
 #include "ArpgConfig.h"
 #include "ArpgHooks.h"
@@ -15,6 +17,7 @@
 #include "Timer.h"
 #include "WorldSession.h"
 
+#include <cmath>
 #include <cstdio>
 #include <list>
 #include <mutex>
@@ -27,6 +30,7 @@ namespace
         uint8 target = 0;     // level the hook returns
         uint8 original = 0;   // level before scaling (the core's own roll)
         bool pinned = false;  // Champion / Superunique / minion (m3): level and multipliers fixed, the tick leaves it alone
+        float tier = 1.0f;    // m4 world tier (uncapped zones): health and damage x this on top of the scaling mods
         float healthMult = 1.0f, damageMult = 1.0f;   // pinned only, on top of the scaling mods
     };
 
@@ -108,14 +112,18 @@ namespace
         c->SetHealth(c->GetMaxHealth());
     }
 
-    void Scale(Creature* c, uint8 target, uint8 original, Arpg::Settings const& s)
+    void Scale(Creature* c, uint8 target, uint8 original, Arpg::Settings const& s, float tier = 1.0f)
     {
         {
             std::lock_guard<std::mutex> l(g_lock);
-            g_scaled[c->GetGUID().GetRawValue()] = { target, original };
+            ScaledEntry e;
+            e.target = target;
+            e.original = original;
+            e.tier = tier;
+            g_scaled[c->GetGUID().GetRawValue()] = e;
         }
         c->SelectLevel(c->GetCreatureTemplate(), true); // hook returns `target`; core computes stats for it
-        ApplyModsAndRefresh(c, s, true);
+        ApplyModsAndRefresh(c, s, true, tier, tier);
     }
 
     void Revert(Creature* c, Arpg::Settings const& s)
@@ -209,6 +217,12 @@ namespace
             int effective = Arpg::Core::LootLevel(int(player->GetLevel()), Arpg::Loot::ZoneLevelsFor(c->GetZoneId(), c->GetAreaId()),
                 s.scaleZoneCapAbove, false);
             uint8 target = Arpg::Core::ScaledLevel(s.scale, original, effective);
+            // World tier (m4, SPEC 4.1 "Paragon grind"): in uncapped zones (the Vale) monsters grow with the player's Paragon.
+            float tier = 1.0f;
+            if (s.uncappedZones.count(c->GetZoneId()))
+                tier = Arpg::Core::WorldTierMultiplier(Arpg::Paragon::ParagonLevel(player), s.paragonWorldTierPct, s.paragonWorldTierCapPct);
+            if (target == 0 && tier > 1.0f)
+                target = original;   // no level change, but the tier still applies
             if (target == 0)
             {
                 if (known)
@@ -219,12 +233,13 @@ namespace
                 }
                 continue;
             }
-            if (!known || e.target != target)
+            if (!known || e.target != target || std::fabs(e.tier - tier) > 0.001f)
             {
-                Scale(c, target, original, s);
+                Scale(c, target, original, s, tier);
                 Arpg::TestEvents::Record(player->GetGUID().GetCounter(), "scale entry=" + std::to_string(c->GetEntry()) +
                     " spawn=" + std::to_string(c->GetDBTableGUIDLow()) + " from=" + std::to_string(original) +
-                    " to=" + std::to_string(target) + " hp=" + std::to_string(c->GetMaxHealth()));
+                    " to=" + std::to_string(target) + " hp=" + std::to_string(c->GetMaxHealth()) +
+                    (tier > 1.0f ? " tier=" + std::to_string(int(tier * 100 + 0.5f)) : ""));
             }
         }
     }
@@ -303,10 +318,10 @@ namespace Arpg::Scaling
         CreatureTemplate const* t = c->GetCreatureTemplate();
         char buf[512];
         std::snprintf(buf, sizeof(buf),
-            "%s entry=%u spawn=%u level=%u template=%u-%u original=%u scaled=%s hp=%u",
+            "%s entry=%u spawn=%u level=%u template=%u-%u original=%u scaled=%s hp=%u tier_pct=%d",
             c->GetName().c_str(), c->GetEntry(), c->GetDBTableGUIDLow(), uint32(c->GetLevel()),
             t ? uint32(t->minlevel) : 0u, t ? uint32(t->maxlevel) : 0u, scaled ? uint32(e.original) : uint32(c->GetLevel()),
-            scaled ? std::to_string(e.target).c_str() : "none", c->GetMaxHealth());
+            scaled ? std::to_string(e.target).c_str() : "none", c->GetMaxHealth(), scaled ? int(e.tier * 100 + 0.5f) : 100);
         return buf;
     }
 

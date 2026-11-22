@@ -56,6 +56,8 @@ namespace Arpg
         double paragonXpBase = 600000.0; // Arpg.Paragon.XpBase (XP from Paragon 0 to 1)
         double paragonXpGrowth = 1.04;   // Arpg.Paragon.XpGrowth (each level needs this much more)
         float paragonQuestXpPct = 100.0f; // Arpg.Paragon.QuestXpPct (share of a quest's XP at the max level)
+        float paragonWorldTierPct = 2.0f;     // Arpg.Paragon.WorldTierPct (uncapped zones: monster health/damage and Paragon XP % per Paragon level)
+        float paragonWorldTierCapPct = 100.0f; // Arpg.Paragon.WorldTierCapPct
         float paragonStatPctPerPoint = 0.5f;   // Arpg.Paragon.StatPctPerPoint (Core: main stat / stamina %)
         int paragonRatingPerPoint = 240;       // Arpg.Paragon.RatingPerPoint (Offense crit/haste/mastery, Defense dodge/parry)
         float paragonArmorPctPerPoint = 0.4f;  // Arpg.Paragon.ArmorPctPerPoint (Defense)

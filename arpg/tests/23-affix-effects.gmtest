@@ -70,6 +70,9 @@
 ? aura_move_speed_pct=30\b
 
 # --- XP: +10% on XP the core gives (same hook as kills and quests).
+# The aggro'd worgs from above may have killed the character (no XP for the dead): setup revives it.
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
 > .arpg test events Arpgtest clear
 ? ok
 > .arpg test effect Arpgtest xp_pct 1000

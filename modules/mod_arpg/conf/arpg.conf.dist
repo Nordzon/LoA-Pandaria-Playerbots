@@ -81,6 +81,10 @@ Arpg.Paragon.Enabled = 1
 Arpg.Paragon.XpBase = 600000
 Arpg.Paragon.XpGrowth = 1.04
 Arpg.Paragon.QuestXpPct = 100
+#    World tier (the endless solo farm, SPEC 4.1): in uncapped zones (Arpg.Scale.UncappedZones = the Vale) monsters get
+#    +WorldTierPct % health and damage per Paragon level (at most +WorldTierCapPct %), and Paragon XP there gets the same %.
+Arpg.Paragon.WorldTierPct = 2
+Arpg.Paragon.WorldTierCapPct = 100
 #    Points (owner: Diablo 3 rotation Core -> Offense -> Defense -> Utility, pick the stat inside the tab, free respec):
 #    Core: strength, agility, intellect or stamina +StatPctPerPoint % (any of them - no main-stat guess); Offense: crit / haste / mastery +RatingPerPoint rating; Defense: armour
 #    +ArmorPctPerPoint %, dodge / parry +RatingPerPoint rating; Utility: move speed +MoveSpeedPerPoint (hundredths of %, up to

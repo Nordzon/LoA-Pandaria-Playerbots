@@ -59,5 +59,35 @@
 > .arpg loot effects Arpgtest
 ! aura_move_speed_pct=[1-9]
 
+# --- World tier (the Vale, uncapped): +2% monster health/damage per Paragon level (cap +100%). The scaling tick re-scales
+# level-90 Vale mobs near the character; the event recorder shows the tier (mobs already fighting NPCs are left alone,
+# so no single fixed probe).
+> .arpg paragon respec Arpgtest
+? ok respec
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg test setup Arpgtest 90 vale-krikthik
+? ok .*\(online\)
+# far teleport (Pandaria): give the client time to arrive
+~ 15000
+> .arpg paragon set Arpgtest 10 0
+? ok paragon level=10
+> .arpg test events Arpgtest clear
+? ok
+~ 4000
+> .arpg test events Arpgtest
+? scale entry=\d+ spawn=\d+ from=90 to=90 hp=\d+ tier=120\b
+> .arpg paragon set Arpgtest 80 0
+? ok paragon level=80
+> .arpg test events Arpgtest clear
+? ok
+~ 4000
+> .arpg test events Arpgtest
+? scale entry=\d+ spawn=\d+ from=90 to=90 hp=\d+ tier=200\b
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok
 > .arpg paragon set Arpgtest 0 0
 ? ok paragon level=0
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 6000

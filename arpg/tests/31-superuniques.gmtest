@@ -12,7 +12,10 @@
 ? ok
 ~ 2500
 
-# The zone has one alive (somewhere at one of its points).
+# The zone has one alive (somewhere at one of its points). A bot may just have killed it: skip the delay first.
+> .arpg superunique next Arpgtest
+? ok
+~ 2500
 > .arpg superunique info Arpgtest
 ? superunique zone=12 pool=5 alive=1 \[id=[1-5] entry=\d+ abilities=3
 

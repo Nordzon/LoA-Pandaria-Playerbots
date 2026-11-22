@@ -14,7 +14,7 @@
 ## 3. Game wiring
 - [x] 3.1 XP at max level -> Paragon XP (OnGiveXP for kills, OnQuestRewarded for quests x QuestXpPct), level-ups with a message
 - [x] 3.2 Stat bonuses applied on login / spend / respec (HandleStatModifier TOTAL_PCT, ApplyRatingMod, effect lines, move speed above the cap)
-- [ ] 3.3 World tier in uncapped zones (health/damage on scaling, XP bonus)
+- [x] 3.3 World tier in uncapped zones (health/damage on scaling, XP bonus) — 2026-11-22, test 40 (Vale spot `vale-krikthik`)
 - [x] 3.4 `.paragon data|info|spend|respec` (any account) + ArpgUI Paragon window (`arpg/addons/ArpgUI`, `install-addons.ps1`), `.arpg paragon set|info|xp|spend|respec|data <char>`
 
 ## 4. Tests

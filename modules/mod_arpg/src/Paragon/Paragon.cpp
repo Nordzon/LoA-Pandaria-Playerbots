@@ -196,7 +196,11 @@ namespace
             Arpg::Settings const& s = sArpgConfig.Get();
             if (!s.paragonEnabled || !amount || !AtMaxLevel(player) || !Arpg::Scaling::IsRealPlayer(player))
                 return;
-            Arpg::Paragon::AddXp(player, uint64(amount), "kill");
+            uint64 xp = amount;
+            if (s.uncappedZones.count(player->GetZoneId()))   // world tier: harder monsters, more Paragon XP
+                xp = uint64(double(xp) * Arpg::Core::WorldTierMultiplier(Arpg::Paragon::ParagonLevel(player), s.paragonWorldTierPct,
+                    s.paragonWorldTierCapPct) + 0.5);
+            Arpg::Paragon::AddXp(player, xp, "kill");
         }
 
         // Quest XP at the max level (the core pays gold instead): Arpg.Paragon.QuestXpPct of it as Paragon XP too.

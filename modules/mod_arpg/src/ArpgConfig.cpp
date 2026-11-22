@@ -18,7 +18,7 @@ namespace
         "Arpg.Loot.ZoneCeilingMargin", "Arpg.Loot.SubstituteGap", "Arpg.Loot.SellCopperPerAffixLevel", "Arpg.Loot.GodRollPityEvery",
         "Arpg.Craft.MaxSkill", "Arpg.Craft.UniqueChance", "Arpg.Craft.UniquePityStep", "Arpg.Potion.DropMult",
         "Arpg.Paragon.Enabled", "Arpg.Paragon.XpBase", "Arpg.Paragon.XpGrowth", "Arpg.Paragon.QuestXpPct",
-        "Arpg.Paragon.StatPctPerPoint", "Arpg.Paragon.RatingPerPoint", "Arpg.Paragon.ArmorPctPerPoint",
+        "Arpg.Paragon.WorldTierPct", "Arpg.Paragon.WorldTierCapPct", "Arpg.Paragon.StatPctPerPoint", "Arpg.Paragon.RatingPerPoint", "Arpg.Paragon.ArmorPctPerPoint",
         "Arpg.Paragon.MoveSpeedPerPoint", "Arpg.Paragon.MoveSpeedCap", "Arpg.Paragon.FindPerPoint", "Arpg.Paragon.MagicFindCap",
         "Arpg.Superunique.Enabled", "Arpg.Superunique.PerZone", "Arpg.Superunique.RespawnDelay", "Arpg.Superunique.UniqueChance",
         "Arpg.Superunique.UniqueBadLuckStep", "Arpg.Superunique.Scale", "Arpg.Champion.EntryOffset", "Arpg.Superunique.EntryOffset",
@@ -61,6 +61,8 @@ namespace Arpg
         s.paragonXpBase = std::max(1.0, double(file.GetFloat("Arpg.Paragon.XpBase", 600000.0f)));
         s.paragonXpGrowth = std::max(1.0, double(file.GetFloat("Arpg.Paragon.XpGrowth", 1.04f)));
         s.paragonQuestXpPct = std::max(0.0f, file.GetFloat("Arpg.Paragon.QuestXpPct", 100.0f));
+        s.paragonWorldTierPct = std::max(0.0f, file.GetFloat("Arpg.Paragon.WorldTierPct", 2.0f));
+        s.paragonWorldTierCapPct = std::max(0.0f, file.GetFloat("Arpg.Paragon.WorldTierCapPct", 100.0f));
         s.paragonStatPctPerPoint = std::max(0.0f, file.GetFloat("Arpg.Paragon.StatPctPerPoint", 0.5f));
         s.paragonRatingPerPoint = std::max(0, file.GetInt("Arpg.Paragon.RatingPerPoint", 240));
         s.paragonArmorPctPerPoint = std::max(0.0f, file.GetFloat("Arpg.Paragon.ArmorPctPerPoint", 0.4f));

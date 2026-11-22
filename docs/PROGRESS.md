@@ -15,7 +15,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
   for every class, drops by monster kind, 999 stacks, level 1, 10 s shared cooldown via item script + Item-sparse hotfixes.
 - **Next step:** owner checks in game (headless can't): Champion/Unique names + silver / winged-silver portraits, loot-window
   names before pickup, potions (999 stack shown, 10 s sweep on all potion buttons, mana potion on a rage class), Superunique
-  casts at a bot tank. m3 left: glow aura + 4.3 playtest (owner). NOW: m4 Paragon (change `m4-paragon`): Core, tables, XP at 90 -> Paragon, `.arpg paragon info|set|xp`, test 40 done; points + bonuses + ArpgUI Paragon window done (owner to try in game: `/paragon`); next: world tier in the Vale (uncapped zones: monster health/damage and Paragon XP x WorldTierMultiplier), world tier in the Vale, `.paragon` player commands. Idea to raise with owner: custom items via Item-sparse
+  casts at a bot tank. m3 left: glow aura + 4.3 playtest (owner). NOW: m4 Paragon (change `m4-paragon`): Core, tables, XP at 90 -> Paragon, `.arpg paragon info|set|xp`, test 40 done; points + bonuses + ArpgUI Paragon window done (owner to try in game: `/paragon`); world tier in the Vale done (test 40). m4 left: 4.3 playtest (>= 5 levels per 2-hour session), loot tier T6-T8 gating comes with m5 raids. NEXT: archive-ready review of m3/m3b/m4 (merge spec deltas), then m5 dungeon scaling (change folder first), world tier in the Vale, `.paragon` player commands. Idea to raise with owner: custom items via Item-sparse
   hotfixes (typed blank bases, catalysts, essences) before m6. Parked: sell price.
 - **Blockers:** owner: potions (change `m3b-potions` drafted) - cooldown 10 s? carry stack 20 or cap ~10 per type? owner question: catalysts and essences (m1b 2b.3) need item ids - reuse unused existing items or wait for custom items (Item-sparse patch, m6)? Champion glow aura: pick a spell id in game. Client: `Wow-64-all.exe` (unlocked; logs in AND loads our client patch `wow-update-enUS-20000.MPQ`).
 - **Bots:** on for play (300) via start-stack / final stage; off for ARPG feature tests. Bot rules in m7.
@@ -57,6 +57,8 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-22 23:53 — m4 Vale world tier committed; test 23 revives the character before the XP step (aggro'd worgs could kill it). **All 17 GM files pass.**
+- 2026-11-22 23:11 — Vale world tier works (test 40), test 31 skips a bot-killed Superunique delay; test 23 XP affix check failed once - paused for the owner's usage reset (23:40), uncommitted.
 - 2026-11-22 22:40 — Paragon Core tab: any of strength/agility/intellect/stamina (owner: no main-stat guess); addon shows the four. **All 17 GM files pass.**
 - 2026-11-22 22:24 — ArpgUI addon: Paragon window (XP bar, 4 tabs, + buttons, free respec, P launcher) over `.paragon` player commands and a hidden `ARPGP|` data line; installed to the client. **All 17 GM files pass.**
 - 2026-11-22 22:07 — m4 Paragon points: D3 rotation, spend/respec (free), bonuses Core/Offense/Defense/Utility applied on login and spend; test-unique equip leaves combat first (test 26 flake). **All 17 GM files pass.**
