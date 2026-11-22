@@ -13,6 +13,9 @@ namespace Arpg::Core
     // Flat stat affix: B x (range at roll01) / 100, rounded, at least 1. roll01 in [0,1].
     uint32_t FlatValue(uint32_t budgetB, TierRange const& range, double roll01);
 
+    // Ascended tiers (T6-T8, BALANCE §12): the T5 range scaled by pct (110 / 120 / 130).
+    TierRange AscendedRange(TierRange const& t5, int pct);
+
     // Percent affix: the range at roll01, rounded to an integer in the table's unit.
     int32_t PercentValue(TierRange const& range, double roll01);
 

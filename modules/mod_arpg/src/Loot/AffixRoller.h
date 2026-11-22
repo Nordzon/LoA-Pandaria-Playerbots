@@ -31,6 +31,9 @@ namespace Arpg::Loot
     std::string LoadAffixData();
     // Startup: removes affix rows of items that no longer exist.
     void CleanOrphanAffixes();
+    // Tests: the character's next roll counts as a drop in a raid of this tier (Ascended tiers).
+    void SetTestRaidTier(Player* player, int tier);
+
     // Sets ArpgHooks::ItemPickup and ArpgHooks::ItemSellPrice.
     void InstallPickupHook();
 

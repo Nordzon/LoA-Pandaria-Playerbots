@@ -30,6 +30,40 @@
 
 > .arpg dungeon level Arpgtest 36 0
 ? ok
+
+# --- Ascended affix tiers (BALANCE §12): a raid drop rolls above T5 only with raid tier AND Paragon. Loot level 90 (the
+# Vale: uncapped) = T5; boss loot rolls every affix at the cap, so the cap shows directly. Item 82437: epic robe (level 90).
+> .arpg test setup Arpgtest 90 vale-krikthik
+? ok .*\(online\)
+~ 15000
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg paragon set Arpgtest 110 0
+? ok
+> .arpg test give Arpgtest 82437 boss 3671 raid 7
+? quality=4 affixes=[3-5]
+> .arpg loot last Arpgtest
+? T8=
+! T[1-7]=
+# Paragon 59 in a tier-5 raid: T7 needs Paragon 60 -> T6.
+> .arpg paragon set Arpgtest 59 0
+? ok
+> .arpg test give Arpgtest 82437 boss 3671 raid 5
+? quality=4
+> .arpg loot last Arpgtest
+? T6=
+! T[78]=
+# No raid: T5 is the top.
+> .arpg test give Arpgtest 82437 boss 3671
+? quality=4
+> .arpg loot last Arpgtest
+? T5=
+! T[678]=
+> .arpg paragon set Arpgtest 0 0
+? ok
+> .arpg test clearbags Arpgtest
+? ok
+
 > .arpg test setup Arpgtest 20 elwynn-northshire
 ? ok .*\(online\)
 ~ 8000

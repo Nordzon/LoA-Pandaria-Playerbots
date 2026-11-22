@@ -456,12 +456,25 @@ public:
     static bool HandleTestGive(ChatHandler* handler, char const* args)
     {
         std::vector<std::string> t = Tokens(args);
-        if ((t.size() != 2 && !(t.size() == 4 && t[2] == "boss")) || !IsNameLike(t[0]))
-            return Fail(handler, "usage: .arpg test give <char> <itemId> [boss <creatureEntry>]");
-        uint32 bossEntry = t.size() == 4 ? uint32(std::strtoul(t[3].c_str(), nullptr, 10)) : 0;
+        char const* usage = "usage: .arpg test give <char> <itemId> [boss <creatureEntry>] [raid <tier>]";
+        if (t.size() < 2 || t.size() % 2 != 0 || !IsNameLike(t[0]))
+            return Fail(handler, usage);
+        uint32 bossEntry = 0;
+        int raidTier = 0;
+        for (size_t i = 2; i + 1 < t.size(); i += 2)
+        {
+            if (t[i] == "boss")
+                bossEntry = uint32(std::strtoul(t[i + 1].c_str(), nullptr, 10));
+            else if (t[i] == "raid")
+                raidTier = atoi(t[i + 1].c_str());
+            else
+                return Fail(handler, usage);
+        }
         Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
         if (!p || !p->IsInWorld())
             return Fail(handler, "character not online");
+        if (raidTier > 0)
+            Arpg::Loot::SetTestRaidTier(p, raidTier);
         uint32 itemId = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
         if (!sObjectMgr->GetItemTemplate(itemId))
             return Fail(handler, "unknown item " + t[1]);

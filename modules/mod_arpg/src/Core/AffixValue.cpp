@@ -32,4 +32,10 @@ namespace Arpg::Core
             return templatePriceCopper;
         return templatePriceCopper + uint64_t(affixCount) * uint64_t(playerLevel) * uint64_t(copperPerAffixLevel);
     }
+
+    TierRange AscendedRange(TierRange const& t5, int pct)
+    {
+        float f = float(pct) / 100.0f;
+        return { t5.min * f, t5.max * f };
+    }
 }

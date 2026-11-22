@@ -12,7 +12,7 @@
 - [x] 3.1 `// ARPG:` hook in AutoBalance (AutoBalanceLevelScaling.cpp, creature multipliers) -> mod_arpg table × tier × role
 - [x] 3.2 Solo player damage dealt (tank / healer) in 5-man instances
 - [x] 3.3 Dungeon level selector (hook on AutoBalance's target level; `character_arpg_dungeon_level`)
-- [ ] 3.4 Ascended affix tiers in raids (loot roll: raid tier + Paragon)
+- [x] 3.4 Ascended affix tiers in raids (loot roll: raid tier + Paragon) — `arpg_ascended_tier`, test 50
 - [x] 3.5 `.arpg dungeon info|level <char>`; AutoBalance on in the confs (`write-confs.ps1`)
 
 ## 4. Tests

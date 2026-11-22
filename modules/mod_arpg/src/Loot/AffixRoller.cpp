@@ -11,6 +11,10 @@
 #include "Loot/BossPity.h"
 #include "Loot/Crafting.h"
 #include "Monsters/Champions.h"
+#include "Dungeons/InstanceScaling.h"
+#include "Paragon/Paragon.h"
+#include "Core/Pity.h"
+#include "Map.h"
 #include "Loot/Uniques.h"
 #include "Loot/Budget.h"
 #include "Loot/NativeEnchants.h"
@@ -60,6 +64,26 @@ namespace
     std::vector<Arpg::Core::TierRule> g_tiers;
     std::unordered_map<uint64, uint64> g_lastItem;                      // player guid -> item guid
     std::map<std::pair<uint32, int32>, std::deque<Arpg::Loot::RollPlan>> g_plans;   // (item id, suffix id) -> loot plans
+    std::vector<Arpg::Core::AscendedRule> g_ascended;    // T6-T8 gates (arpg_ascended_tier)
+    std::map<int, int> g_ascendedPct;                    // tier -> % of the T5 range
+    std::unordered_map<uint64, int> g_testRaidTier;      // player guid -> raid tier for the next roll (tests)
+
+    // The raid tier the character's next drop counts for: the map's (arpg_raid_tier) or a test override.
+    int RaidTierForRoll(Player* player)
+    {
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            auto it = g_testRaidTier.find(player->GetGUID().GetCounter());
+            if (it != g_testRaidTier.end())
+            {
+                int t = it->second;
+                g_testRaidTier.erase(it);
+                return t;
+            }
+        }
+        Map* map = player->GetMap();
+        return map && map->IsRaid() ? Arpg::Dungeons::RaidTierOf(map->GetId()) : 0;
+    }
     std::unordered_map<uint32, std::vector<Arpg::Loot::StatLine>> g_itemStats; // item guid -> flat stat affixes
     std::unordered_map<uint32, std::vector<Arpg::Loot::EffectLine>> g_itemEffects; // item guid -> effect affixes
 
@@ -180,8 +204,31 @@ namespace
 
 namespace Arpg::Loot
 {
+    void LoadAscended()
+    {
+        std::vector<Core::AscendedRule> rules;
+        std::map<int, int> pct;
+        if (QueryResult r = WorldDatabase.Query("SELECT tier, min_raid_tier, min_paragon, value_pct FROM arpg_ascended_tier ORDER BY tier"))
+            do
+            {
+                Field* f = r->Fetch();
+                rules.push_back({ int(f[0].GetUInt8()), int(f[1].GetUInt8()), int(f[2].GetUInt16()) });
+                pct[int(f[0].GetUInt8())] = int(f[3].GetUInt16());
+            } while (r->NextRow());
+        std::lock_guard<std::mutex> l(g_lock);
+        g_ascended = rules;
+        g_ascendedPct = pct;
+    }
+
+    void SetTestRaidTier(Player* player, int tier)
+    {
+        std::lock_guard<std::mutex> l(g_lock);
+        g_testRaidTier[player->GetGUID().GetCounter()] = tier;
+    }
+
     std::string LoadAffixData()
     {
+        LoadAscended();
         std::vector<AffixInfo> affixes;
         std::map<std::pair<uint32, int>, Core::TierRange> ranges;
         std::map<int, int> unlock;
@@ -408,6 +455,25 @@ namespace Arpg::Loot
                 plan.godRoll = true;
             }
         }
+        // Ascended tiers (BALANCE §12): in a raid, raid tier + Paragon may lift the cap above T5 (T6-T8).
+        {
+            int raidTier = RaidTierForRoll(player);
+            if (raidTier > 0)
+            {
+                std::vector<Core::AscendedRule> rules;
+                {
+                    std::lock_guard<std::mutex> l(g_lock);
+                    rules = g_ascended;
+                }
+                int base = Core::MaxTierForLevel(tiers, lootLevel);
+                int asc = Core::MaxAffixTier(base, raidTier, Arpg::Paragon::ParagonLevel(player), rules.data(), int(rules.size()));
+                if (asc > base)
+                {
+                    req.absoluteMaxTier = asc;
+                    req.tierBonus += asc - base;
+                }
+            }
+        }
         // Magic find (of Fortune / Lucky): chance in hundredths of a percent for +1 tier (BALANCE §13 pity is separate).
         if (int32 mf = EffectTotal(player, Core::Effect::MagicFindPct))
             if (int32(urand(0, 9999)) < std::min<int32>(mf, 10000))
@@ -471,6 +537,16 @@ namespace Arpg::Loot
                 continue;   // affix removed by a reload since the plan was made
             AffixInfo const& a = byId[rolled[i].affixId];
             Core::TierRange range = ranges[{ a.def.id, rolled[i].tier }];
+            if (rolled[i].tier > 5 && range.max <= 0.0f)   // Ascended: T5 range x the tier's %
+            {
+                int pct = 100;
+                {
+                    std::lock_guard<std::mutex> l(g_lock);
+                    auto it = g_ascendedPct.find(rolled[i].tier);
+                    pct = it == g_ascendedPct.end() ? 100 : it->second;
+                }
+                range = Core::AscendedRange(ranges[{ a.def.id, 5 }], pct);
+            }
             int32 value = 1;
             if (a.unit == "B")
                 value = int32(Core::FlatValue(budget, range, rand_norm()));

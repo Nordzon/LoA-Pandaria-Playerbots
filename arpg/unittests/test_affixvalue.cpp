@@ -39,3 +39,11 @@ TEST(affix_sell_value)                               // Scenario: selling a 3-af
     CHECK_EQ(SellValue(tenGold, 0, 90, 200), tenGold);             // plain items unchanged
     CHECK_EQ(SellValue(0, 1, 1, 200), uint64_t(200));
 }
+
+TEST(affix_ascended_range_scales_t5)
+{
+    TierRange t5{ 10.0f, 20.0f };
+    TierRange t8 = AscendedRange(t5, 130);
+    CHECK(t8.min > 12.99f && t8.min < 13.01f);
+    CHECK(t8.max > 25.99f && t8.max < 26.01f);
+}
