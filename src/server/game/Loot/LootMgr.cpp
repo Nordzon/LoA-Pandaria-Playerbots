@@ -29,6 +29,9 @@
 #include "SpellInfo.h"
 #include "Util.h"
 #include "World.h"
+#include "ArpgHooks.h" // ARPG
+
+ArpgHooks::LootFilledFn ArpgHooks::LootFilled = nullptr; // ARPG: set by mod_arpg
 
 static Rates const qualityToRate[MAX_ITEM_QUALITY] =
 {
@@ -695,6 +698,10 @@ bool Loot::FillLoot(Object* source, uint32 lootId, LootStore const& store, Playe
                     items.push_back(LootItem{ itr.second });
         }
     }
+
+    // ARPG: mod_arpg level-appropriate loot (see ArpgHooks.h)
+    if (ArpgHooks::LootFilled)
+        ArpgHooks::LootFilled(this, lootOwner);
 
     // Setting access rights for group loot case
     Group* group = lootOwner->GetGroup();

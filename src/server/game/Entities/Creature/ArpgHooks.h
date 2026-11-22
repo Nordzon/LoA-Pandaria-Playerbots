@@ -1,0 +1,49 @@
+/*
+ * ARPG: hook points for modules/mod_arpg (Pandaria ARPG fork). Listed in docs/CODEMAP.md "Upstream touches".
+ * Each hook is a plain function pointer, null unless mod_arpg sets it, so with the module absent the core
+ * behaves exactly as upstream.
+ */
+#ifndef TRINITY_ARPG_HOOKS_H
+#define TRINITY_ARPG_HOOKS_H
+
+#include "Define.h"
+
+class Creature;
+class Item;
+class Player;
+struct Loot;
+enum class ItemPickupSourceType : uint8;
+
+namespace ArpgHooks
+{
+    // ScriptMgr::OnItemPickup, before the item's own ItemScript: a player received a new item (loot, quest, craft...).
+    using ItemPickupFn = void (*)(Player* player, Item* item, ItemPickupSourceType sourceType, uint32 sourceId);
+    TC_GAME_API extern ItemPickupFn ItemPickup;
+
+    // Creature::SelectLevel, after the level roll (and AutoBalance). Return 0 to keep `level`, or the level to use
+    // instead; health/damage/stats are then computed for that level by SelectLevel itself.
+    using CreatureLevelFn = uint8 (*)(Creature* creature, uint8 level);
+    TC_GAME_API extern CreatureLevelFn CreatureLevel;
+
+    // Player::_ApplyItemBonuses (not the level-scale-only pass): an equipped item's stats are applied or removed
+    // (equip, unequip, login, break/repair, item-level rescale). mod_arpg adds/removes the item's affix stats.
+    using ItemBonusesFn = void (*)(Player* player, Item const* item, uint8 slot, bool apply);
+    TC_GAME_API extern ItemBonusesFn ItemBonuses;
+
+    // WorldSession::HandleLootMoneyOpcode, after AutoBalance and before the money is handed out: mod_arpg may raise the
+    // looted gold (gold find affixes). `gold` is the loot's whole money (shared later if the group splits it).
+    using LootMoneyFn = void (*)(Player* player, uint32& gold);
+    TC_GAME_API extern LootMoneyFn LootMoney;
+
+    // Loot::FillLoot, after the loot template (and world drops) filled `loot->items`, before group rights are set:
+    // mod_arpg may swap item ids (level-appropriate loot with a zone ceiling).
+    using LootFilledFn = void (*)(Loot* loot, Player* lootOwner);
+    TC_GAME_API extern LootFilledFn LootFilled;
+
+    // Vendor price of an item (WorldSession::HandleSellItemOpcode payout AND Player::AddItemToBuyBackSlot buyback price, so
+    // the two always agree - no sell/buy-back gold loop). Returns the price to use; `basePrice` = template price * count.
+    using ItemSellPriceFn = uint64 (*)(Item const* item, uint64 basePrice);
+    TC_GAME_API extern ItemSellPriceFn ItemSellPrice;
+}
+
+#endif

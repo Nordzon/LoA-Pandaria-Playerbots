@@ -31,6 +31,7 @@
 #include "GuildMgr.h"
 #include "ServiceMgr.h"
 #include <vector>
+#include "ArpgHooks.h" // ARPG
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
 {
@@ -530,6 +531,9 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
             if (pProto->SellPrice > 0)
             {
                 uint64 money = uint64(pProto->SellPrice) * count;
+                // ARPG: mod_arpg affix sell value (see ArpgHooks.h)
+                if (ArpgHooks::ItemSellPrice)
+                    money = ArpgHooks::ItemSellPrice(pItem, money);
                 if (count < pItem->GetCount())               // need split items
                 {
                     Item* pNewItem = pItem->CloneItem(count, _player);

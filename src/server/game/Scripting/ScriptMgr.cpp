@@ -16,6 +16,9 @@
 */
 
 #include "ScriptMgrMacros.h"
+#include "ArpgHooks.h"   // ARPG: mod_arpg hook points
+
+ArpgHooks::ItemPickupFn ArpgHooks::ItemPickup = nullptr; // ARPG: set by mod_arpg (affix roll on new items)
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "ObjectMgr.h"
@@ -691,6 +694,8 @@ bool ScriptMgr::OnItemPickup(Player* player, Item* item, ItemPickupSourceType so
 {
     ASSERT(player);
     ASSERT(item);
+    if (ArpgHooks::ItemPickup) // ARPG: affixes roll when a player receives a new item (mod_arpg)
+        ArpgHooks::ItemPickup(player, item, sourceType, sourceId);
     //#ifdef ELUNA
     //    if (sHookMgr->OnPickup(player, item, sourceType, sourceId))
     //        return true;

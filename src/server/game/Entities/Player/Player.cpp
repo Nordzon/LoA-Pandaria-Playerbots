@@ -16,6 +16,7 @@
 */
 
 #include "Player.h"
+#include "ArpgHooks.h" // ARPG
 #include "RBAC.h"
 #include "GameClient.h"
 #include "AccountMgr.h"
@@ -154,6 +155,9 @@ enum CharacterCustomizeFlags
 // corpse reclaim times
 #define DEATH_EXPIRE_STEP (5*MINUTE)
 #define MAX_DEATH_COUNT 3
+
+ArpgHooks::ItemBonusesFn ArpgHooks::ItemBonuses = nullptr; // ARPG: set by mod_arpg
+ArpgHooks::ItemSellPriceFn ArpgHooks::ItemSellPrice = nullptr; // ARPG: set by mod_arpg
 
 static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 
@@ -8389,6 +8393,10 @@ void Player::_ApplyItemBonuses(Item const* item, uint8 slot, bool apply, bool on
     if (slot >= INVENTORY_SLOT_BAG_END)
         return;
 
+    // ARPG: mod_arpg affix stats (see ArpgHooks.h)
+    if (!only_level_scale && ArpgHooks::ItemBonuses)
+        ArpgHooks::ItemBonuses(this, item, slot, apply);
+
     ItemTemplate const* proto = item->GetTemplate();
 
     ScalingStatDistributionEntry const* ssd = proto->ScalingStatDistribution ? sScalingStatDistributionStore.LookupEntry(proto->ScalingStatDistribution) : nullptr;
@@ -14364,7 +14372,12 @@ void Player::AddItemToBuyBackSlot(Item* pItem)
 
         SetUInt64Value(PLAYER_FIELD_INV_SLOTS + (slot * 2), pItem->GetGUID());
         if (ItemTemplate const* proto = pItem->GetTemplate())
-            SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE + eslot, proto->SellPrice * pItem->GetCount());
+        {
+            uint64 price = uint64(proto->SellPrice) * pItem->GetCount();
+            if (ArpgHooks::ItemSellPrice)   // ARPG: same price as the sale (see ArpgHooks.h)
+                price = ArpgHooks::ItemSellPrice(pItem, price);
+            SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE + eslot, uint32(std::min<uint64>(price, 0xFFFFFFFFu)));
+        }
         else
             SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE + eslot, 0);
         SetUInt32Value(PLAYER_FIELD_BUYBACK_TIMESTAMP + eslot, (uint32)etime);

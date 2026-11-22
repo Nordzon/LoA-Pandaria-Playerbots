@@ -17,6 +17,9 @@
 
 #include "Creature.h"
 #include "AutoBalanceLevelScaling.h"  // #702: instance level scaling (off unless AutoBalance.Enable.Global = 1)
+#include "ArpgHooks.h"                // ARPG: mod_arpg hook points
+
+ArpgHooks::CreatureLevelFn ArpgHooks::CreatureLevel = nullptr; // ARPG: set by mod_arpg (open-world scaling)
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "ChaseMovementGenerator.h"
@@ -1385,6 +1388,14 @@ void Creature::SelectLevel(const CreatureTemplate* cinfo, bool keepLevel)
     int32 scaledExpansion = -1;
     if (AutoBalance::IsActive())
         level = AutoBalance::OnCreatureSelectLevel(this, cinfo, level, scaledExpansion);
+
+    // ARPG: open-world level scaling (mod_arpg); stats below are computed for the returned level
+    if (ArpgHooks::CreatureLevel)
+        if (uint8 arpgLevel = ArpgHooks::CreatureLevel(this, level))
+        {
+            level = arpgLevel;
+            scaledExpansion = int32(AutoBalance::ExpansionColumnForLevel(level));
+        }
 
     SetLevel(level);
 

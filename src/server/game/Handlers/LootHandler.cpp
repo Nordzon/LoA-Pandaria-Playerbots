@@ -32,11 +32,14 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "ScriptMgr.h"
+#include "ArpgHooks.h" // ARPG
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #ifdef ELUNA
 #include "HookMgr.h"
 #endif
+
+ArpgHooks::LootMoneyFn ArpgHooks::LootMoney = nullptr; // ARPG: set by mod_arpg
 
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 {
@@ -236,6 +239,10 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         // AutoBalance.Enable.Global = 1 in a scaled instance)
         if (AutoBalance::IsActive())
             AutoBalance::OnPlayerBeforeLootMoney(player, loot, guid);
+
+        // ARPG: mod_arpg gold find (see ArpgHooks.h)
+        if (ArpgHooks::LootMoney)
+            ArpgHooks::LootMoney(player, loot->gold);
 
         loot->NotifyMoneyRemoved();
         if (shareMoney && player->GetGroup())      //item, pickpocket and players can be looted only single player

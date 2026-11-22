@@ -94,3 +94,9 @@ if (USE_MODULES)
 	# add core modules
 	add_subdirectory(modules)
 endif()
+
+# ARPG: unit tests for mod_arpg pure logic (ctest -R arpg); see docs/CODEMAP.md
+if (EXISTS ${CMAKE_SOURCE_DIR}/arpg/unittests/CMakeLists.txt)
+  enable_testing()
+  add_subdirectory(arpg/unittests)
+endif()
