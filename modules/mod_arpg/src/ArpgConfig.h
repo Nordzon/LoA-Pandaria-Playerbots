@@ -52,6 +52,11 @@ namespace Arpg
         float superuniqueScale = 1.4f;             // Arpg.Superunique.Scale
         float superuniquePatrolRadius = 15.0f;     // Arpg.Superunique.PatrolRadius (yards around its point; 0 = stand)
         bool superuniqueAnnounce = true;           // Arpg.Superunique.Announce (zone message on spawn)
+        bool dungeonEnabled = true;            // Arpg.Dungeon.Enabled (m5 party table / raid tiers / solo roles / level selector)
+        float dungeonSoloNonTankDamage = 0.75f;   // Arpg.Dungeon.SoloNonTankDamage (creature damage, alone and not a tank)
+        float dungeonSoloTankDamageDealt = 1.25f; // Arpg.Dungeon.SoloTankDamageDealt
+        float dungeonSoloHealerDamageDealt = 1.6f; // Arpg.Dungeon.SoloHealerDamageDealt
+        float dungeonRaidTierStep = 0.15f;     // Arpg.Dungeon.RaidTierStep (raid extra multiplier 1 + step x tier)
         bool paragonEnabled = true;      // Arpg.Paragon.Enabled
         double paragonXpBase = 600000.0; // Arpg.Paragon.XpBase (XP from Paragon 0 to 1)
         double paragonXpGrowth = 1.04;   // Arpg.Paragon.XpGrowth (each level needs this much more)

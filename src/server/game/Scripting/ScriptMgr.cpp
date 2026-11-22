@@ -18,6 +18,8 @@
 #include "ScriptMgrMacros.h"
 #include "ArpgHooks.h"   // ARPG: mod_arpg hook points
 
+ArpgHooks::InstanceScaleFn ArpgHooks::InstanceScale = nullptr; // ARPG: set by mod_arpg (dungeon/raid scaling)
+ArpgHooks::InstanceLevelFn ArpgHooks::InstanceLevel = nullptr; // ARPG: set by mod_arpg (dungeon level selector)
 ArpgHooks::ItemPickupFn ArpgHooks::ItemPickup = nullptr; // ARPG: set by mod_arpg (affix roll on new items)
 #include "DatabaseEnv.h"
 #include "DBCStores.h"

@@ -83,6 +83,7 @@ $overrides = @{
       'SkillGain.Gathering'    = "$SkillGain"
       'SkillChance.Yellow'     = '100'                # default 75
       'SkillChance.Green'      = '50'                 # default 25
+      'AutoBalance.Enable.Global' = '1'             # m5: dungeon/raid scaling (mod_arpg replaces the player-count curve)
     }
   }
   'playerbots.conf' = @{

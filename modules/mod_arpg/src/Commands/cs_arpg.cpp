@@ -16,6 +16,7 @@
 #include "Monsters/Superuniques.h"
 #include "Loot/Potions.h"
 #include "Paragon/Paragon.h"
+#include "Dungeons/InstanceScaling.h"
 #include "Loot/ZoneLevels.h"
 
 #include "Bag.h"
@@ -255,8 +256,14 @@ public:
             { "spend",  &HandleMyParagonSpend,  rbac::RBAC_PERM_COMMAND_HELP, Console::No },
             { "respec", &HandleMyParagonRespec, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
         };
+        static std::vector<ChatCommand> dungeonTable =
+        {
+            { "info",  &HandleDungeonInfo,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "level", &HandleDungeonLevel, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+        };
         static std::vector<ChatCommand> arpgTable =
         {
+            { "dungeon", dungeonTable,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "paragon", paragonTable,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "superunique", superuniqueTable, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "champion", championTable,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -297,8 +304,9 @@ public:
         std::string champ = Arpg::Monsters::LoadChampionData();
         std::string su = Arpg::Monsters::LoadSuperuniqueData();
         std::string pot = Arpg::Loot::LoadPotionData();
-        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
-            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str());
+        std::string dun = Arpg::Dungeons::LoadInstanceData();
+        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
+            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str());
         return ok;
     }
 
@@ -1296,6 +1304,33 @@ public:
             return false;
         p->GiveXP(uint32(std::max(1, atoi(t[1].c_str()))), nullptr);
         handler->PSendSysMessage("ok %s", Arpg::Paragon::Describe(p).c_str());
+        return true;
+    }
+
+    // .arpg dungeon info <char>   instance, players counted, role, solo, chosen level, raid tier
+    static bool HandleDungeonInfo(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg dungeon info <char>");
+        if (!p)
+            return false;
+        handler->PSendSysMessage("%s", Arpg::Dungeons::Describe(p).c_str());
+        return true;
+    }
+
+    // .arpg dungeon level <char> <mapId> <level|0>   the level that dungeon runs at for the character (0 = own level)
+    static bool HandleDungeonLevel(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 3)
+            return Fail(handler, "usage: .arpg dungeon level <char> <mapId> <level|0>");
+        Player* p = OnlineChar(handler, t, "usage: .arpg dungeon level <char> <mapId> <level|0>");
+        if (!p)
+            return false;
+        uint32 map = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
+        int level = std::max(0, std::min(atoi(t[2].c_str()), int(p->GetLevel())));
+        Arpg::Dungeons::SetChosenLevel(p, map, level);
+        handler->PSendSysMessage("ok dungeon level map=%u level=%d", map, Arpg::Dungeons::ChosenLevel(p, map));
         return true;
     }
 

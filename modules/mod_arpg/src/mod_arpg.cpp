@@ -13,6 +13,7 @@
 #include "Monsters/Superuniques.h"
 #include "Loot/Potions.h"
 #include "Paragon/Paragon.h"
+#include "Dungeons/InstanceScaling.h"
 
 #include "Chat.h"
 #include "Player.h"
@@ -48,6 +49,7 @@ namespace
             Arpg::Monsters::LoadChampionData();
             Arpg::Monsters::LoadSuperuniqueData();
             Arpg::Loot::LoadPotionData();
+            Arpg::Dungeons::LoadInstanceData();
         }
     };
 }
@@ -65,6 +67,7 @@ void AddSC_mod_arpg()
     Arpg::Monsters::InstallSuperuniques();
     Arpg::Loot::InstallPotions();
     Arpg::Paragon::InstallParagon();
+    Arpg::Dungeons::InstallInstanceScaling();
     Arpg::Loot::InstallLootPlanner();   // last kill script: plans corpse loot after the others added items and pity
     AddSC_arpg_commandscript();
 }

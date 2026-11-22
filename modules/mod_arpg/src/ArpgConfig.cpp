@@ -17,6 +17,8 @@ namespace
         "Arpg.Display.EnchantBase", "Arpg.Display.EnchantStride", "Arpg.Display.EffectBase", "Arpg.Display.SuffixBase", "Arpg.Display.UniqueBase", "Arpg.Test.ForceProcs", "Arpg.Scale.ZoneCapAbove", "Arpg.Scale.UncappedZones",
         "Arpg.Loot.ZoneCeilingMargin", "Arpg.Loot.SubstituteGap", "Arpg.Loot.SellCopperPerAffixLevel", "Arpg.Loot.GodRollPityEvery",
         "Arpg.Craft.MaxSkill", "Arpg.Craft.UniqueChance", "Arpg.Craft.UniquePityStep", "Arpg.Potion.DropMult",
+        "Arpg.Dungeon.Enabled", "Arpg.Dungeon.SoloNonTankDamage", "Arpg.Dungeon.SoloTankDamageDealt",
+        "Arpg.Dungeon.SoloHealerDamageDealt", "Arpg.Dungeon.RaidTierStep",
         "Arpg.Paragon.Enabled", "Arpg.Paragon.XpBase", "Arpg.Paragon.XpGrowth", "Arpg.Paragon.QuestXpPct",
         "Arpg.Paragon.WorldTierPct", "Arpg.Paragon.WorldTierCapPct", "Arpg.Paragon.StatPctPerPoint", "Arpg.Paragon.RatingPerPoint", "Arpg.Paragon.ArmorPctPerPoint",
         "Arpg.Paragon.MoveSpeedPerPoint", "Arpg.Paragon.MoveSpeedCap", "Arpg.Paragon.FindPerPoint", "Arpg.Paragon.MagicFindCap",
@@ -57,6 +59,11 @@ namespace Arpg
         s.godRollPityEvery = std::max(1, file.GetInt("Arpg.Loot.GodRollPityEvery", 3));
         s.craftMaxSkill = std::max(1, file.GetInt("Arpg.Craft.MaxSkill", 600));
         s.potionDropMult = std::max(0.0f, file.GetFloat("Arpg.Potion.DropMult", 1.0f));
+        s.dungeonEnabled = file.GetBool("Arpg.Dungeon.Enabled", true);
+        s.dungeonSoloNonTankDamage = std::max(0.0f, file.GetFloat("Arpg.Dungeon.SoloNonTankDamage", 0.75f));
+        s.dungeonSoloTankDamageDealt = std::max(0.0f, file.GetFloat("Arpg.Dungeon.SoloTankDamageDealt", 1.25f));
+        s.dungeonSoloHealerDamageDealt = std::max(0.0f, file.GetFloat("Arpg.Dungeon.SoloHealerDamageDealt", 1.6f));
+        s.dungeonRaidTierStep = std::max(0.0f, file.GetFloat("Arpg.Dungeon.RaidTierStep", 0.15f));
         s.paragonEnabled = file.GetBool("Arpg.Paragon.Enabled", true);
         s.paragonXpBase = std::max(1.0, double(file.GetFloat("Arpg.Paragon.XpBase", 600000.0f)));
         s.paragonXpGrowth = std::max(1.0, double(file.GetFloat("Arpg.Paragon.XpGrowth", 1.04f)));

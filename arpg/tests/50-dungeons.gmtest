@@ -1,0 +1,37 @@
+# Dungeon scaling (m5 tasks 3.1-3.3, SPEC 4.6). Needs Arpgtest online. AutoBalance (on via write-confs) scales the
+# instance; mod_arpg replaces its player-count curve: 5-man solo = 30% health / 40% damage, x0.75 damage for a non-tank.
+# The hook records what it applied (event recorder).
+
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg dungeon level Arpgtest 36 0
+? ok dungeon level map=36 level=0
+> .arpg test setup Arpgtest 90 deadmines-inside
+? ok .*\(online\)
+~ 12000
+> .arpg dungeon info Arpgtest
+? dungeon map=36 instance=1 raid=0 players=1 role=(damage|tank|healer) solo=1
+> .arpg test events Arpgtest
+? instance scale map=36 players=1 boss=0 health=0\.300 damage=0\.(300|400) tier=0 role=(0\.75|1\.00)
+
+# Level selector: run the Deadmines at 20 (chosen outside, applied when the instance counts its players on entry).
+> .arpg test setup Arpgtest 90 elwynn-northshire
+? ok .*\(online\)
+~ 8000
+> .arpg dungeon level Arpgtest 36 20
+? ok dungeon level map=36 level=20
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test setup Arpgtest 90 deadmines-inside
+? ok .*\(online\)
+~ 12000
+> .arpg test events Arpgtest
+? instance level map=36 level=20
+
+> .arpg dungeon level Arpgtest 36 0
+? ok
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 8000
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

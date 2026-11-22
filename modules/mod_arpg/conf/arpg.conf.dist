@@ -73,6 +73,18 @@ Arpg.Craft.MaxSkill = 600
 Arpg.Craft.UniqueChance = 2.0
 Arpg.Craft.UniquePityStep = 1.0
 
+# --- Dungeons and raids (SPEC 4.6, change m5-dungeon-scaling) ---------------------------
+#    Built on the core's AutoBalance (worldserver.conf AutoBalance.Enable.Global = 1, set by write-confs.ps1): mod_arpg
+#    replaces its player-count curve with arpg_party_scale (5-man solo 30% health / 40% damage .. full group 100%; raids
+#    10-man normal = 100%, solo 10% / 25%), times the raid tier (arpg_raid_tier: 1 + RaidTierStep x tier).
+#    Alone in a 5-man: creatures deal x SoloNonTankDamage to a non-tank; a tank deals x SoloTankDamageDealt, a healer
+#    x SoloHealerDamageDealt. A character may pick the level a dungeon runs at (.arpg dungeon level).
+Arpg.Dungeon.Enabled = 1
+Arpg.Dungeon.SoloNonTankDamage = 0.75
+Arpg.Dungeon.SoloTankDamageDealt = 1.25
+Arpg.Dungeon.SoloHealerDamageDealt = 1.6
+Arpg.Dungeon.RaidTierStep = 0.15
+
 # --- Paragon (SPEC 4.5, change m4-paragon) ----------------------------------------------
 #    From the max level all XP becomes Paragon XP. XP to the next Paragon level = XpBase x XpGrowth^level
 #    (600000 / 1.04: >= 5 levels in a 2-hour session at the start, then slower). QuestXpPct: share of a quest's XP at the max

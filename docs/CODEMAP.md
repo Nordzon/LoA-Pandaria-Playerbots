@@ -13,6 +13,7 @@ verified against this fork — confirm in m0 and remove the mark.
 | `modules/mod_arpg/src/Loot/Potions.{h,cpp}` + `Core/Potions` | m3b potions: % heal override (ModifyHealReceived by potion spell), resource restore (OnSpellCast), drops by monster kind (OnCreatureKill), `.arpg test potion`; data `arpg_potion`, `arpg_potion_drop`, item_template + Item-sparse hotfixes |
 | `modules/mod_arpg/src/Paragon/Paragon.{h,cpp}` + `Core/Paragon` | m4 Paragon: XP at 90 -> Paragon (OnGiveXP, OnQuestRewarded), points (D3 rotation, `character_paragon_point`), bonuses, `.paragon` player commands + data line `ARPGP|…` for the addon |
 | `arpg/addons/ArpgUI/` | client addon: Paragon window (`/paragon`, P button); install with `arpg/scripts/install-addons.ps1` |
+| `modules/mod_arpg/src/Dungeons/InstanceScaling.{h,cpp}` + `Core/InstanceScale` | m5: party-size table x raid tier x solo role replaces AutoBalance's curve, solo tank/healer damage dealt, dungeon level selector (`character_arpg_dungeon_level`), `.arpg dungeon info|level` |
 | `modules/mod_arpg/sql/tools/gen_monster_tags.py` | generates the Champion/Superunique tag copies of creature templates (entry +5,000,000 / +6,000,000) |
 | `modules/mod_arpg/src/Monsters/Superuniques.{h,cpp}` | m3 Superuniques: zone pools (`arpg_superunique`, `_spawn`, `_ability`), PerZone alive while a real player is in the zone, band kind 1 via `Scaling::Pin`, kit abilities at the aggro holder (% of target max health), rotation `Core::NextSuperunique`, kill → orb/blue/Unique ladder, `.arpg superunique spawn/next/info/kill/loot/fight` |
 | `modules/mod_arpg/src/Commands/cs_arpg.cpp` | `.arpg version/reload/config set/test setup/scale probe` |
@@ -48,6 +49,7 @@ verified against this fork — confirm in m0 and remove the mark.
 | Hook | Our handler | Change |
 | --- | --- | --- |
 | `ArpgHooks::CreatureLevel` (our hook in `Creature::SelectLevel`) | `WorldScaling.cpp` `CreatureLevelHook` | m1 |
+| `ArpgHooks::InstanceScale` / `InstanceLevel` (in `Maps/AutoBalanceLevelScaling.cpp` ComputeCreatureMultipliers / RecountPlayers) | `Dungeons/InstanceScaling.cpp` | m5 |
 | `ArpgHooks::ItemPickup` (in `ScriptMgr::OnItemPickup`) | `Loot/AffixRoller.cpp` `PickupHook` | m2 |
 | `ArpgHooks::ItemBonuses` (in `Player::_ApplyItemBonuses`) + `PlayerScript::OnLogout` | `Loot/AffixStats.cpp` | m2 |
 | `PlayerScript::OnUpdate`, `OnLogout` | `ArpgScalingPlayerScript` | m1 |

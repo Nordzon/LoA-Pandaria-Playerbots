@@ -12,6 +12,7 @@ class Creature;
 class Item;
 class Player;
 struct Loot;
+class Map;
 enum class ItemPickupSourceType : uint8;
 
 namespace ArpgHooks
@@ -44,6 +45,17 @@ namespace ArpgHooks
     // the two always agree - no sell/buy-back gold loop). Returns the price to use; `basePrice` = template price * count.
     using ItemSellPriceFn = uint64 (*)(Item const* item, uint64 basePrice);
     TC_GAME_API extern ItemSellPriceFn ItemSellPrice;
+
+    // AutoBalance (Maps/AutoBalanceLevelScaling.cpp ComputeCreatureMultipliers): a creature's player-count health / damage
+    // multipliers before AutoBalance's floors. mod_arpg may replace them (party-size table x raid tier x solo role, m5).
+    // playerCount = AutoBalance's adjusted count (bots included).
+    using InstanceScaleFn = void (*)(Map* map, uint32 maxPlayers, uint32 playerCount, bool boss, float& health, float& damage);
+    TC_GAME_API extern InstanceScaleFn InstanceScale;
+
+    // AutoBalance RecountPlayers: the player level the instance scales its creatures to (the highest player level).
+    // mod_arpg may lower it (dungeon level selector, m5).
+    using InstanceLevelFn = void (*)(Map* map, uint8& level);
+    TC_GAME_API extern InstanceLevelFn InstanceLevel;
 }
 
 #endif

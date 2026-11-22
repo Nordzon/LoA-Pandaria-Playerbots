@@ -116,6 +116,7 @@
  */
 
 #include "AutoBalanceLevelScaling.h"
+#include "ArpgHooks.h" // ARPG
 #include "Chat.h"
 #include "Config.h"
 #include "Creature.h"
@@ -913,6 +914,8 @@ namespace
         state.adjustedPlayerCount = uint32(std::clamp<int32>(adjusted, 0, 255));
 
         // nobody left: keep the last levels (nothing re-scales without players, phase 1)
+        if (highest && ArpgHooks::InstanceLevel) // ARPG: mod_arpg dungeon level selector may lower it
+            ArpgHooks::InstanceLevel(map, highest);
         if (highest)
         {
             state.highestPlayerLevel = highest;
@@ -1125,7 +1128,8 @@ namespace
     }
 
     // AB ABAllCreatureScript.cpp:513-543 + :645-1409: the player-count (and level) multipliers of a relevant creature.
-    void ComputeCreatureMultipliers(CreatureState& cs, CreatureTemplate const* cinfo, InstanceState const& state, Settings const& s)
+    void ComputeCreatureMultipliers(CreatureState& cs, CreatureTemplate const* cinfo, InstanceState const& state, Settings const& s,
+                                    Map* map = nullptr) // ARPG: map for the mod_arpg hook
     {
         cs.healthMultiplier = cs.scaledHealthMultiplier = 1.0f;
         cs.manaMultiplier = cs.scaledManaMultiplier = 1.0f;
@@ -1150,6 +1154,10 @@ namespace
         StatModifiers const mods = StatModifiersFor(state, s, true, cs.boss, cinfo->Entry);
 
         float health = defaultMultiplier * mods.global * mods.health;
+        float damage = defaultMultiplier * mods.global * mods.damage;
+        // ARPG: mod_arpg party-size table x raid tier x solo role (see ArpgHooks.h)
+        if (ArpgHooks::InstanceScale && map)
+            ArpgHooks::InstanceScale(map, state.maxPlayers, adjustedPlayerCount, cs.boss, health, damage);
         if (health <= s.minHPModifier)
             health = s.minHPModifier;
         cs.healthMultiplier = health;
@@ -1164,7 +1172,6 @@ namespace
         cs.armorMultiplier = defaultMultiplier * mods.global * mods.armor;
         cs.scaledArmorMultiplier = cs.armorMultiplier;                  // the core already reads the armor of the scaled level
 
-        float damage = defaultMultiplier * mods.global * mods.damage;
         if (damage <= s.minDamageModifier)
             damage = s.minDamageModifier;
         cs.damageMultiplier = damage;
@@ -1938,7 +1945,7 @@ uint8 AutoBalance::OnCreatureSelectLevel(Creature* creature, CreatureTemplate co
     creatureState.selectedLevel = selectedLevel;
     creatureState.boss = boss;
     creatureState.stamp = state->stamp;
-    ComputeCreatureMultipliers(creatureState, cinfo, *state, *settings);
+    ComputeCreatureMultipliers(creatureState, cinfo, *state, *settings, map); // ARPG: map
 
     if (selectedLevel != unmodifiedLevel)
         expansionColumn = int32(ExpansionColumnForLevel(selectedLevel));
