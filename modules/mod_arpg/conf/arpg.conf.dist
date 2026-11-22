@@ -1,0 +1,165 @@
+###############################################################################
+# Pandaria ARPG (mod_arpg) settings.
+# Copied to arpg.conf next to worldserver.exe by arpg\scripts\write-confs.ps1 (only if arpg.conf is missing,
+# so your edits survive). Apply edits with ".arpg reload" - no restart needed.
+###############################################################################
+
+# --- World scaling (change m1-world-scaling, SPEC 4.2) -----------------------
+# Open-world creatures near a real player (not bots) rise to the player's level + LevelOffset.
+# Upward-only: higher-level creatures are never lowered. Creatures already in combat keep their level.
+
+#    Arpg.Scale.Enabled      1 = on, 0 = off (kill switch)
+Arpg.Scale.Enabled = 1
+
+#    Arpg.Scale.LevelOffset  levels added to the player's level (may be negative)
+Arpg.Scale.LevelOffset = 0
+
+#    Arpg.Scale.Radius       yards around the player in which creatures are scaled (~visibility range)
+Arpg.Scale.Radius = 100
+
+#    Arpg.Scale.HealthMod    extra multiplier on a scaled creature's health (1.0 = core stats for that level)
+Arpg.Scale.HealthMod = 1.0
+
+#    Arpg.Scale.DamageMod    extra multiplier on a scaled creature's melee damage
+Arpg.Scale.DamageMod = 1.0
+
+#    Arpg.Scale.TickMs       how often (ms) each real player's surroundings are checked (min 200)
+Arpg.Scale.TickMs = 1000
+
+#    Arpg.Scale.ZoneCapAbove   monsters scale to at most the zone's normal max level (arpg_zone_level) + this many levels
+#                              (owner 2026-11-22: 15). Zones without a range (cities, unknown) are not capped.
+Arpg.Scale.ZoneCapAbove = 15
+
+#    Arpg.Scale.UncappedZones  comma list of zone ids that scale to any level (5840 = Vale of Eternal Blossoms, endgame hub)
+Arpg.Scale.UncappedZones = "5840"
+
+# --- Loot (change m2-affix-loot, SPEC 4.1) -----------------------------------------
+#    Arpg.Loot.EpicIlvlCurve  player level -> item level of an epic at that level, "level:ilvl,..." (linear between points).
+#                             B (the stat budget flat affixes are a share of) is the core's epic budget at that item level.
+Arpg.Loot.EpicIlvlCurve = "1:6,59:64,60:66,70:115,80:213,85:359,90:463"
+
+#    Arpg.Loot.Enabled        1 = items roll affixes when a real player gets them (loot, quest rewards, crafting)
+Arpg.Loot.Enabled = 1
+
+#    Arpg.Loot.AffixBotItems  1 = bots' items roll affixes too (default 0: bot gear stays vanilla)
+Arpg.Loot.AffixBotItems = 0
+
+#    Arpg.Loot.SmartLootPct   % of items whose first affix is your spec's main stat (if the slot allows it)
+Arpg.Loot.SmartLootPct = 70
+
+#    Arpg.Loot.ZoneCeilingMargin  loot level = min(player level, zone max level + this). Out-levelled zones stop giving
+#                                 better loot (prompts moving on). Instances: no ceiling.
+Arpg.Loot.ZoneCeilingMargin = 15
+
+#    Arpg.Loot.SubstituteGap      a drop whose required level is more than this below the loot level is swapped for a
+#                                 same-slot, same-type, same-quality item near the loot level
+Arpg.Loot.SubstituteGap = 5
+
+#    Arpg.Loot.SellCopperPerAffixLevel  vendor price = template price + affixes x required level x this (copper).
+#                                       200 = a level-90 item with 4 affixes sells for 7.2 gold more. Buyback uses the same price.
+Arpg.Loot.SellCopperPerAffixLevel = 200
+
+#    Arpg.Loot.GodRollPityEvery  every Nth boss kill without a 5-affix item makes the next epic from boss loot roll 5 affixes
+#                                (BALANCE §13). Items from bosses always roll at the highest tier the loot level allows.
+Arpg.Loot.GodRollPityEvery = 3
+
+# --- Crafting wheel (SPEC 4.8) -----------------------------------------------------
+#    Crafted green/blue/epic items roll affixes like loot. Recipe colour: orange/yellow +1 affix tier (and may become a
+#    Unique), green plain, grey capped at T1. A catalyst in the craft adds +1 tier and doubles the Unique chance.
+#    Arpg.Craft.MaxSkill        crafter skill at or above this rolls one extra affix (never past the quality's max count)
+#    Arpg.Craft.UniqueChance    % chance an orange/yellow craft becomes a Unique of its slot (if one exists)
+#    Arpg.Craft.UniquePityStep  + % per such craft without a Unique (per character and profession)
+Arpg.Craft.MaxSkill = 600
+Arpg.Craft.UniqueChance = 2.0
+Arpg.Craft.UniquePityStep = 1.0
+
+# --- Paragon (SPEC 4.5, change m4-paragon) ----------------------------------------------
+#    From the max level all XP becomes Paragon XP. XP to the next Paragon level = XpBase x XpGrowth^level
+#    (600000 / 1.04: >= 5 levels in a 2-hour session at the start, then slower). QuestXpPct: share of a quest's XP at the max
+#    level that counts (the core pays gold instead of XP there; owner to decide full or half).
+Arpg.Paragon.Enabled = 1
+Arpg.Paragon.XpBase = 600000
+Arpg.Paragon.XpGrowth = 1.04
+Arpg.Paragon.QuestXpPct = 100
+
+# --- Potions (change m3b-potions) --------------------------------------------------------
+#    Potions heal / restore a % of max health / resource (arpg_potion), drop by monster kind (arpg_potion_drop: normal 5%,
+#    elite 15%, Champion 50%, Superunique and boss always), stack to 999, need level 1, 10 s shared cooldown (SQL, hotfixed
+#    to the client). Arpg.Potion.DropMult multiplies every drop chance (1 = as the table says).
+Arpg.Potion.DropMult = 1
+
+# --- Superuniques (SPEC 4.3, BALANCE §14) ---------------------------------------------
+#    Zones with a pool (arpg_superunique) keep PerZone alive while a real player is in the zone; RespawnDelay seconds after a
+#    kill a DIFFERENT one spawns at one of its points. Kill: 40% orb, a guaranteed blue, Unique chance + step per kill without.
+Arpg.Superunique.Enabled = 1
+Arpg.Superunique.PerZone = 1
+Arpg.Superunique.RespawnDelay = 300
+Arpg.Superunique.UniqueChance = 10
+Arpg.Superunique.UniqueBadLuckStep = 5
+Arpg.Superunique.Scale = 1.4
+#    Arpg.Superunique.PatrolRadius  yards it roams around its spawn point (0 = stands still)
+#    Arpg.Superunique.Announce      1 = zone message "<name> stalks <area>!" when one spawns
+Arpg.Superunique.PatrolRadius = 15
+Arpg.Superunique.Announce = 1
+
+# --- Champions (SPEC 4.3, BALANCE §14) -----------------------------------------------
+#    An open-world creature becomes a Champion the first time a real player's scaling tick sees it (once per life).
+#    Level / health / damage / monster affixes / minions come from arpg_monster_band by the player's level.
+#    Arpg.Champion.Enabled         1 = on
+#    Arpg.Champion.Chance          % chance per creature (rares and bosses never)
+#    Arpg.Champion.Scale           model size multiplier (0 = unchanged)
+#    Arpg.Champion.VisualAura      spell id of a glow aura on the Champion (0 = none until one is picked in game)
+#    Arpg.Champion.LootBlueChance  % chance the loot floor adds a blue (it always adds a green); items looted from a
+#                                  Champion roll +1 affix tier
+Arpg.Champion.Enabled = 1
+#    Arpg.Champion.EntryOffset / Arpg.Superunique.EntryOffset: tag copies of creature templates ("Champion <name>" rank Rare,
+#    "Unique <name>" rank Rare Elite) made by sql/tools/gen_monster_tags.py with these offsets; 0 = no tag (keep the name)
+Arpg.Champion.EntryOffset = 5000000
+Arpg.Superunique.EntryOffset = 6000000
+Arpg.Champion.Chance = 2.0
+Arpg.Champion.Scale = 1.25
+Arpg.Champion.VisualAura = 0
+Arpg.Champion.LootBlueChance = 25
+
+#    Monster affixes (damage is always a % of the player's max health from arpg_monster_band.affix_damage_pct, never a kill):
+#    Arpg.Champion.ChillSpell        Cold Enchanted: aura put on the player on each hit (6136 Chilled)
+#    Arpg.Champion.SparkChance       Lightning Enchanted: % per hit to spark for a third of the affix damage
+#    Arpg.Champion.NukeSpell         Arcane Caster: interruptible cast every NukeEveryMs at its target (133 Fireball's cast)
+#    Arpg.Champion.ExplosionRadius   Fire Enchanted: death blast radius; it goes off ExplosionDelayMs after the kill
+Arpg.Champion.ChillSpell = 6136
+Arpg.Champion.SparkChance = 25
+Arpg.Champion.NukeSpell = 133
+Arpg.Champion.NukeEveryMs = 8000
+Arpg.Champion.ExplosionRadius = 8
+Arpg.Champion.ExplosionDelayMs = 1500
+
+# --- Affix display (SPEC 5, client patch) ----------------------------------------
+#    Arpg.Display.Enabled       1 = flat stat affixes show as tooltip lines from our client patch rows (needs the patch
+#                               Data\enUS\wow-update-enUS-20000.MPQ and the unlocked Wow-64-all.exe); 0 = old behaviour
+#                               (only values a Blizzard enchant row matches within 5% show)
+Arpg.Display.Enabled = 1
+
+#    Arpg.Display.EnchantBase   first enchant id of our rows; EnchantStride = ids per stat (values 1..stride-1).
+#                               MUST match arpg/client-patch/build-client-patch.py output (it reads these keys).
+Arpg.Display.EnchantBase = 60000
+Arpg.Display.EnchantStride = 2000
+
+#    Arpg.Display.EffectBase    first id of the effect affix rows (id = base + effect * 1000 + value in tenths of a %).
+Arpg.Display.EffectBase = 100000
+
+#    Arpg.Display.SuffixBase    random-suffix rows (id = base + affix id): an affixed item shows 5 lines (slots 8-12) and is
+#                               named after its highest-tier affix ("... of the Phoenix"). Client patch AND server DBC.
+Arpg.Display.SuffixBase = 30000
+
+#    Arpg.Display.UniqueBase    Unique power tooltip lines: id = base + power * 1000 + tier * 100 + roll step. Unique names use
+#                               suffix rows SuffixBase + 1000 + unique id. Both come from the client patch generator.
+Arpg.Display.UniqueBase = 200000
+
+# --- Testing ---------------------------------------------------------------------
+#    Arpg.Test.RecordEvents  1 = our code records what it does per character, read with ".arpg test events <char>"
+#                            (tests switch it on with ".arpg config set"); 0 = off (normal play)
+Arpg.Test.RecordEvents = 0
+
+#    Arpg.Test.ForceProcs    1 = every chance-on-hit affix procs (Fire Nova, Chain Lightning, Frost Nova, poison, bleed,
+#                            crushing blow, struck chain); tests switch it on with ".arpg config set". 0 = normal play.
+Arpg.Test.ForceProcs = 0
