@@ -8,11 +8,11 @@
   bonus per point with caps, world tier multiplier
 
 ## 2. Data
-- [ ] 2.1 characters `character_paragon` (guid, level, xp) + `character_paragon_point` (guid, tab, stat, points)
+- [x] 2.1 characters `character_paragon` (guid, level, xp) + `character_paragon_point` (guid, tab, stat, points)
 - [ ] 2.2 `arpg.conf`: Arpg.Paragon.Enabled, XpBase, XpGrowth, WorldTierPct, WorldTierCapPct, RespecGold
 
 ## 3. Game wiring
-- [ ] 3.1 XP at max level -> Paragon XP (PlayerScript OnGiveXP), level-ups with a message
+- [x] 3.1 XP at max level -> Paragon XP (OnGiveXP for kills, OnQuestRewarded for quests x QuestXpPct), level-ups with a message
 - [ ] 3.2 Stat bonuses applied on login / spend / respec (same machinery as affix stats)
 - [ ] 3.3 World tier in uncapped zones (health/damage on scaling, XP bonus)
 - [ ] 3.4 `.paragon info|spend|respec`, `.arpg paragon set|info <char>`

@@ -88,7 +88,7 @@ namespace
                 Arpg::Paragon::AddXp(player, xp, "quest");
         }
 
-        void OnLogin(Player* player, bool /*firstLogin*/) override
+        void OnLogin(Player* player) override
         {
             Load(player->GetGUID().GetCounter());
         }

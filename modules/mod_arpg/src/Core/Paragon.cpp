@@ -8,7 +8,8 @@ namespace Arpg::Core
     uint64_t ParagonXpToNext(ParagonCurve const& c, int level)
     {
         double v = std::max(1.0, c.base) * std::pow(std::max(1.0, c.growth), double(std::max(0, level)));
-        return v >= 1.8e19 ? UINT64_MAX : std::max<uint64_t>(1, uint64_t(v));
+        // Rounded to the nearest XP: config floats (1.04 -> 1.0399999) must not shift the curve by one.
+        return v >= 1.8e19 ? UINT64_MAX : std::max<uint64_t>(1, uint64_t(std::llround(v)));
     }
 
     int AddParagonXp(ParagonCurve const& c, int& level, uint64_t& xpIntoLevel, uint64_t gained)

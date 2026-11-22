@@ -10,6 +10,8 @@ TEST(paragon_curve_grows_slowly)
     CHECK_EQ(ParagonXpToNext(c, 0), 600000u);
     CHECK(ParagonXpToNext(c, 10) > 880000u && ParagonXpToNext(c, 10) < 890000u);   // 600k x 1.04^10 = 888k
     CHECK(ParagonXpToNext(c, 100) > ParagonXpToNext(c, 99));
+    ParagonCurve f{ 600000.0, double(1.04f) };   // as read from the conf (float): still exact
+    CHECK_EQ(ParagonXpToNext(f, 1), 624000u);
 }
 
 TEST(paragon_xp_carries_over_levels)
