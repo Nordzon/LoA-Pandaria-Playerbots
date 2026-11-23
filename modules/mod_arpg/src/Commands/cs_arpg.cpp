@@ -189,6 +189,7 @@ public:
         {
             { "setup",    &HandleTestSetup,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "learnall", &HandleTestLearnAll, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "professions", &HandleTestProfessions, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "events",   &HandleTestEvents,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "pack",     &HandleTestPack,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "give",     &HandleTestGive,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -312,12 +313,17 @@ public:
             { "test",    testTable,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "scale",   scaleTable,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
         };
+        static std::vector<ChatCommand> playerProfessionsTable =
+        {
+            { "data", &HandleMyProfessionsData, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+        };
         static std::vector<ChatCommand> commandTable =
         {
             { "arpg",    arpgTable,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "paragon", playerParagonTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
             { "lootpet", playerLootPetTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
             { "lootfilter", playerFilterTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "professions", playerProfessionsTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
         };
         return commandTable;
     }
@@ -449,6 +455,58 @@ public:
             if (p->HasSkill(skillId))
                 ++have;
         handler->PSendSysMessage("ok %s professions=%u of 11", p->GetName().c_str(), have);
+        return true;
+    }
+
+    // Professions panel data (m1b 2.1): "ARPGT|skill:value:max:spell;..." for every primary profession the character has, in
+    // the order below. spell = a known spell of that skill line that opens its window (trade skill effect), 0 if none
+    // (Herbalism, Skinning). The client can't list more than two primaries itself, so ArpgUI reads this line.
+    static std::string ProfessionsDataLine(Player* p)
+    {
+        static uint32 const primarySkills[] = { 171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197 };
+        std::string line = "ARPGT|";
+        bool first = true;
+        for (uint32 skillId : primarySkills)
+        {
+            if (!p->HasSkill(skillId))
+                continue;
+            uint32 openSpell = 0;
+            for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows() && !openSpell; ++j)
+            {
+                SkillLineAbilityEntry const* sla = sSkillLineAbilityStore.LookupEntry(j);
+                if (!sla || sla->SkillLine != skillId || !p->HasSpell(sla->Spell))
+                    continue;
+                SpellInfo const* info = sSpellMgr->GetSpellInfo(sla->Spell);
+                if (info && info->HasEffect(SPELL_EFFECT_TRADE_SKILL))
+                    openSpell = sla->Spell;
+            }
+            line += (first ? "" : ";") + std::to_string(skillId) + ":" + std::to_string(p->GetSkillValue(skillId)) + ":"
+                + std::to_string(p->GetMaxSkillValue(skillId)) + ":" + std::to_string(openSpell);
+            first = false;
+        }
+        return line;
+    }
+
+    // .arpg test professions <char>   the professions panel line of an online character
+    static bool HandleTestProfessions(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 1 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test professions <char>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        handler->SendSysMessage(ProfessionsDataLine(p).c_str());
+        return true;
+    }
+
+    // .professions data   (player) the panel line for ArpgUI
+    static bool HandleMyProfessionsData(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        handler->SendSysMessage(ProfessionsDataLine(p).c_str());
         return true;
     }
 

@@ -1,7 +1,8 @@
 ## Interface: 50400
 ## Title: ArpgUI
-## Notes: Pandaria ARPG: Paragon window, loot companion button, loot filter panel. Talks to mod_arpg through .paragon commands.
+## Notes: Pandaria ARPG: Paragon window, loot companion button, loot filter panel, professions panel. Talks to mod_arpg through .paragon commands.
 ## Version: 0.1
 ## SavedVariablesPerCharacter: ArpgUIDB
 Paragon.lua
 Loot.lua
+Professions.lua

@@ -3,3 +3,8 @@
 
 > .arpg test learnall Arpgtest
 ? professions=11 of 11
+
+# --- ArpgUI professions panel line (m1b 2.1): all 11 listed with skill; crafting ones carry the spell that opens their window.
+> .arpg test professions Arpgtest
+? ARPGT\|171:\d+:\d+:[1-9]\d*;164:\d+:\d+:[1-9]\d*;333:\d+:\d+:[1-9]\d*;202:
+? ARPGT\|(\d+:\d+:\d+:\d+;){10}\d+:\d+:\d+:\d+\s*$

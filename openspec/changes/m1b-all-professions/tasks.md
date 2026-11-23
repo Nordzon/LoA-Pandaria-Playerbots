@@ -5,7 +5,7 @@
 - [x] 1.2 If hard-coded: tiny `// ARPG:` patch — not needed (config key)
 
 ## 2. Addon
-- [ ] 2.1 ArpgUI professions panel: list learned professions + skill, click opens the profession window
+- [x] 2.1 ArpgUI professions panel: list learned professions + skill, click opens the profession window
 
 ## 2b. Crafting wheel (owner 2026-11-22, SPEC 4.8)
 - [x] 2b.1 Recipe colour → tier bonus / affix count (orange/yellow +1 tier, max skill +1 affix, grey T1); craft source detection in the roll
