@@ -1,7 +1,6 @@
 # Code map
 
-What's where, and what we've touched. Paths marked **?** are TrinityCore-family guesses not yet
-verified against this fork — confirm in m0 and remove the mark.
+What's where, and what we've touched. All paths below were checked against this fork (2026-11-23).
 
 ## Our code
 | Path | What |
@@ -40,10 +39,10 @@ verified against this fork — confirm in m0 and remove the mark.
 | Creature level/stats | `src/server/game/Entities/Creature/Creature.cpp` | `SelectLevel(cinfo, keepLevel)` computes health/damage/AP for a level; `UpdateAllStats` |
 | Instance scaling | `src/server/game/Maps/AutoBalanceLevelScaling.{h,cpp}` | Port of AC mod-autobalance (instances only, off by default) - base for m5 dungeon scaling |
 | Module build | `modules/CMakeLists.txt` | Every subfolder with .cpp/.h is a module; all its .cpp go into lib `modules`; entry `AddSC_<folder>()` |
-| Player XP | `src/server/game/Entities/Player/Player.cpp` **?** | `GiveXP` → Paragon intercept at 90 |
-| Item enchant slots | `src/server/game/Entities/Item/Item.{h,cpp}` **?** | `SetEnchantment`, PROP_ENCHANTMENT slots for affixes |
-| Loot | `src/server/game/Loot/` **?** | item creation on loot |
-| Dungeon Finder | `src/server/game/DungeonFinding/LFGMgr.cpp` **?** | level checks, bot matching hook |
+| Player XP | `src/server/game/Entities/Player/Player.cpp` | `Player::GiveXP`; Paragon takes XP at 90 through `PlayerScript::OnGiveXP` (no core patch) |
+| Item enchant slots | `src/server/game/Entities/Item/Item.{h,cpp}` | `Item::SetEnchantment(slot, id, duration, charges)`; PROP_ENCHANTMENT slots for affixes |
+| Loot | `src/server/game/Loot/LootMgr.{h,cpp}` | `struct LootItem` (`randomPropertyId` carries our roll plan), loot generation |
+| Dungeon Finder | `src/server/game/DungeonFinding/LFGMgr.cpp` | `InitializeLockedDungeons` (level locks), `JoinLfg`, `CheckGroupRoles` - m7 bot matching hook |
 | Chat commands | `src/server/scripts/Commands/` | `std::vector<ChatCommand>` tables; we use `rbac::RBAC_PERM_COMMAND_DEBUG` (GM 3 has it; no auth DB rows needed) |
 | Playerbots | `modules/mod_playerbots/` | bot AI, `.botscenario` test commands in `src/Scenario/` |
 | Headless client | `contrib/headless-client/` | scripted login smoke tests |

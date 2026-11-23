@@ -34,5 +34,5 @@ Bots: off during build/smoke; turned **on (300)** for play once mmaps exist (own
 - [ ] 4.5 First full `update-upstream.ps1` run end to end (backup, tag, merge, build, tests)
 
 ## 5. Docs
-- [ ] 5.1 Verify CODEMAP **?** paths against this fork
+- [x] 5.1 Verify CODEMAP **?** paths against this fork (2026-11-23: all four exist; rows now name the real functions)
 - [x] 5.2 Update PROGRESS (Now + Log)

@@ -22,8 +22,8 @@
 - [ ] 3b.2 Confirm each native window opens on the summoned pet (core `GetNPCIfCanInteractWith` accepts it); fix with a tiny `// ARPG:` patch only if one refuses
 - [x] 3b.3 (vendor list as `npc_vendor` rows for 7000001; looks `arpg_companion_model`, 9 models) `arpg_companion_vendor` (reagents/consumables) and gossip "Change appearance" from `arpg_companion_model`; choice persists (`character_arpg_companion`)
 - [x] 3b.4 Roles off in combat (`Arpg.Companion.InCombat` 0): flags cleared on combat start, restored on combat end
-- [ ] 3b.5 `.arpg companion info|model|roles <char> ...`
-- [ ] 3b.6 `arpg/tests/22-companion.gmtest`: flags match config; model change persists; vendor list present
+- [x] 3b.5 `.arpg companion info|model|roles <char> ...` (done as `.arpg lootpet info|model`: info shows the role flags)
+- [x] 3b.6 `arpg/tests/22-companion.gmtest`: flags match config; model change persists; vendor list present (covered in `34-loot-pet.gmtest`)
 
 ## 4. Addon
 - [x] 4.1 ArpgUI: pet toggle button (L by the minimap; left = on/off, right = filter panel)

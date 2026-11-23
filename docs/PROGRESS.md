@@ -57,6 +57,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-23 10:25 m0 5.1: CODEMAP guessed paths verified (no **?** left); ticked m2 5.1 (sell formula unit test existed), m2b 3b.5/3b.6 (covered by `.arpg lootpet` + test 34). Docs only.
 - 2026-11-23 10:10 m1-world-scaling 3.4: bot lock GM test (`.arpg scale combat <char> <spawnId> on|off|status`: a Young Wolf stand-in on a player faction; neutral mobs (faction 7) need faction 14 for the fight) - test 10 passes.
 - 2026-11-23 09:05 m1b-all-professions 2.1: ArpgUI professions panel (all 11 listed from the server line `ARPGT|`, secure buttons open each window); full run ALL OK.
 - 2026-11-23 08:35 m6-any-race-class: CharBaseInfo client rows + server copy, headless Undead Monk creation test OK; gmtest `*` retry directive (test 40 world-tier check waited a fixed 4 s and once saw no event).

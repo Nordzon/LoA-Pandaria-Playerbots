@@ -41,7 +41,7 @@
 - [x] 4.6 MPQ-loading spike — **works** (2026-11-22): unlocked `Wow-64-all.exe` + plain DBC in `Data\enUS\wow-update-enUS-20000.MPQ`; new enchant rows (5300, 60000) and a changed row show in game. Native slots 9-12. Details SPEC 5
 
 ## 5. Tests
-- [ ] 5.1 Unit: AffixRoll rules, AffixValue ranges, sell formula
+- [x] 5.1 Unit: AffixRoll rules, AffixValue ranges, sell formula (test_affixroll, test_affixvalue incl. `affix_sell_value`)
 - [~] 5.2 `21-affix-loot.gmtest`: per-quality counts, tier cap by level, saved to DB, Blizzard-random items skipped, kill switch — done; relog + bot item still to add
 - [x] 5.3 pity tests: god-roll on 3rd kill (`25-boss-pity`), pity set 4 → Unique (`27-unique-drops`)
 - [ ] 5.4 Headless: sell one 3-affix item, gold delta = formula
