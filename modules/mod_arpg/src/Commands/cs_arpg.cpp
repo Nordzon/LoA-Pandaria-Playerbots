@@ -26,6 +26,7 @@
 
 #include "ObjectMgr.h"
 #include "TemporarySummon.h"
+#include <map>
 
 #include "CellImpl.h"
 #include "Chat.h"
@@ -211,6 +212,7 @@ public:
         static std::vector<ChatCommand> scaleTable =
         {
             { "probe", &HandleScaleProbe, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "combat", &HandleScaleCombat, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
         };
         static std::vector<ChatCommand> lootTable =
         {
@@ -1849,6 +1851,82 @@ public:
     }
 
     // .arpg scale probe <char> nearest|<spawnId>
+    // .arpg scale combat <char> <spawnId> on|off   (m1 3.4) the bot lock without bots: "on" makes that creature fight a
+    // summoned stand-in (a Young Wolf on a player faction, defensive, with a million health) that is not a real player, as when a bot pulls it;
+    // "off" removes the stand-in so the creature leaves combat. A creature in such a fight must keep its level.
+    static bool HandleScaleCombat(ChatHandler* handler, char const* args)
+    {
+        static std::map<uint32, ObjectGuid> standIns;   // spawnId -> stand-in
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 3 || !IsNameLike(t[0]) || (t[2] != "on" && t[2] != "off" && t[2] != "status"))
+            return Fail(handler, "usage: .arpg scale combat <char> <spawnId> on|off|status");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        uint32 spawnId = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
+        float radius = sArpgConfig.Get().scaleRadius;
+        Creature* c = nullptr;
+        std::list<Unit*> units;
+        Trinity::AnyUnitInObjectRangeCheck check(p, radius);
+        Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(p, units, check);
+        Cell::VisitAllObjects(p, searcher, radius);
+        for (Unit* u : units)
+            if (Creature* cr = u->ToCreature())
+                if (cr->GetDBTableGUIDLow() == spawnId)
+                    c = cr;
+        if (!c || !c->IsAlive())
+            return Fail(handler, "spawn " + t[1] + " not found alive near " + p->GetName());
+
+        if (t[2] == "status")
+        {
+            Unit* v = c->GetVictim();
+            Creature* d = nullptr;
+            auto it = standIns.find(spawnId);
+            if (it != standIns.end())
+                d = ObjectAccessor::GetCreature(*p, it->second);
+            handler->PSendSysMessage("ok combat status spawn=%u incombat=%u victim=%u evading=%u standin=%u alive=%u hp=%u faction=%u "
+                "hostile=%u valid=%u standin_combat=%u", spawnId, c->IsInCombat() ? 1u : 0u,
+                v && v->ToCreature() ? v->ToCreature()->GetEntry() : 0u, c->IsInEvadeMode() ? 1u : 0u, d ? 1u : 0u,
+                d && d->IsAlive() ? 1u : 0u, d ? d->GetHealth() : 0u, d ? d->GetFaction() : 0u, d && c->IsHostileTo(d) ? 1u : 0u,
+                d && c->IsValidAttackTarget(d) ? 1u : 0u, d && d->IsInCombat() ? 1u : 0u);
+            return true;
+        }
+        if (t[2] == "off")
+        {
+            auto it = standIns.find(spawnId);
+            if (it != standIns.end())
+            {
+                if (Creature* d = ObjectAccessor::GetCreature(*p, it->second))
+                    d->DespawnOrUnsummon();
+                standIns.erase(it);
+            }
+            c->RestoreFaction();
+            c->CombatStop(true);
+            handler->PSendSysMessage("ok combat off spawn=%u", spawnId);
+            return true;
+        }
+
+        uint32 const youngWolf = 299;   // a plain beast: a valid target (a critter is not, the fight dropped at once)
+        // Summoned by the map, not by the creature: a creature's own summon counts as its side.
+        Creature* d = c->GetMap()->SummonCreature(youngWolf, c->GetNearPosition(3.0f, 0.0f), nullptr, Milliseconds(120000));
+        if (!d)
+            return Fail(handler, "stand-in not summoned");
+        d->SetFaction(1);                      // a player faction (Human): world monsters treat it as an enemy, like a bot
+        d->SetReactState(REACT_DEFENSIVE);     // hits back only at what hits it
+        d->SetMaxHealth(1000000);
+        d->SetFullHealth();
+        standIns[spawnId] = d->GetGUID();
+        // Neutral world mobs (faction 7) don't fight NPCs of any side; for the test the creature turns Monster (14, hostile to
+        // players and so to the stand-in) until "off".
+        c->SetFaction(14);
+        // Threat first: AttackStart alone leaves the threat list empty until a hit lands, and UpdateVictim then evades at once.
+        c->GetThreatManager().AddThreat(d, 1000.0f, nullptr, true, true);
+        if (c->AI())
+            c->AI()->AttackStart(d);
+        handler->PSendSysMessage("ok combat on spawn=%u incombat=%u", spawnId, c->IsInCombat() ? 1u : 0u);
+        return true;
+    }
+
     static bool HandleScaleProbe(ChatHandler* handler, char const* args)
     {
         std::vector<std::string> t = Tokens(args);

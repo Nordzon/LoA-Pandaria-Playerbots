@@ -62,6 +62,27 @@
 > .arpg scale probe Arpgtest 308244
 ? scaled=none
 
+# --- Bot lock (task 3.4): a creature fighting someone who is not a real player (a bot; here a summoned stand-in) keeps its
+# level when the player's level changes; once out of combat it scales again.
+> .arpg test setup Arpgtest 30 elwynn-northshire
+? ok .*\(online\)
+~ 6000
+> .arpg scale probe Arpgtest 178359
+? scaled=30\b
+> .arpg scale combat Arpgtest 178359 on
+? ok combat on spawn=178359 incombat=1
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+~ 6000
+> .arpg scale combat Arpgtest 178359 status
+? incombat=1 victim=299\b
+> .arpg scale probe Arpgtest 178359
+? scaled=30\b
+> .arpg scale combat Arpgtest 178359 off
+? ok combat off
+> .arpg scale probe Arpgtest 178359
+* scaled=60\b
+
 # --- Kill switch turns scaling off (and reverts what was scaled) -------------------------
 > .arpg config set Arpg.Scale.Enabled 0
 ? ok

@@ -93,7 +93,7 @@ and the full matrix runs overnight (it fits next to bots and mmaps on this machi
 | Feature | Unit (Core) | GM test (SOAP state checks) | Headless scenario (real play) |
 | --- | --- | --- | --- |
 | Config / commands | ✓ parser | ✓ version, reload, config set | – |
-| World scaling (m1) | ✓ formula | ✓ low zone → player level; high zone untouched; kill switch reverts | kill a scaled mob at 85 in Northshire; time-to-kill sane |
+| World scaling (m1) | ✓ formula | ✓ low zone → player level; high zone untouched; kill switch reverts; bot lock: a creature fighting a non-player stand-in keeps its level, rescales after (`.arpg scale combat`) [`10-world-scaling`] | kill a scaled mob at 85 in Northshire; time-to-kill sane |
 | Quest scaling (m1) | – | quest level reads -1 for a zone quest; backup table holds the original | accept + turn in a low quest at 85, XP > 0 |
 | Professions (m1b) | – | ✓ learnall → 11 of 11 | gather one node, skill rises by 2 |
 | Rates (XP, move, drops) | – | config values loaded (`.server info` / probe) | walk a fixed path: time ≈ 1/1.15; kill a known mob: XP = 1.5 × base |
@@ -164,7 +164,7 @@ Our `.arpg` commands, added per change (each takes an explicit player name so it
 | Feature | Commands |
 | --- | --- |
 | General | `.arpg version`, `.arpg reload`, `.arpg config set <key> <value>`, `.arpg test setup <char> <lvl> <spot>` |
-| Scaling (m1) | `.arpg scale probe <char> nearest\|<guid>` (template vs scaled level and multipliers), `.arpg scale radius <char>` |
+| Scaling (m1) | `.arpg scale probe <char> nearest\|<guid>` (template vs scaled level and multipliers), `.arpg scale combat <char> <spawnId> on\|off\|status` (bot lock stand-in), `.arpg scale radius <char>` |
 | Loot (m2) | `.arpg roll <char> <itemId> [n]` (creates items), `.arpg loot sim <itemId> <lvl> 1000` (stats only, no items) |
 | Professions (m1b) | `.arpg test learnall <char>` (all 11 primary professions) |
 | Loot pet and filter (m2b) | `.arpg lootpet on\|off\|info <char>`, `.arpg filter list\|add\|remove\|move <char> …`, `.arpg test pack <char> <entry> <n>` (spawn and kill a pack next to the character) |

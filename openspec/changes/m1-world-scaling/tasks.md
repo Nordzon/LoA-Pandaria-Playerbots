@@ -16,7 +16,7 @@
 - [x] 3.1 Unit: formula edge cases (offset, upward-only, level caps) — 10 cases pass
 - [x] 3.2 `arpg/tests/10-world-scaling.gmtest` passes (live, 2026-11-22 00:57: levels 30/60/85/90, offsets ±2, cap, upward-only, kill switch)
 - [ ] 3.3 Playtest: level 85 in Northshire, Westfall and Jade Forest; note kill times; tune HealthMod/DamageMod
-- [ ] 3.4 Unit/GM test of the bot lock using a creature put "in combat with a bot" by test command; the live check with real bots happens in m7
+- [x] 3.4 Unit/GM test of the bot lock using a creature put "in combat with a bot" by test command; the live check with real bots happens in m7
 
 ## 4. Docs
 - [ ] 4.1 Update docs/CODEMAP.md (hooks used, upstream touches)
