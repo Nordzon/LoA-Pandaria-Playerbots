@@ -12,6 +12,7 @@
 #include "Loot/BossPity.h"
 #include "Loot/Crafting.h"
 #include "Loot/LootFilter.h"
+#include "Loot/LootPet.h"
 #include "Loot/Uniques.h"
 #include "Monsters/Champions.h"
 #include "Monsters/Superuniques.h"
@@ -270,8 +271,15 @@ public:
             { "move",   &HandleFilterMove,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "reset",  &HandleFilterReset,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
         };
+        static std::vector<ChatCommand> lootpetTable =
+        {
+            { "on",   &HandleLootPetOn,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "off",  &HandleLootPetOff,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "info", &HandleLootPetInfo, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+        };
         static std::vector<ChatCommand> arpgTable =
         {
+            { "lootpet", lootpetTable,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "filter",  filterTable,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "dungeon", dungeonTable,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "paragon", paragonTable,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -1434,6 +1442,39 @@ public:
         return true;
     }
 
+    // .arpg lootpet on|off|info <char>   the loot companion (persists per character)
+    static bool HandleLootPetOn(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg lootpet on <char>");
+        if (!p)
+            return false;
+        Arpg::Loot::SetLootPet(p, true);
+        handler->PSendSysMessage("ok %s", Arpg::Loot::DescribeLootPet(p).c_str());
+        return true;
+    }
+
+    static bool HandleLootPetOff(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg lootpet off <char>");
+        if (!p)
+            return false;
+        Arpg::Loot::SetLootPet(p, false);
+        handler->PSendSysMessage("ok %s", Arpg::Loot::DescribeLootPet(p).c_str());
+        return true;
+    }
+
+    static bool HandleLootPetInfo(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg lootpet info <char>");
+        if (!p)
+            return false;
+        handler->PSendSysMessage("%s", Arpg::Loot::DescribeLootPet(p).c_str());
+        return true;
+    }
+
     static bool HandleTestClearBags(ChatHandler* handler, char const* args)
     {
         std::vector<std::string> t = Tokens(args);
@@ -1496,8 +1537,10 @@ public:
     static bool HandleTestPack(ChatHandler* handler, char const* args)
     {
         std::vector<std::string> t = Tokens(args);
-        if (t.size() < 3 || t.size() > 4 || !IsNameLike(t[0]) || (t.size() == 4 && t[3] != "kill" && t[3] != "aggro"))
-            return Fail(handler, "usage: .arpg test pack <char> <entry> <n> [kill|aggro]");
+        bool const withLoot = t.size() == 5 && t[3] == "kill" && t[4] == "loot";
+        if (t.size() < 3 || t.size() > 5 || !IsNameLike(t[0]) || (t.size() == 4 && t[3] != "kill" && t[3] != "aggro") ||
+            (t.size() == 5 && !withLoot))
+            return Fail(handler, "usage: .arpg test pack <char> <entry> <n> [kill [loot]|aggro]");
         Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
         if (!p || !p->IsInWorld())
             return Fail(handler, "character not online");
@@ -1507,7 +1550,7 @@ public:
             return Fail(handler, "unknown creature entry " + t[1]);
         if (n < 1 || n > 40)
             return Fail(handler, "n must be 1-40");
-        bool kill = t.size() == 4 && t[3] == "kill";
+        bool kill = t.size() >= 4 && t[3] == "kill";
         bool aggro = t.size() == 4 && t[3] == "aggro";   // the pack fights the character (neutral mobs too)
 
         int spawned = 0, killed = 0;
@@ -1525,6 +1568,8 @@ public:
             if (kill)
             {
                 c->SetLootRecipient(p);
+                if (withLoot)   // "kill loot": counts as the player's damage, so the core fills the corpse's loot
+                    c->LowerPlayerDamageReq(c->GetMaxHealth());
                 p->Kill(c);
                 ++killed;
             }

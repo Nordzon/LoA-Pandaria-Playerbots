@@ -52,6 +52,9 @@ namespace Arpg
         float superuniqueScale = 1.4f;             // Arpg.Superunique.Scale
         float superuniquePatrolRadius = 15.0f;     // Arpg.Superunique.PatrolRadius (yards around its point; 0 = stand)
         bool superuniqueAnnounce = true;           // Arpg.Superunique.Announce (zone message on spawn)
+        bool lootPetEnabled = true;            // Arpg.LootPet.Enabled (players may turn their companion on)
+        bool lootPetWaitForCombatEnd = true;   // Arpg.LootPet.WaitForCombatEnd
+        uint32_t lootPetReachTimeoutMs = 3000; // Arpg.LootPet.ReachTimeoutMs (then loots from where it is)
         bool dungeonEnabled = true;            // Arpg.Dungeon.Enabled (m5 party table / raid tiers / solo roles / level selector)
         float dungeonSoloNonTankDamage = 0.75f;   // Arpg.Dungeon.SoloNonTankDamage (creature damage, alone and not a tank)
         float dungeonSoloTankDamageDealt = 1.25f; // Arpg.Dungeon.SoloTankDamageDealt

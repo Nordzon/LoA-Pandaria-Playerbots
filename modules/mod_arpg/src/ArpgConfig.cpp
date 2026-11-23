@@ -17,6 +17,7 @@ namespace
         "Arpg.Display.EnchantBase", "Arpg.Display.EnchantStride", "Arpg.Display.EffectBase", "Arpg.Display.SuffixBase", "Arpg.Display.UniqueBase", "Arpg.Test.ForceProcs", "Arpg.Scale.ZoneCapAbove", "Arpg.Scale.UncappedZones",
         "Arpg.Loot.ZoneCeilingMargin", "Arpg.Loot.SubstituteGap", "Arpg.Loot.SellCopperPerAffixLevel", "Arpg.Loot.GodRollPityEvery",
         "Arpg.Craft.MaxSkill", "Arpg.Craft.UniqueChance", "Arpg.Craft.UniquePityStep", "Arpg.Potion.DropMult",
+        "Arpg.LootPet.Enabled", "Arpg.LootPet.WaitForCombatEnd", "Arpg.LootPet.ReachTimeoutMs",
         "Arpg.Dungeon.Enabled", "Arpg.Dungeon.SoloNonTankDamage", "Arpg.Dungeon.SoloTankDamageDealt",
         "Arpg.Dungeon.SoloHealerDamageDealt", "Arpg.Dungeon.RaidTierStep",
         "Arpg.Paragon.Enabled", "Arpg.Paragon.XpBase", "Arpg.Paragon.XpGrowth", "Arpg.Paragon.QuestXpPct",
@@ -59,6 +60,9 @@ namespace Arpg
         s.godRollPityEvery = std::max(1, file.GetInt("Arpg.Loot.GodRollPityEvery", 3));
         s.craftMaxSkill = std::max(1, file.GetInt("Arpg.Craft.MaxSkill", 600));
         s.potionDropMult = std::max(0.0f, file.GetFloat("Arpg.Potion.DropMult", 1.0f));
+        s.lootPetEnabled = file.GetBool("Arpg.LootPet.Enabled", true);
+        s.lootPetWaitForCombatEnd = file.GetBool("Arpg.LootPet.WaitForCombatEnd", true);
+        s.lootPetReachTimeoutMs = uint32_t(std::max(500, file.GetInt("Arpg.LootPet.ReachTimeoutMs", 3000)));
         s.dungeonEnabled = file.GetBool("Arpg.Dungeon.Enabled", true);
         s.dungeonSoloNonTankDamage = std::max(0.0f, file.GetFloat("Arpg.Dungeon.SoloNonTankDamage", 0.75f));
         s.dungeonSoloTankDamageDealt = std::max(0.0f, file.GetFloat("Arpg.Dungeon.SoloTankDamageDealt", 1.25f));

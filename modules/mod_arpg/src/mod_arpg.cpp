@@ -14,6 +14,7 @@
 #include "Loot/Potions.h"
 #include "Paragon/Paragon.h"
 #include "Dungeons/InstanceScaling.h"
+#include "Loot/LootPet.h"
 
 #include "Chat.h"
 #include "Player.h"
@@ -68,6 +69,7 @@ void AddSC_mod_arpg()
     Arpg::Loot::InstallPotions();
     Arpg::Paragon::InstallParagon();
     Arpg::Dungeons::InstallInstanceScaling();
+    Arpg::Loot::InstallLootPet();
     Arpg::Loot::InstallLootPlanner();   // last kill script: plans corpse loot after the others added items and pity
     AddSC_arpg_commandscript();
 }

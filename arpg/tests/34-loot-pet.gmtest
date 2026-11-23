@@ -1,0 +1,36 @@
+# Loot companion (m2b tasks 3.1-3.4, 5.2; SPEC 4.7). Needs Arpgtest online. The pet queues the character's kills and,
+# out of combat, walks to each corpse and moves its gold and items into the bags (core store path: affixes, loot filter).
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg filter reset Arpgtest
+? ok|filter
+> .arpg lootpet on Arpgtest
+? ok lootpet on
+~ 2000
+> .arpg lootpet info Arpgtest
+? lootpet on pet=[1-9]\d* queue=0
+
+# Three kills (Kobold Vermin: always carry gold, so no corpse is empty): the pet empties all three.
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test pack Arpgtest 6 3 kill loot
+? killed=3
+~ 12000
+> .arpg lootpet info Arpgtest
+? lootpet on pet=[1-9]\d* queue=0 looted=3
+> .arpg test events Arpgtest
+? lootpet looted corpse=6 items=\d+ gold=[1-9]\d*
+
+# Off: the pet goes away.
+> .arpg lootpet off Arpgtest
+? ok lootpet off
+~ 2000
+> .arpg lootpet info Arpgtest
+? lootpet off pet=0
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

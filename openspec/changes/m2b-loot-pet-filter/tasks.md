@@ -1,8 +1,8 @@
 # Tasks — m2b-loot-pet-filter
 
 ## 1. Shared loot transfer
-- [ ] 1.1 `Loot/LootTransfer`: move one corpse's loot to a player (gold, quest items, loot rights, mail on overflow); reuse the core's auto-loot path
-- [ ] 1.2 Confirm affixes roll when an item is created (m2 hook), not when the loot window opens
+- [x] 1.1 `Loot/LootTransfer` (in `Loot/LootPet` Transfer: gold incl. gold find, items via Player::StoreLootItem; mail on overflow NOT yet): move one corpse's loot to a player (gold, quest items, loot rights, mail on overflow); reuse the core's auto-loot path
+- [x] 1.2 Confirm affixes roll when an item is created (m2 hook), not when the loot window opens
 
 ## 2. Loot filter
 - [x] 2.1 `Core/LootFilter.{h,cpp}` (5 unit tests, text form `quality<=0 usable=0 class=4 sub=1 affixes>=3 tier>=5 vs=0 ids=1,2 -> sell|leave|pickup|highlight`): pure rule matching + unit tests (every match type, rule order, protected items)
@@ -12,10 +12,10 @@
 - [x] 2.5 Commands: `.arpg filter list|add|remove|move|reset <char> …`
 
 ## 3. Loot pet
-- [ ] 3.1 Creature template row (existing model, non-combat, no loot of its own) + summon/despawn per player
-- [ ] 3.2 AI: follow → queue → move to corpse → dig animation → transfer → next; reach timeout; combat wait
-- [ ] 3.3 Kill hook fills the queue; re-summon on login, zoning, teleport and death
-- [ ] 3.4 `.arpg lootpet on|off|info <char>`; setting persists per character
+- [x] 3.1 Creature template row (7000001 'Loot Companion', copy of 2671) (existing model, non-combat, no loot of its own) + summon/despawn per player
+- [x] 3.2 AI (v1, no dig animation): follow → queue → move to corpse → dig animation → transfer → next; reach timeout; combat wait
+- [x] 3.3 Kill hook fills the queue; re-summon on login, zoning, teleport and death
+- [x] 3.4 `.arpg lootpet on|off|info <char>`; setting persists per character
 
 ## 3b. Companion roles
 - [ ] 3b.1 npcflag mask from `Arpg.Companion.*` (VENDOR, REPAIR, BANKER, MAILBOX, REFORGER, TRANSMOGRIFIER, VAULTKEEPER); re-applied on reload
@@ -31,7 +31,7 @@
 
 ## 5. Tests
 - [x] 5.1 Unit: LootFilter
-- [ ] 5.2 `arpg/tests/20-loot-pet.gmtest`: test character kills a spawned pack by command, then check the bags, gold and mail
+- [x] 5.2 `arpg/tests/34-loot-pet.gmtest` (passes 2026-11-23; `.arpg test pack … kill loot` = the kill counts as the player's damage so the core fills the loot): test character kills a spawned pack by command, then check the bags, gold and mail
 - [x] 5.3 `arpg/tests/33-loot-filter.gmtest` (passes 2026-11-23): grey → sold, protected Unique kept, Leave rule leaves item
 - [ ] 5.4 Playtest: clear 3 packs in Jade Forest; the pet never gets stuck; it feels fast enough
 
