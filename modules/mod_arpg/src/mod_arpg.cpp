@@ -51,6 +51,7 @@ namespace
             Arpg::Monsters::LoadSuperuniqueData();
             Arpg::Loot::LoadPotionData();
             Arpg::Dungeons::LoadInstanceData();
+            Arpg::Loot::LoadCompanionModels();
         }
     };
 }

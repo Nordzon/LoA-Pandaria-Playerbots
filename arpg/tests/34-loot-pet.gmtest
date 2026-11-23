@@ -13,7 +13,7 @@
 ? ok lootpet on
 ~ 2000
 > .arpg lootpet info Arpgtest
-? lootpet on pet=[1-9]\d* queue=0
+? lootpet on .*pet=[1-9]\d* queue=0
 
 # Three kills (Kobold Vermin: always carry gold, so no corpse is empty): the pet empties all three.
 > .arpg test events Arpgtest clear
@@ -22,7 +22,7 @@
 ? killed=3
 ~ 12000
 > .arpg lootpet info Arpgtest
-? lootpet on pet=[1-9]\d* queue=0 looted=3
+? lootpet on .*pet=[1-9]\d* queue=0 looted=3
 > .arpg test events Arpgtest
 ? lootpet looted corpse=6 items=\d+ gold=[1-9]\d*
 
@@ -58,11 +58,21 @@
 > .arpg test pack Arpgtest 49871 1 kill
 ? killed=1
 
+# Appearance (arpg_companion_model): Hawk Owl (6) -> display 6299, applied now and kept.
+> .arpg lootpet model Arpgtest 6
+? ok model=6 display=6299
+> .arpg lootpet info Arpgtest
+? lootpet on display=6299 model=6
+> .arpg lootpet model Arpgtest 99
+? unknown look 99
+> .arpg lootpet model Arpgtest 1
+? ok model=1
+
 # Off: the pet goes away.
 > .arpg lootpet off Arpgtest
 ? ok lootpet off
 ~ 2000
 > .arpg lootpet info Arpgtest
-? lootpet off pet=0
+? lootpet off .*pet=0
 > .arpg config set Arpg.Test.RecordEvents 0
 ? ok

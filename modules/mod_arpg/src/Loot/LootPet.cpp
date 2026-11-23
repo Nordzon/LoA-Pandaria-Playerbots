@@ -43,6 +43,28 @@ namespace
 
     std::mutex g_lock;
     std::unordered_map<uint32, PetState> g_state;   // player guid -> state
+    std::vector<std::pair<uint32, std::pair<uint32, std::string>>> g_models;   // id -> (display, name), in order
+    std::unordered_map<uint32, uint32> g_chosenModel;   // player guid -> model id
+
+    uint32 DisplayOf(uint32 modelId)
+    {
+        for (auto const& m : g_models)
+            if (m.first == modelId)
+                return m.second.first;
+        return 0;
+    }
+
+    uint32 ChosenModel(uint32 guid)
+    {
+        auto it = g_chosenModel.find(guid);
+        if (it != g_chosenModel.end())
+            return it->second;
+        uint32 id = 0;
+        if (QueryResult r = CharacterDatabase.PQuery("SELECT model_id FROM character_arpg_companion WHERE guid = %u", guid))
+            id = r->Fetch()[0].GetUInt8();
+        g_chosenModel[guid] = id;
+        return id;
+    }
 
     PetState& State(uint32 guid)
     {
@@ -69,6 +91,16 @@ namespace
         if (!c)
             return nullptr;
         c->SetFaction(p->GetFaction());
+        uint32 display = 0;
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            display = DisplayOf(ChosenModel(p->GetGUID().GetCounter()));
+        }
+        if (display)
+        {
+            c->SetDisplayId(display);
+            c->SetNativeDisplayId(display);
+        }
         c->GetMotionMaster()->MoveFollow(p, 2.0f, float(M_PI) * 0.75f);
         return c;
     }
@@ -250,7 +282,7 @@ namespace
     }
 
     // Right-click on the companion: its owner gets a menu of the enabled roles; each opens the game's own window.
-    enum CompanionAction : uint32 { ACT_VENDOR = 1, ACT_BANK = 2, ACT_MAIL = 3 };
+    enum CompanionAction : uint32 { ACT_VENDOR = 1, ACT_BANK = 2, ACT_MAIL = 3, ACT_LOOKS = 4, ACT_MODEL_BASE = 100 };
 
     class ArpgCompanionCreatureScript : public CreatureScript
     {
@@ -273,6 +305,7 @@ namespace
                 AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "Bank", GOSSIP_SENDER_MAIN, ACT_BANK);
             if (f & UNIT_NPC_FLAG_MAILBOX)
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Mailbox", GOSSIP_SENDER_MAIN, ACT_MAIL);
+            AddGossipItemFor(player, GOSSIP_ICON_TABARD, "Change appearance", GOSSIP_SENDER_MAIN, ACT_LOOKS);
             SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             return true;
         }
@@ -280,7 +313,26 @@ namespace
         bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
         {
             ClearGossipMenuFor(player);
+            if (action == ACT_LOOKS)
+            {
+                std::vector<std::pair<uint32, std::string>> list;
+                {
+                    std::lock_guard<std::mutex> l(g_lock);
+                    for (auto const& m : g_models)
+                        list.push_back({ m.first, m.second.second });
+                }
+                for (auto const& m : list)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, m.second, GOSSIP_SENDER_MAIN, ACT_MODEL_BASE + m.first);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                return true;
+            }
             CloseGossipMenuFor(player);
+            if (action > ACT_MODEL_BASE)
+            {
+                std::string out;
+                Arpg::Loot::SetCompanionModel(player, action - ACT_MODEL_BASE, out);
+                return true;
+            }
             uint32 f = creature->GetUInt32Value(UNIT_FIELD_NPC_FLAGS);
             switch (action)
             {
@@ -337,6 +389,46 @@ namespace
 
 namespace Arpg::Loot
 {
+    std::string LoadCompanionModels()
+    {
+        std::vector<std::pair<uint32, std::pair<uint32, std::string>>> models;
+        if (QueryResult r = WorldDatabase.Query("SELECT id, display_id, name FROM arpg_companion_model ORDER BY id"))
+            do
+            {
+                Field* f = r->Fetch();
+                models.push_back({ f[0].GetUInt8(), { f[1].GetUInt32(), f[2].GetString() } });
+            } while (r->NextRow());
+        std::lock_guard<std::mutex> l(g_lock);
+        g_models = models;
+        return std::to_string(models.size()) + " companion looks";
+    }
+
+    bool SetCompanionModel(Player* player, uint32 modelId, std::string& out)
+    {
+        uint32 guid = player->GetGUID().GetCounter();
+        uint32 display = 0;
+        uint64 pet = 0;
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            display = DisplayOf(modelId);
+            if (!display)
+            {
+                out = "unknown look " + std::to_string(modelId);
+                return false;
+            }
+            g_chosenModel[guid] = modelId;
+            pet = State(guid).pet;
+        }
+        CharacterDatabase.PExecute("REPLACE INTO character_arpg_companion (guid, model_id) VALUES (%u, %u)", guid, modelId);
+        if (Creature* c = pet ? ObjectAccessor::GetCreature(*player, ObjectGuid(pet)) : nullptr)
+        {
+            c->SetDisplayId(display);
+            c->SetNativeDisplayId(display);
+        }
+        out = "model=" + std::to_string(modelId) + " display=" + std::to_string(display);
+        return true;
+    }
+
     void InstallLootPet()
     {
         new ArpgLootPetPlayerScript();
@@ -369,7 +461,11 @@ namespace Arpg::Loot
         if (Creature* c = st.pet ? ObjectAccessor::GetCreature(*player, ObjectGuid(st.pet)) : nullptr)
             f = c->GetUInt32Value(UNIT_FIELD_NPC_FLAGS);
         std::snprintf(flags, sizeof(flags), "0x%X", f);
-        return std::string("lootpet ") + (st.on ? "on" : "off") + " pet=" + std::to_string(uint32(ObjectGuid(st.pet).GetCounter())) +
+        uint32 display = 0;
+        if (Creature* c = st.pet ? ObjectAccessor::GetCreature(*player, ObjectGuid(st.pet)) : nullptr)
+            display = c->GetDisplayId();
+        return std::string("lootpet ") + (st.on ? "on" : "off") + " display=" + std::to_string(display) + " model=" +
+            std::to_string(ChosenModel(player->GetGUID().GetCounter())) + " pet=" + std::to_string(uint32(ObjectGuid(st.pet).GetCounter())) +
             " queue=" + std::to_string(st.queue.size() + (st.target ? 1 : 0)) + " looted=" + std::to_string(st.looted) + " npcflags=" + flags;
     }
 }

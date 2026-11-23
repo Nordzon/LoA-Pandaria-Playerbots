@@ -277,6 +277,7 @@ public:
             { "on",   &HandleLootPetOn,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "off",  &HandleLootPetOff,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "info", &HandleLootPetInfo, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "model", &HandleLootPetModel, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
         };
         static std::vector<ChatCommand> arpgTable =
         {
@@ -324,8 +325,9 @@ public:
         std::string su = Arpg::Monsters::LoadSuperuniqueData();
         std::string pot = Arpg::Loot::LoadPotionData();
         std::string dun = Arpg::Dungeons::LoadInstanceData();
-        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
-            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str());
+        std::string comp = Arpg::Loot::LoadCompanionModels();
+        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
+            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str());
         return ok;
     }
 
@@ -1471,6 +1473,22 @@ public:
             return false;
         Arpg::Loot::SetLootPet(p, false);
         handler->PSendSysMessage("ok %s", Arpg::Loot::DescribeLootPet(p).c_str());
+        return true;
+    }
+
+    // .arpg lootpet model <char> <id>   the companion's look (arpg_companion_model), saved per character
+    static bool HandleLootPetModel(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2)
+            return Fail(handler, "usage: .arpg lootpet model <char> <id>");
+        Player* p = OnlineChar(handler, t, "usage: .arpg lootpet model <char> <id>");
+        if (!p)
+            return false;
+        std::string out;
+        if (!Arpg::Loot::SetCompanionModel(p, uint32(atoi(t[1].c_str())), out))
+            return Fail(handler, out);
+        handler->PSendSysMessage("ok %s", out.c_str());
         return true;
     }
 

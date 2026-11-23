@@ -14,6 +14,10 @@ class Player;
 namespace Arpg::Loot
 {
     void InstallLootPet();
+    // Startup / reload: arpg_companion_model.
+    std::string LoadCompanionModels();
+    // The companion look (arpg_companion_model.id); applied now and on every summon, saved per character.
+    bool SetCompanionModel(Player* player, uint32 modelId, std::string& out);
     void SetLootPet(Player* player, bool on);
     bool LootPetOn(Player* player);
     // "lootpet on|off pet=<guid|0> queue=N looted=N"
