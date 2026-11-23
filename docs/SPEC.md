@@ -240,6 +240,11 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   A gossip menu offers **appearance**: pick the companion's model from `arpg_companion_model` (unlocked list; `.arpg companion model`).
   Roles never work in combat or in instances' boss areas (`Arpg.Companion.InCombat` 0). Later roles (not v1): gathering herbs/ore,
   stable master, a "stash" shared between characters.
+- *Implemented 2026-11-23 (m2b):* filter rules in text form (`quality<=0 usable=0 affixes>=3 tier>=5 vs=0 class=4 ids=1,2 ->
+  sell|leave|pickup|highlight`), applied when a corpse/chest's loot is rolled (sell = gold at once; v1 leave = out of the loot);
+  loot companion = creature 7000001 (follow, queue, walk to corpse, 3 s reach timeout, core loot store path, mail on full bags,
+  9 looks); roles via gossip menu (Sell and repair, Bank, Mailbox open the native windows; reforge/transmog/void flags set,
+  in-game check pending); ArpgUI L button + filter panel over `.lootpet` / `.lootfilter` player commands.
 
 ### 4.8 All professions (m1b)
 - Primary-profession limit 2 → 11: `MaxPrimaryTradeSkill = 11` (config, no core patch; set by `write-confs.ps1`). ArpgUI professions panel

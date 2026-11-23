@@ -57,6 +57,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-23 06:45 — Docs catch-up: TESTING coverage table (potions, crafting, loot filter/pet, companion, Superuniques, Paragon, dungeons, raids), SPEC 4.7 implementation notes.
 - 2026-11-23 06:32 — m2 4.3 complete: CC/snare reduction (aura duration), cooldown rate (shortened after the cast), skill-up (polled), pet range (companion reach), Socketed (prismatic socket enchant 3729); all 35 effects roll; `.arpg test debuff`. **All 20 GM files pass.**
 - 2026-11-23 05:30 — ArpgUI: loot companion button (L) and loot filter panel over new player commands `.lootpet`, `.lootfilter`; `.arpg filter data`. **All 20 GM files pass.**
 - 2026-11-23 05:00 — m2b companion looks (9 models, gossip "Change appearance", saved per character, `.arpg lootpet model`) + shop (`npc_vendor` water/bread/flour/spices/parchment/vellum). **All 20 GM files pass.**

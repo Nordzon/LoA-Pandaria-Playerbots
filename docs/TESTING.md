@@ -98,17 +98,19 @@ and the full matrix runs overnight (it fits next to bots and mmaps on this machi
 | Affixes on items (m2) | roll rules: counts per quality, ≤3/≤3/≤5, no dupes, tiers by level, smart loot | forced roll on a created item: affix slots filled, values in tier range, persists after relog | loot pet picks up an item, it has affixes |
 | Affix stats (m2) | – | `.arpg test equip/unequip`: measured stat change = template + affix lines (exact), swap removes the old item's affixes, unequip removes all [`22-affix-stats`] | equip a rolled item in the real client: character sheet goes up |
 | Pity + loot tiers (m2/m5) | ✓ ladder, god-roll, Ascended | ✓ god-roll every 3rd boss kill [`25-boss-pity`]; ✓ pity set 4 → next boss kill owes the Unique, the next boss item of its slot becomes it, counter 0 [`27-unique-drops`]; T7 only at Paragon 60 + raid tier 5 | – |
-| Sell value / gold (m2) | price formula | – | sell one 3-affix item: gold delta = formula |
+| Sell value / gold (m2) | ✓ price formula | ✓ sell price shown by `.arpg loot last` [`21-affix-loot`] | sell one 3-affix item: gold delta = formula |
 | Uniques (m2+) | ✓ power tiers, steps, cooldown | ✓ tier ranges, max 4 affixes, powers fire (forced procs), passive speed above the cap [`26-uniques`] | trigger the mechanic once (cast/attack a dummy) → event recorder shows the effect with the right numbers |
-| Loot pet + filter (m2b) | filter rule matching | rules saved/loaded; protected items never sold | kill a 5-pack: bags/gold/mail as the rules say; pet doesn't get stuck |
-| Companion roles (m2b) | – | npc flags match config; flags cleared in combat; model choice persists | open vendor/bank/transmog on the pet (server sends the window) |
+| Loot pet + filter (m2b) | ✓ filter rule matching, order, protected items, text form | ✓ rules add/move/remove/reset, data line, Champion floor: green sold for gold, blue left [`33-loot-filter`]; ✓ pet empties 3 corpses, full bags -> mailed, looks persist [`34-loot-pet`] | kill a 5-pack: bags/gold/mail as the rules say; pet doesn't get stuck |
+| Companion roles (m2b) | – | ✓ npc flags match config (0x3C021081), cleared in combat, look change [`34-loot-pet`] | open vendor/bank/mail on the pet (gossip); do reforge/transmog/void open? (owner) |
 | Champions (m3) | ✓ bands, affix pick rules, minions, orb | ✓ `.arpg champion make`: band level, minions, affixes; pinned against the scaling tick; kill → orb + green + blue floor; looted items marked +1 tier [`30-champions`] | fight one: death explosion recorded |
 | Crafting wheel (m1b) | ✓ recipe colour, mods, Unique ladder, extra affix/tier cap in the roll | ✓ `.arpg test craft` with skill override: orange/green/grey rules, catalyst +1, max skill +1 affix, crafted Unique at full pity [`28-crafting`] | craft a recipe in the real client |
-| Superuniques (m3) | – | kill → a **different** one spawns after the delay (delay set to 5 s in the test); announce sent | – |
-| Paragon (m4) | XP curve, point maths | addxp → level/points; spend → stats change by the right %; respec | – |
-| Dungeon scaling (m5) | party-size table, solo role knobs | probe solo vs 3 bots vs 5: multipliers match; role knobs per spec | solo pack + first boss per role (BrM, Rogue, healer): deaths, time, lowest HP % |
-| Level selector (m5) | – | set Deadmines to 30: mobs probe at 30; forced drop has level-30 affix values | – |
-| Raid tiers (m5) | tier multiplier | probe tier multiplier per raid; Paragon gates Ascended tiers | Paragon 0 vs 60 in one tier-5 raid: kill time drops |
+| Superuniques (m3) | ✓ rotation | ✓ spawn, abilities at the aggro holder, kill → orb, blue, own Unique, a **different** one after the delay, announce [`31-superuniques`] | – |
+| Paragon (m4) | ✓ XP curve, rotation, caps, world tier | ✓ XP at 90 → levels (exact curve), spend → exact rating/stamina, respec, addon data line, Vale world tier 120%/200% [`40-paragon`] | ≥ 5 levels in a 2-hour session (owner) |
+| Dungeon scaling (m5) | ✓ party-size table, interpolation, solo role knobs | ✓ solo Deadmines 0.30/0.30 (non-tank) [`50-dungeons`]; 3 bots vs 5 not headless | solo pack + first boss per role (BrM, Rogue, healer): deaths, time, lowest HP % (owner) |
+| Level selector (m5) | – | ✓ Deadmines at 20 applied on entry [`50-dungeons`] | – |
+| Raid tiers (m5) | ✓ tier multiplier, Ascended gate, Ascended range | ✓ solo Molten Core 0.115/0.288; T8 at raid 7 + Paragon 110, T6 at raid 5 + Paragon 59, T5 outside [`50-dungeons`] | Paragon 0 vs 60 in one tier-5 raid: kill time drops |
+| Potions (m3b) | ✓ % heal, resource rules, tier/kind pick | ✓ exact % heals, shared 10 s cooldown, mana potion on a rage class, Champion drop [`32-potions`] | 999 stacks + cooldown sweep shown by the client (owner) |
+| Crafting wheel (m1b) | ✓ recipe colour, mods, Unique ladder | ✓ colour rules, catalyst, max skill, crafted Unique [`28-crafting`] | craft in the real client |
 | Bots (m7) | – | bots online count; a creature in combat with a bot keeps its level | 300 bots + headless for 30 min: update time stays low, no crash |
 | Upstream sync | all | all | quick set |
 
@@ -165,7 +167,7 @@ Our `.arpg` commands, added per change (each takes an explicit player name so it
 | Professions (m1b) | `.arpg test learnall <char>` (all 11 primary professions) |
 | Loot pet and filter (m2b) | `.arpg lootpet on\|off\|info <char>`, `.arpg filter list\|add\|remove\|move <char> …`, `.arpg test pack <char> <entry> <n>` (spawn and kill a pack next to the character) |
 | Monsters (m3) | `.arpg champion spawn <char> [affix]`, `.arpg superunique spawn <char> <id>`, `.arpg superunique list` |
-| Paragon (m4) | `.arpg paragon addxp <char> <xp>`, `.arpg paragon info <char>`, `.arpg paragon reset <char>` |
+| Paragon (m4) | `.arpg paragon info|set|xp|spend|respec|data <char>`; player: `.paragon data|info|spend|respec` |
 | Dungeons (m5) | `.arpg dungeon info <char>` (party size, multipliers, instance level), `.arpg lfg probe <char> <dungeon>` |
 
 A typical playtest of scaling: `.character level Me 85` → `.tele Northshire` → pull a wolf and check its
