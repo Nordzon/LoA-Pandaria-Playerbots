@@ -26,6 +26,18 @@
 > .arpg test events Arpgtest
 ? lootpet looted corpse=6 items=\d+ gold=[1-9]\d*
 
+# Companion roles (Arpg.Companion.*): gossip + vendor + repair + bank + mailbox + reforge + transmog + void = 0x3C021081.
+> .arpg lootpet info Arpgtest
+? npcflags=0x3C021081\b
+# In combat they're cleared (Arpg.Companion.InCombat 0), and back afterwards.
+> .arpg test pack Arpgtest 49871 1 aggro
+? spawned=1
+~ 2500
+> .arpg lootpet info Arpgtest
+? npcflags=0x0\b
+> .arpg test pack Arpgtest 49871 1 kill
+? killed=1
+
 # Off: the pet goes away.
 > .arpg lootpet off Arpgtest
 ? ok lootpet off

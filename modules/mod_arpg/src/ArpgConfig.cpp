@@ -17,6 +17,8 @@ namespace
         "Arpg.Display.EnchantBase", "Arpg.Display.EnchantStride", "Arpg.Display.EffectBase", "Arpg.Display.SuffixBase", "Arpg.Display.UniqueBase", "Arpg.Test.ForceProcs", "Arpg.Scale.ZoneCapAbove", "Arpg.Scale.UncappedZones",
         "Arpg.Loot.ZoneCeilingMargin", "Arpg.Loot.SubstituteGap", "Arpg.Loot.SellCopperPerAffixLevel", "Arpg.Loot.GodRollPityEvery",
         "Arpg.Craft.MaxSkill", "Arpg.Craft.UniqueChance", "Arpg.Craft.UniquePityStep", "Arpg.Potion.DropMult",
+        "Arpg.Companion.Vendor", "Arpg.Companion.Repair", "Arpg.Companion.Bank", "Arpg.Companion.Mail",
+        "Arpg.Companion.Reforge", "Arpg.Companion.Transmog", "Arpg.Companion.VoidStorage", "Arpg.Companion.InCombat",
         "Arpg.LootPet.Enabled", "Arpg.LootPet.WaitForCombatEnd", "Arpg.LootPet.ReachTimeoutMs",
         "Arpg.Dungeon.Enabled", "Arpg.Dungeon.SoloNonTankDamage", "Arpg.Dungeon.SoloTankDamageDealt",
         "Arpg.Dungeon.SoloHealerDamageDealt", "Arpg.Dungeon.RaidTierStep",
@@ -60,6 +62,20 @@ namespace Arpg
         s.godRollPityEvery = std::max(1, file.GetInt("Arpg.Loot.GodRollPityEvery", 3));
         s.craftMaxSkill = std::max(1, file.GetInt("Arpg.Craft.MaxSkill", 600));
         s.potionDropMult = std::max(0.0f, file.GetFloat("Arpg.Potion.DropMult", 1.0f));
+        {
+            // NPC flags (UnitDefines.h): gossip 0x1, vendor 0x80, repair 0x1000, banker 0x20000, mailbox 0x4000000,
+            // reforger 0x8000000, transmogrifier 0x10000000, vault keeper 0x20000000.
+            uint32_t f = 0x1;
+            if (file.GetBool("Arpg.Companion.Vendor", true))      f |= 0x80;
+            if (file.GetBool("Arpg.Companion.Repair", true))      f |= 0x1000 | 0x80;
+            if (file.GetBool("Arpg.Companion.Bank", true))        f |= 0x20000;
+            if (file.GetBool("Arpg.Companion.Mail", true))        f |= 0x4000000;
+            if (file.GetBool("Arpg.Companion.Reforge", true))     f |= 0x8000000;
+            if (file.GetBool("Arpg.Companion.Transmog", true))    f |= 0x10000000;
+            if (file.GetBool("Arpg.Companion.VoidStorage", true)) f |= 0x20000000;
+            s.companionNpcFlags = f;
+        }
+        s.companionInCombat = file.GetBool("Arpg.Companion.InCombat", false);
         s.lootPetEnabled = file.GetBool("Arpg.LootPet.Enabled", true);
         s.lootPetWaitForCombatEnd = file.GetBool("Arpg.LootPet.WaitForCombatEnd", true);
         s.lootPetReachTimeoutMs = uint32_t(std::max(500, file.GetInt("Arpg.LootPet.ReachTimeoutMs", 3000)));

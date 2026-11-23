@@ -81,6 +81,18 @@ Arpg.LootPet.Enabled = 1
 Arpg.LootPet.WaitForCombatEnd = 1
 Arpg.LootPet.ReachTimeoutMs = 3000
 
+#    Companion roles (owner 2026-11-22): right-click the loot companion for the game's own windows. Each role 1/0.
+#    Vendor (sell; reagents later), Repair, Bank, Mail (mailbox), Reforge, Transmog, VoidStorage. InCombat = 1 lets the
+#    roles work in combat (default 0: the flags are cleared while the owner fights).
+Arpg.Companion.Vendor = 1
+Arpg.Companion.Repair = 1
+Arpg.Companion.Bank = 1
+Arpg.Companion.Mail = 1
+Arpg.Companion.Reforge = 1
+Arpg.Companion.Transmog = 1
+Arpg.Companion.VoidStorage = 1
+Arpg.Companion.InCombat = 0
+
 # --- Dungeons and raids (SPEC 4.6, change m5-dungeon-scaling) ---------------------------
 #    Built on the core's AutoBalance (worldserver.conf AutoBalance.Enable.Global = 1, set by write-confs.ps1): mod_arpg
 #    replaces its player-count curve with arpg_party_scale (5-man solo 30% health / 40% damage .. full group 100%; raids

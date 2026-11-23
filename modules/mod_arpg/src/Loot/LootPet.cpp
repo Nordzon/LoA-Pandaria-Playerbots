@@ -14,7 +14,10 @@
 #include "ScriptMgr.h"
 #include "TemporarySummon.h"
 #include "Timer.h"
+#include "ScriptedGossip.h"
+#include "WorldSession.h"
 
+#include <cstdio>
 #include <deque>
 #include <mutex>
 #include <unordered_map>
@@ -148,6 +151,12 @@ namespace
                 return;
             target = 0;
         }
+        // Companion roles (vendor, repair, bank, mail, reforge, transmog, void): native NPC flags, cleared in combat.
+        {
+            uint32 want = (p->IsInCombat() && !s.companionInCombat) ? 0u : s.companionNpcFlags;
+            if (pet->GetUInt32Value(UNIT_FIELD_NPC_FLAGS) != want)
+                pet->SetUInt32Value(UNIT_FIELD_NPC_FLAGS, want);
+        }
         if (s.lootPetWaitForCombatEnd && p->IsInCombat())
         {
             Arpg::TestEvents::Record(key, "lootpet waits (combat)");
@@ -201,6 +210,50 @@ namespace
         }
     }
 
+    // Right-click on the companion: its owner gets a menu of the enabled roles; each opens the game's own window.
+    enum CompanionAction : uint32 { ACT_VENDOR = 1, ACT_BANK = 2, ACT_MAIL = 3 };
+
+    class ArpgCompanionCreatureScript : public CreatureScript
+    {
+    public:
+        ArpgCompanionCreatureScript() : CreatureScript("arpg_companion") { }
+
+        bool OnGossipHello(Player* player, Creature* creature) override
+        {
+            ClearGossipMenuFor(player);
+            if (creature->GetOwnerGUID() != player->GetGUID() && creature->ToTempSummon() &&
+                creature->ToTempSummon()->GetSummonerGUID() != player->GetGUID())
+            {
+                CloseGossipMenuFor(player);
+                return true;   // someone else's companion
+            }
+            uint32 f = creature->GetUInt32Value(UNIT_FIELD_NPC_FLAGS);
+            if (f & UNIT_NPC_FLAG_VENDOR)
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, (f & UNIT_NPC_FLAG_REPAIR) ? "Sell and repair" : "Sell", GOSSIP_SENDER_MAIN, ACT_VENDOR);
+            if (f & UNIT_NPC_FLAG_BANKER)
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "Bank", GOSSIP_SENDER_MAIN, ACT_BANK);
+            if (f & UNIT_NPC_FLAG_MAILBOX)
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Mailbox", GOSSIP_SENDER_MAIN, ACT_MAIL);
+            SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+            return true;
+        }
+
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+        {
+            ClearGossipMenuFor(player);
+            CloseGossipMenuFor(player);
+            uint32 f = creature->GetUInt32Value(UNIT_FIELD_NPC_FLAGS);
+            switch (action)
+            {
+                case ACT_VENDOR: if (f & UNIT_NPC_FLAG_VENDOR)  player->GetSession()->SendListInventory(creature->GetGUID()); break;
+                case ACT_BANK:   if (f & UNIT_NPC_FLAG_BANKER)  player->GetSession()->SendShowBank(creature->GetGUID()); break;
+                case ACT_MAIL:   if (f & UNIT_NPC_FLAG_MAILBOX) player->GetSession()->SendShowMailBox(creature->GetGUID()); break;
+                default: break;
+            }
+            return true;
+        }
+    };
+
     class ArpgLootPetPlayerScript : public PlayerScript
     {
     public:
@@ -248,6 +301,7 @@ namespace Arpg::Loot
     void InstallLootPet()
     {
         new ArpgLootPetPlayerScript();
+        new ArpgCompanionCreatureScript();
     }
 
     void SetLootPet(Player* player, bool on)
@@ -271,7 +325,12 @@ namespace Arpg::Loot
     {
         std::lock_guard<std::mutex> l(g_lock);
         PetState& st = State(player->GetGUID().GetCounter());
+        char flags[16];
+        uint32 f = 0;
+        if (Creature* c = st.pet ? ObjectAccessor::GetCreature(*player, ObjectGuid(st.pet)) : nullptr)
+            f = c->GetUInt32Value(UNIT_FIELD_NPC_FLAGS);
+        std::snprintf(flags, sizeof(flags), "0x%X", f);
         return std::string("lootpet ") + (st.on ? "on" : "off") + " pet=" + std::to_string(uint32(ObjectGuid(st.pet).GetCounter())) +
-            " queue=" + std::to_string(st.queue.size() + (st.target ? 1 : 0)) + " looted=" + std::to_string(st.looted);
+            " queue=" + std::to_string(st.queue.size() + (st.target ? 1 : 0)) + " looted=" + std::to_string(st.looted) + " npcflags=" + flags;
     }
 }
