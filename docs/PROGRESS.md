@@ -57,6 +57,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-23 11:15 backlog without the owner is empty (rest = owner checks/answers, upstream sync, m7); servers healthy (300 bots); check-in cron stopped. Next session: owner answers from Blockers, then recreate the check-in job if work runs.
 - 2026-11-23 10:45 upstream dry run: 11 new commits on upstream/playerbot, all world-DB quest/event fixes (`sql/updates/world/2026_11_22_00..10`), no code, no overlap with `// ARPG:` patches - low risk; real sync (m0 4.5) left for the owner to start.
 - 2026-11-23 10:25 m0 5.1: CODEMAP guessed paths verified (no **?** left); ticked m2 5.1 (sell formula unit test existed), m2b 3b.5/3b.6 (covered by `.arpg lootpet` + test 34). Docs only.
 - 2026-11-23 10:10 m1-world-scaling 3.4: bot lock GM test (`.arpg scale combat <char> <spawnId> on|off|status`: a Young Wolf stand-in on a player faction; neutral mobs (faction 7) need faction 14 for the fight) - test 10 passes.
