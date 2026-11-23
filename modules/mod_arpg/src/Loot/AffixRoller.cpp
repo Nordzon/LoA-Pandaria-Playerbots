@@ -606,7 +606,8 @@ namespace Arpg::Loot
             if (MakeUnique(player, item, plan.makeUnique, tier, msg))
                 summary += " | " + msg;
         }
-        item->SetState(ITEM_CHANGED, player);
+        if (item->IsInWorld())   // in the bags; a mailed item (overflow) is saved by the mail
+            item->SetState(ITEM_CHANGED, player);
         {
             std::lock_guard<std::mutex> l(g_lock);
             g_lastItem[player->GetGUID().GetCounter()] = itemGuid;

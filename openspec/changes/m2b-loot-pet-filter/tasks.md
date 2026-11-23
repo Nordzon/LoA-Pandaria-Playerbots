@@ -1,7 +1,7 @@
 # Tasks — m2b-loot-pet-filter
 
 ## 1. Shared loot transfer
-- [x] 1.1 `Loot/LootTransfer` (in `Loot/LootPet` Transfer: gold incl. gold find, items via Player::StoreLootItem; mail on overflow NOT yet): move one corpse's loot to a player (gold, quest items, loot rights, mail on overflow); reuse the core's auto-loot path
+- [x] 1.1 `Loot/LootTransfer` (in `Loot/LootPet` Transfer: gold incl. gold find, items via Player::StoreLootItem; mail on overflow done 2026-11-23: rolled first, 'Loot Companion' mail, 12 items per mail): move one corpse's loot to a player (gold, quest items, loot rights, mail on overflow); reuse the core's auto-loot path
 - [x] 1.2 Confirm affixes roll when an item is created (m2 hook), not when the loot window opens
 
 ## 2. Loot filter

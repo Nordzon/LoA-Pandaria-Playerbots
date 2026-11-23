@@ -26,6 +26,8 @@ namespace Arpg::Monsters
     bool MakeChampion(Creature* c, Player* player, std::string& out, std::vector<uint32> const& forcedAffixes = {});
 
     bool IsChampion(Creature* c);
+    // The Champion's minions (creature guids, raw).
+    std::vector<uint64> ChampionMinions(Creature* c);
     // The original creature entry of a tag copy (Champion / Superunique), or the entry itself.
     uint32 BaseEntry(uint32 entry);
     // Tests: the last Champion made for this player (alive or its corpse), on the player's map; null if gone.

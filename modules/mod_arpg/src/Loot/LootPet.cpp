@@ -14,6 +14,9 @@
 #include "ScriptMgr.h"
 #include "TemporarySummon.h"
 #include "Timer.h"
+#include "Item.h"
+#include "Mail.h"
+#include "Loot/AffixRoller.h"
 #include "ScriptedGossip.h"
 #include "WorldSession.h"
 
@@ -93,6 +96,42 @@ namespace
                     ++items;
             }
         p->SetLootGUID(oldLoot);
+        // Full bags: what is left is rolled now (its planned affixes / name) and mailed by the companion.
+        std::vector<Item*> overflow;
+        for (LootItem& li : loot.items)
+        {
+            if (li.is_looted || li.currency || li.is_blocked || li.needs_quest)
+                continue;
+            ItemPosCountVec dest;
+            if (p->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, li.itemid, std::max<uint32>(1, li.count)) == EQUIP_ERR_OK)
+                continue;   // it fits: it stayed for another reason (unique-equipped, rights) - leave it
+            Item* it = Item::CreateItem(li.itemid, std::max<uint32>(1, li.count), p);
+            if (!it)
+                continue;
+            if (li.randomPropertyId)
+                it->SetItemRandomProperties(li.randomPropertyId);
+            std::string why;
+            Arpg::Loot::RollPlan plan;
+            if (li.randomPropertyId < 0 && Arpg::Loot::TakePlan(li.itemid, li.randomPropertyId, plan))
+                Arpg::Loot::ApplyRoll(p, it, plan, why);
+            else
+                Arpg::Loot::RollForItem(p, it, ItemPickupSourceType::CreatureLoot, why, corpse->GetEntry());
+            overflow.push_back(it);
+            li.is_looted = true;
+            if (loot.unlootedCount)
+                --loot.unlootedCount;
+        }
+        for (size_t i = 0; i < overflow.size(); i += MAX_MAIL_ITEMS)
+        {
+            MailDraft draft("Loot Companion", "Your bags were full, so I sent you these.");
+            for (size_t j = i; j < overflow.size() && j < i + MAX_MAIL_ITEMS; ++j)
+                draft.AddItem(overflow[j]);
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            draft.SendMailTo(trans, MailReceiver(p), MailSender(MAIL_CREATURE, PetEntry), MAIL_CHECK_MASK_COPIED);
+            CharacterDatabase.CommitTransaction(trans);
+        }
+        if (!overflow.empty())
+            Arpg::TestEvents::Record(p->GetGUID().GetCounter(), "lootpet mailed items=" + std::to_string(overflow.size()));
         if (loot.isLooted())
         {
             corpse->RemoveFlag(OBJECT_FIELD_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);

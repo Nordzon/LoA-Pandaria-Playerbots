@@ -513,6 +513,13 @@ namespace Arpg::Monsters
         return entry;
     }
 
+    std::vector<uint64> ChampionMinions(Creature* c)
+    {
+        std::lock_guard<std::mutex> l(g_lock);
+        auto it = c ? g_champions.find(c->GetGUID().GetRawValue()) : g_champions.end();
+        return it == g_champions.end() ? std::vector<uint64>() : it->second.minions;
+    }
+
     bool IsChampion(Creature* c)
     {
         std::lock_guard<std::mutex> l(g_lock);

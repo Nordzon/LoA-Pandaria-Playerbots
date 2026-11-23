@@ -193,6 +193,7 @@ public:
             { "pack",     &HandleTestPack,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "give",     &HandleTestGive,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "clearbags", &HandleTestClearBags, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "fillbags", &HandleTestFillBags, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "equip",    &HandleTestEquip,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "unequip",  &HandleTestUnequip,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "probeitem", &HandleTestProbeItem, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -1022,14 +1023,22 @@ public:
     static bool HandleChampionKill(ChatHandler* handler, char const* args)
     {
         std::vector<std::string> t = Tokens(args);
-        if (t.size() != 1 || !IsNameLike(t[0]))
-            return Fail(handler, "usage: .arpg champion kill <char>");
+        if ((t.size() != 1 && !(t.size() == 2 && t[1] == "all")) || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg champion kill <char> [all]");
         Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
         if (!p || !p->IsInWorld())
             return Fail(handler, "character not online");
         Creature* c = Arpg::Monsters::LastChampionOf(p);
         if (!c || !c->IsAlive())
             return Fail(handler, "no live champion");
+        if (t.size() == 2)   // "all": its minions die too (tests that need the fight to be over)
+            for (uint64 g : Arpg::Monsters::ChampionMinions(c))
+                if (Creature* m = ObjectAccessor::GetCreature(*p, ObjectGuid(g)))
+                    if (m->IsAlive())
+                    {
+                        m->SetLootRecipient(p);
+                        p->Kill(m);
+                    }
         // Start from half health/power so the orb shows.
         p->SetHealth(std::max<uint32>(1, p->GetMaxHealth() / 2));
         p->SetPower(p->GetPowerType(), p->GetMaxPower(p->GetPowerType()) / 2);
@@ -1472,6 +1481,31 @@ public:
         if (!p)
             return false;
         handler->PSendSysMessage("%s", Arpg::Loot::DescribeLootPet(p).c_str());
+        return true;
+    }
+
+    // .arpg test fillbags <char> <itemId>   fills every free bag slot with that (non-stacking) item (overflow tests)
+    static bool HandleTestFillBags(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2)
+            return Fail(handler, "usage: .arpg test fillbags <char> <itemId>");
+        Player* p = OnlineChar(handler, t, "usage: .arpg test fillbags <char> <itemId>");
+        if (!p)
+            return false;
+        uint32 itemId = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
+        if (!sObjectMgr->GetItemTemplate(itemId))
+            return Fail(handler, "unknown item " + t[1]);
+        uint32 n = 0;
+        for (; n < 200; ++n)
+        {
+            ItemPosCountVec dest;
+            if (p->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1) != EQUIP_ERR_OK)
+                break;
+            if (!p->StoreNewItem(dest, itemId, true))
+                break;
+        }
+        handler->PSendSysMessage("ok %s filled=%u", p->GetName().c_str(), n);
         return true;
     }
 
