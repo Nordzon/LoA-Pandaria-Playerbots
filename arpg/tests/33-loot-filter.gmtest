@@ -1,0 +1,43 @@
+# Loot filter (m2b tasks 2.2/2.3/2.5, SPEC 4.7). Needs Arpgtest online. Ordered rules per character; the first match
+# decides. Applied when a corpse is planned: Sell = out of the loot + its vendor price paid; Leave = out of the loot.
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg config set Arpg.Champion.LootBlueChance 100
+? ok
+
+# Default: sell greys.
+> .arpg filter reset Arpgtest
+? filter 1 rules \| 1: quality<=0 -> sell
+> .arpg filter add Arpgtest quality=2 -> sell
+? filter 2 rules .* 2: quality>=2 quality<=2 -> sell
+> .arpg filter add Arpgtest quality=3 -> leave
+? filter 3 rules .* 3: quality>=3 quality<=3 -> leave
+> .arpg filter move Arpgtest 3 1
+? 1: quality>=3 quality<=3 -> leave \| 2: quality<=0 -> sell \| 3: quality>=2 quality<=2 -> sell
+> .arpg filter remove Arpgtest 9
+? no rule 9
+> .arpg filter add Arpgtest colour=red -> sell
+? bad rule
+
+# A Champion's loot floor (a green + a blue): the green is sold for gold (rule 3), the blue is left (rule 1).
+> .arpg champion make Arpgtest 49871
+? ok
+> .arpg test events Arpgtest clear
+? ok
+> .arpg champion kill Arpgtest
+? ok .* killed champion
+> .arpg test events Arpgtest
+? filter item=\d+ action=sell gold=[1-9]\d* rule=3
+? filter item=\d+ action=leave rule=1
+
+> .arpg filter reset Arpgtest
+? filter 1 rules
+> .arpg config set Arpg.Champion.LootBlueChance 25
+? ok
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

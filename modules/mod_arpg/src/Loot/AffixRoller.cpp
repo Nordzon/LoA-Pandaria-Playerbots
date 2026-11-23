@@ -10,6 +10,7 @@
 #include "Loot/ZoneLevels.h"
 #include "Loot/BossPity.h"
 #include "Loot/Crafting.h"
+#include "Loot/LootFilter.h"
 #include "Monsters/Champions.h"
 #include "Dungeons/InstanceScaling.h"
 #include "Paragon/Paragon.h"
@@ -640,7 +641,20 @@ namespace Arpg::Loot
             RollPlan plan;
             std::string why;
             if (!proto || !PlanRoll(owner, proto, source, sourceId, 0, championLoot, plan, why))
+            {
+                if (proto)
+                    ApplyFilter(owner, loot, li, 0, 0, false);   // greys / whites go through the filter too
                 continue;
+            }
+            int bestTier = 0;
+            for (Core::RolledAffix const& r : plan.rolled)
+                bestTier = std::max(bestTier, r.tier);
+            if (!ApplyFilter(owner, loot, li, int(plan.rolled.size()), bestTier, plan.makeUnique != 0))
+            {
+                if (plan.makeUnique)
+                    SetPendingUnique(owner, sourceId, plan.makeUnique);   // never happens (Uniques are protected); safety
+                continue;   // sold or left: the plan is dropped
+            }
             int32 rp = PlanSuffixId(plan);
             if (!rp)
                 continue;   // no display rows: nothing to show in the loot window - roll at pickup as before

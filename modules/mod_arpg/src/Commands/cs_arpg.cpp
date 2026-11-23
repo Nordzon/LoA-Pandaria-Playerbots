@@ -11,6 +11,7 @@
 #include "Loot/Substitution.h"
 #include "Loot/BossPity.h"
 #include "Loot/Crafting.h"
+#include "Loot/LootFilter.h"
 #include "Loot/Uniques.h"
 #include "Monsters/Champions.h"
 #include "Monsters/Superuniques.h"
@@ -261,8 +262,17 @@ public:
             { "info",  &HandleDungeonInfo,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "level", &HandleDungeonLevel, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
         };
+        static std::vector<ChatCommand> filterTable =
+        {
+            { "list",   &HandleFilterList,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "add",    &HandleFilterAdd,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "remove", &HandleFilterRemove, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "move",   &HandleFilterMove,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "reset",  &HandleFilterReset,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+        };
         static std::vector<ChatCommand> arpgTable =
         {
+            { "filter",  filterTable,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "dungeon", dungeonTable,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "paragon", paragonTable,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "superunique", superuniqueTable, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -1344,6 +1354,83 @@ public:
         int level = std::max(0, std::min(atoi(t[2].c_str()), int(p->GetLevel())));
         Arpg::Dungeons::SetChosenLevel(p, map, level);
         handler->PSendSysMessage("ok dungeon level map=%u level=%d", map, Arpg::Dungeons::ChosenLevel(p, map));
+        return true;
+    }
+
+    static void SendFilterList(ChatHandler* handler, Player* p)
+    {
+        std::vector<std::string> rules = Arpg::Loot::FilterRules(p);
+        std::string out = "filter " + std::to_string(rules.size()) + " rules";
+        for (size_t i = 0; i < rules.size(); ++i)
+            out += " | " + std::to_string(i + 1) + ": " + rules[i];
+        handler->PSendSysMessage("%s", out.c_str());
+    }
+
+    // .arpg filter list <char>
+    static bool HandleFilterList(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg filter list <char>");
+        if (!p)
+            return false;
+        SendFilterList(handler, p);
+        return true;
+    }
+
+    // .arpg filter add <char> <rule...>   e.g. ".arpg filter add Bob quality<=0 -> sell"
+    static bool HandleFilterAdd(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg filter add <char> <rule>");
+        if (!p || t.size() < 2)
+            return p ? Fail(handler, "usage: .arpg filter add <char> <rule>") : false;
+        std::string text;
+        for (size_t i = 1; i < t.size(); ++i)
+            text += (i > 1 ? " " : "") + t[i];
+        std::string err;
+        if (!Arpg::Loot::AddFilterRule(p, text, err))
+            return Fail(handler, err);
+        SendFilterList(handler, p);
+        return true;
+    }
+
+    // .arpg filter remove <char> <position>
+    static bool HandleFilterRemove(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg filter remove <char> <position>");
+        if (!p || t.size() != 2)
+            return p ? Fail(handler, "usage: .arpg filter remove <char> <position>") : false;
+        std::string err;
+        if (!Arpg::Loot::RemoveFilterRule(p, atoi(t[1].c_str()), err))
+            return Fail(handler, err);
+        SendFilterList(handler, p);
+        return true;
+    }
+
+    // .arpg filter move <char> <from> <to>
+    static bool HandleFilterMove(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg filter move <char> <from> <to>");
+        if (!p || t.size() != 3)
+            return p ? Fail(handler, "usage: .arpg filter move <char> <from> <to>") : false;
+        std::string err;
+        if (!Arpg::Loot::MoveFilterRule(p, atoi(t[1].c_str()), atoi(t[2].c_str()), err))
+            return Fail(handler, err);
+        SendFilterList(handler, p);
+        return true;
+    }
+
+    // .arpg filter reset <char>   back to the default (sell greys)
+    static bool HandleFilterReset(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg filter reset <char>");
+        if (!p)
+            return false;
+        Arpg::Loot::ResetFilter(p);
+        SendFilterList(handler, p);
         return true;
     }
 
