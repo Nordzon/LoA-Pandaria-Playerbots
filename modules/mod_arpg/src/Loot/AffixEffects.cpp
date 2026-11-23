@@ -19,6 +19,8 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
+#include "SpellHistory.h"
+#include "Spell.h"
 #include "Timer.h"
 
 #include <algorithm>
@@ -56,7 +58,38 @@ namespace
         std::map<uint32, uint32> powerReadyAt;          // item guid -> getMSTime() when the power may fire again
         std::map<uint32, int> powerHits;                 // item guid -> hits counted (every Nth hit)
         int32 paragonMove = 0;                           // Paragon Utility: move speed above the cap (hundredths of %)
+        std::vector<uint32> pendingCooldowns;            // spells just cast: their cooldown is shortened next update
+        std::map<uint32, uint16> skills;                 // profession skill values seen (skill-up affix)
+        uint32 lastSkillCheck = 0;
     };
+
+    // Profession skill lines (primary + secondary) the skill-up affix watches.
+    uint32 const ProfessionSkills[] = { 164, 165, 171, 182, 186, 197, 202, 333, 393, 755, 773, 129, 185, 356, 794 };
+
+    enum class CcKind { None, Control, Snare };
+
+    // Hostile crowd control (stun, fear, confuse, charm, silence, pacify) or a snare/root.
+    CcKind CcKindOf(SpellInfo const* si)
+    {
+        CcKind k = CcKind::None;
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (!si->Effects[i].IsAura())
+                continue;
+            switch (si->Effects[i].ApplyAuraName)
+            {
+                case SPELL_AURA_MOD_STUN: case SPELL_AURA_MOD_FEAR: case SPELL_AURA_MOD_CONFUSE: case SPELL_AURA_MOD_CHARM:
+                case SPELL_AURA_MOD_SILENCE: case SPELL_AURA_MOD_PACIFY_SILENCE: case SPELL_AURA_MOD_PACIFY:
+                    return CcKind::Control;
+                case SPELL_AURA_MOD_DECREASE_SPEED: case SPELL_AURA_MOD_ROOT:
+                    k = CcKind::Snare;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return k;
+    }
 
     std::mutex g_lock;
     std::map<Effect, EffectTuning> g_tuning;
@@ -362,6 +395,30 @@ namespace
     public:
         ArpgEffectsUnitScript() : UnitScript("arpg_affix_effects_unit") { }
 
+        // CC / snare reduction: hostile crowd control and snares on the player last shorter.
+        void OnAuraApply(Unit* unit, Aura* aura) override
+        {
+            Player* p = unit ? unit->ToPlayer() : nullptr;
+            if (!p || !aura || aura->GetSpellInfo()->IsPositive() || aura->GetCasterGUID() == p->GetGUID() || aura->GetMaxDuration() <= 0)
+                return;
+            CcKind kind = CcKindOf(aura->GetSpellInfo());
+            if (kind == CcKind::None)
+                return;
+            EffectTotals t;
+            if (!TotalsOf(p, t))
+                return;
+            int32 pct = t.Get(kind == CcKind::Control ? Effect::CcReductionPct : Effect::SnareReductionPct);   // hundredths of %
+            if (pct <= 0)
+                return;
+            int32 base = aura->GetMaxDuration();
+            int32 dur = std::max(100, int32(int64(base) * (10000 - std::min(pct, 10000)) / 10000));
+            aura->SetMaxDuration(dur);
+            aura->SetDuration(dur);
+            aura->SetNeedClientUpdateForTargets();
+            Record(p, std::string(kind == CcKind::Control ? "cc" : "snare") + " reduced spell=" + std::to_string(aura->GetId()) +
+                " " + std::to_string(base) + "->" + std::to_string(dur));
+        }
+
         // White melee hits (before armour): weapon damage %, heal on hit, power on hit, procs; victim: thorns, struck chain.
         void ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage) override
         {
@@ -541,6 +598,73 @@ namespace
         }
     };
 
+    // Cooldown rate + skill-up (polled: there is no skill-up hook in the core).
+    void TickCooldownsAndSkills(Player* player)
+    {
+        uint64 key = player->GetGUID().GetCounter();
+        std::vector<uint32> pending;
+        bool checkSkills = false;
+        int32 cdPct = 0, skillPct = 0;
+        uint32 now = getMSTime();
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            auto it = g_fx.find(key);
+            if (it == g_fx.end())
+                return;
+            PlayerFx& fx = it->second;
+            pending.swap(fx.pendingCooldowns);
+            cdPct = fx.totals.Get(Effect::CooldownRatePct);
+            skillPct = fx.totals.Get(Effect::SkillupPct);
+            if (skillPct > 0 && getMSTimeDiff(fx.lastSkillCheck, now) >= 1000)
+            {
+                fx.lastSkillCheck = now;
+                checkSkills = true;
+            }
+        }
+        if (cdPct > 0)
+            for (uint32 spellId : pending)
+            {
+                auto const& cds = player->GetSpellHistory()->GetCooldowns();
+                auto c = cds.find(spellId);
+                if (c == cds.end())
+                    continue;
+                int64 remaining = int64(c->second.CooldownEnd - TimeValue::Now());
+                if (remaining <= 1500)   // the global cooldown and tiny ones stay
+                    continue;
+                int32 cut = int32(remaining * std::min(cdPct, 10000) / 10000);
+                player->GetSpellHistory()->ModifyCooldown(spellId, -cut);
+                Record(player, "cooldown rate spell=" + std::to_string(spellId) + " cut=" + std::to_string(cut));
+            }
+        if (!checkSkills)
+            return;
+        for (uint32 skill : ProfessionSkills)
+        {
+            uint16 value = player->GetSkillValue(skill);
+            uint16 seen = 0;
+            bool known = false;
+            {
+                std::lock_guard<std::mutex> l(g_lock);
+                auto& skills = g_fx[key].skills;
+                auto s = skills.find(skill);
+                known = s != skills.end();
+                seen = known ? s->second : 0;
+                skills[skill] = value;
+            }
+            if (!known || !value || value <= seen)
+                continue;
+            uint16 max = player->GetPureMaxSkillValue(skill);
+            for (uint16 gained = value - seen; gained > 0 && value < max; --gained)
+                if (Arpg::Core::ProcRoll(skillPct, urand(0, 9999), ForceProcs()))
+                {
+                    ++value;
+                    player->SetSkill(uint16(skill), player->GetSkillStep(uint16(skill)), value, max);
+                    Record(player, "skillup extra skill=" + std::to_string(skill) + " value=" + std::to_string(value));
+                }
+            std::lock_guard<std::mutex> l(g_lock);
+            g_fx[key].skills[skill] = value;
+        }
+    }
+
     class ArpgEffectsPlayerScript : public PlayerScript
     {
     public:
@@ -558,10 +682,25 @@ namespace
         }
 
         // Regeneration (every 5 s), Warding pool on entering combat, aura refresh once in the world.
+        // Cooldown rate: the spell's cooldown starts after the cast; it is shortened on the next update.
+        void OnSpellCast(Player* player, Spell* spell, bool /*skipCheck*/) override
+        {
+            if (!player || !spell || !spell->GetSpellInfo() || t_depth)
+                return;
+            EffectTotals t;
+            if (!TotalsOf(player, t) || t.Get(Effect::CooldownRatePct) <= 0)
+                return;
+            std::lock_guard<std::mutex> l(g_lock);
+            auto& pending = g_fx[player->GetGUID().GetCounter()].pendingCooldowns;
+            if (pending.size() < 16)
+                pending.push_back(spell->GetSpellInfo()->Id);
+        }
+
         void OnUpdate(Player* player, uint32 /*diff*/) override
         {
             if (!player->IsInWorld())
                 return;
+            TickCooldownsAndSkills(player);
             uint64 key = player->GetGUID().GetCounter();
             bool dirty = false, refill = false, regen = false;
             int32 move = 0, cast = 0, absorb = 0, regenPct = 0;

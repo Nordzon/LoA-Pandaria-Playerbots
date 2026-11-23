@@ -588,6 +588,8 @@ namespace Arpg::Loot
                     item->SetEnchantment(EnchantmentSlot(nextNativeSlot++), enchantId, 0, 0);
                 }
             }
+            if (a.effect == "prismatic_socket")   // Socketed: a real prismatic socket (the belt buckle's enchant)
+                item->SetEnchantment(PRISMATIC_ENCHANTMENT_SLOT, 3729, 0, 0);
             if (flatStat)
                 statLines.push_back({ flatStat, value, enchantId != 0 });
             else if (Core::Effect e = Core::EffectFromName(a.effect); e != Core::Effect::None)

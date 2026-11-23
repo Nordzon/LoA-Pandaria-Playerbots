@@ -27,8 +27,7 @@ AGI, STR, INT, STA = 3, 4, 5, 7
 TIER_UNLOCK = [1, 15, 35, 60, 85]
 
 # Effects the game code does not implement yet (m2 task 4.3): weight 0 until they work. Remove a name here once it does.
-NOT_YET_ACTIVE = {'cc_reduction_pct', 'snare_reduction_pct', 'cooldown_rate_pct', 'skillup_pct', 'pet_range_pct',
-                  'prismatic_socket'}
+NOT_YET_ACTIVE = set()   # 2026-11-23: all effects work (CC/snare, cooldown rate, skill-up, pet range, socket)
 
 # A real blue item's stat line as a percent of B (epic budget, same slot, same player level). Medians over levels 15-90,
 # measured 2026-11-22 by blue_stats.py; the ratio is stable across levels (main 36-53%, secondary 27-40%).

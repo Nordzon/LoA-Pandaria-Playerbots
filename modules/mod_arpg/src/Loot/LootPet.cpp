@@ -17,6 +17,8 @@
 #include "Item.h"
 #include "Mail.h"
 #include "Loot/AffixRoller.h"
+#include "Loot/AffixEffects.h"
+#include "Core/AffixEffects.h"
 #include "ScriptedGossip.h"
 #include "WorldSession.h"
 
@@ -260,7 +262,9 @@ namespace
             return;
         Creature* corpse = ObjectAccessor::GetCreature(*p, ObjectGuid(target));
         bool done = !corpse || corpse->IsAlive() || corpse->loot.isLooted();
-        if (!done && (pet->IsWithinDistInMap(corpse, 3.0f) || getMSTimeDiff(moveStart, now) > s.lootPetReachTimeoutMs))
+        // Pet range affix (hundredths of %): the companion reaches corpses from further away.
+        float reach = 3.0f * (1.0f + float(Arpg::Loot::EffectTotal(p, Arpg::Core::Effect::PetRangePct)) / 10000.0f);
+        if (!done && (pet->IsWithinDistInMap(corpse, reach) || getMSTimeDiff(moveStart, now) > s.lootPetReachTimeoutMs))
         {
             Transfer(p, corpse);   // reached it, or unreachable: loot from where it is
             done = true;

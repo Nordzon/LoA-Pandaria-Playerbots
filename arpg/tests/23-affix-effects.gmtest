@@ -69,6 +69,24 @@
 > .arpg loot effects Arpgtest
 ? aura_move_speed_pct=30\b
 
+# --- CC / snare reduction (50%): a hostile snare (Hamstring) and stun (Hammer of Justice) last half as long.
+> .arpg test pack Arpgtest 49871 1
+? spawned=1
+> .arpg test effect Arpgtest snare_reduction_pct 5000
+? ok
+> .arpg test debuff Arpgtest 1715
+? ok aura spell=1715 base=(\d+) duration=\d+
+> .arpg test effect Arpgtest cc_reduction_pct 5000
+? ok
+> .arpg test debuff Arpgtest 853
+? ok aura spell=853 base=6000 duration=3000\b
+> .arpg test effect Arpgtest cc_reduction_pct -5000
+? ok
+> .arpg test effect Arpgtest snare_reduction_pct -5000
+? ok
+> .arpg test debuff Arpgtest 853
+? ok aura spell=853 base=6000 duration=6000\b
+
 # --- XP: +10% on XP the core gives (same hook as kills and quests).
 # The aggro'd worgs from above may have killed the character (no XP for the dead): setup revives it.
 > .arpg test setup Arpgtest 20 elwynn-northshire

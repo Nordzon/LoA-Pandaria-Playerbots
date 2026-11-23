@@ -194,6 +194,7 @@ public:
             { "give",     &HandleTestGive,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "clearbags", &HandleTestClearBags, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "fillbags", &HandleTestFillBags, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "debuff",   &HandleTestDebuff,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "equip",    &HandleTestEquip,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "unequip",  &HandleTestUnequip,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "probeitem", &HandleTestProbeItem, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -1629,6 +1630,33 @@ public:
         if (!p)
             return false;
         handler->PSendSysMessage("%s", Arpg::Loot::DescribeLootPet(p).c_str());
+        return true;
+    }
+
+    // .arpg test debuff <char> <spellId>   the nearest hostile creature puts the aura on the character; reports its base and
+    // final duration (CC / snare reduction affixes), then removes it
+    static bool HandleTestDebuff(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2)
+            return Fail(handler, "usage: .arpg test debuff <char> <spellId>");
+        Player* p = OnlineChar(handler, t, "usage: .arpg test debuff <char> <spellId>");
+        if (!p)
+            return false;
+        uint32 spellId = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
+        SpellInfo const* si = sSpellMgr->GetSpellInfo(spellId);
+        if (!si)
+            return Fail(handler, "unknown spell " + t[1]);
+        Creature* c = NearestHostile(p);
+        if (!c)
+            return Fail(handler, "no hostile creature within 30 yards");
+        Aura* a = c->AddAura(spellId, p);
+        if (!a)
+            return Fail(handler, "aura not applied");
+        int32 base = si->GetMaxDuration();
+        int32 dur = a->GetMaxDuration();
+        p->RemoveAurasDueToSpell(spellId);
+        handler->PSendSysMessage("ok aura spell=%u base=%d duration=%d", spellId, base, dur);
         return true;
     }
 
