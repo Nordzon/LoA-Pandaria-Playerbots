@@ -271,6 +271,7 @@ public:
             { "remove", &HandleFilterRemove, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "move",   &HandleFilterMove,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "reset",  &HandleFilterReset,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "data",   &HandleFilterData,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
         };
         static std::vector<ChatCommand> lootpetTable =
         {
@@ -278,6 +279,21 @@ public:
             { "off",  &HandleLootPetOff,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "info", &HandleLootPetInfo, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "model", &HandleLootPetModel, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+        };
+        // .lootpet / .lootfilter - the player's own (ArpgUI talks through these); every account has the help permission.
+        static std::vector<ChatCommand> playerLootPetTable =
+        {
+            { "on",   &HandleMyLootPetOn,   rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "off",  &HandleMyLootPetOff,  rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "data", &HandleMyLootPetData, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+        };
+        static std::vector<ChatCommand> playerFilterTable =
+        {
+            { "data",   &HandleMyFilterData,   rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "add",    &HandleMyFilterAdd,    rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "remove", &HandleMyFilterRemove, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "move",   &HandleMyFilterMove,   rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "reset",  &HandleMyFilterReset,  rbac::RBAC_PERM_COMMAND_HELP, Console::No },
         };
         static std::vector<ChatCommand> arpgTable =
         {
@@ -299,6 +315,8 @@ public:
         {
             { "arpg",    arpgTable,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "paragon", playerParagonTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "lootpet", playerLootPetTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "lootfilter", playerFilterTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
         };
         return commandTable;
     }
@@ -1242,6 +1260,118 @@ public:
     {
         WorldSession* s = handler->GetSession();
         return s ? s->GetPlayer() : nullptr;
+    }
+
+    // ArpgUI data lines (hidden by the addon): "ARPGF|count|rule|rule|..." and "ARPGL|on|model".
+    static std::string FilterDataLine(Player* p)
+    {
+        std::vector<std::string> rules = Arpg::Loot::FilterRules(p);
+        std::string out = "ARPGF|" + std::to_string(rules.size());
+        for (std::string const& r : rules)
+            out += "|" + r;
+        return out;
+    }
+
+    static std::string LootPetDataLine(Player* p)
+    {
+        return std::string("ARPGL|") + (Arpg::Loot::LootPetOn(p) ? "1" : "0");
+    }
+
+    static bool HandleFilterData(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg filter data <char>");
+        if (!p)
+            return false;
+        handler->PSendSysMessage("%s", FilterDataLine(p).c_str());
+        return true;
+    }
+
+    static bool HandleMyLootPetOn(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        Arpg::Loot::SetLootPet(p, true);
+        handler->SendSysMessage(LootPetDataLine(p).c_str());
+        return true;
+    }
+
+    static bool HandleMyLootPetOff(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        Arpg::Loot::SetLootPet(p, false);
+        handler->SendSysMessage(LootPetDataLine(p).c_str());
+        return true;
+    }
+
+    static bool HandleMyLootPetData(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        handler->SendSysMessage(LootPetDataLine(p).c_str());
+        return true;
+    }
+
+    static bool HandleMyFilterData(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        handler->SendSysMessage(FilterDataLine(p).c_str());
+        return true;
+    }
+
+    // .lootfilter add <rule>
+    static bool HandleMyFilterAdd(ChatHandler* handler, char const* args)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        std::string err;
+        if (!Arpg::Loot::AddFilterRule(p, args ? std::string(args) : std::string(), err))
+            handler->PSendSysMessage("%s", err.c_str());
+        handler->SendSysMessage(FilterDataLine(p).c_str());
+        return true;
+    }
+
+    static bool HandleMyFilterRemove(ChatHandler* handler, char const* args)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        std::string err;
+        if (!Arpg::Loot::RemoveFilterRule(p, args ? atoi(args) : 0, err))
+            handler->PSendSysMessage("%s", err.c_str());
+        handler->SendSysMessage(FilterDataLine(p).c_str());
+        return true;
+    }
+
+    // .lootfilter move <from> <to>
+    static bool HandleMyFilterMove(ChatHandler* handler, char const* args)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        std::vector<std::string> t = Tokens(args);
+        std::string err;
+        if (t.size() != 2 || !Arpg::Loot::MoveFilterRule(p, atoi(t[0].c_str()), atoi(t[1].c_str()), err))
+            handler->PSendSysMessage("%s", err.empty() ? "usage: .lootfilter move <from> <to>" : err.c_str());
+        handler->SendSysMessage(FilterDataLine(p).c_str());
+        return true;
+    }
+
+    static bool HandleMyFilterReset(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        Arpg::Loot::ResetFilter(p);
+        handler->SendSysMessage(FilterDataLine(p).c_str());
+        return true;
     }
 
     static bool HandleMyParagonData(ChatHandler* handler, char const* /*args*/)

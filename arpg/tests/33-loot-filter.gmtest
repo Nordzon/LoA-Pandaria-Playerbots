@@ -19,6 +19,9 @@
 ? filter 3 rules .* 3: quality>=3 quality<=3 -> leave
 > .arpg filter move Arpgtest 3 1
 ? 1: quality>=3 quality<=3 -> leave \| 2: quality<=0 -> sell \| 3: quality>=2 quality<=2 -> sell
+# The ArpgUI filter panel's data line: count|rule|rule|...
+> .arpg filter data Arpgtest
+? ARPGF\|3\|quality>=3 quality<=3 -> leave\|quality<=0 -> sell\|quality>=2 quality<=2 -> sell
 > .arpg filter remove Arpgtest 9
 ? no rule 9
 > .arpg filter add Arpgtest colour=red -> sell

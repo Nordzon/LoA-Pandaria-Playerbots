@@ -26,8 +26,8 @@
 - [ ] 3b.6 `arpg/tests/22-companion.gmtest`: flags match config; model change persists; vendor list present
 
 ## 4. Addon
-- [ ] 4.1 ArpgUI: pet toggle button
-- [ ] 4.2 ArpgUI: filter panel (list, add, reorder, delete rules) over addon messages
+- [x] 4.1 ArpgUI: pet toggle button (L by the minimap; left = on/off, right = filter panel)
+- [x] 4.2 ArpgUI: filter panel (list in plain words, add box + quick rules, reorder, delete, reset) over `.lootfilter` player commands and the hidden `ARPGF|` line
 
 ## 5. Tests
 - [x] 5.1 Unit: LootFilter
