@@ -16,6 +16,8 @@ verified against this fork — confirm in m0 and remove the mark.
 | `modules/mod_arpg/src/Loot/LootPet.{h,cpp}` | m2b loot companion (creature 7000001): follow, kill queue, walk to corpse (reach timeout), transfer via StoreLootItem, re-summon, `character_arpg_lootpet`, `.arpg lootpet on|off|info` |
 | `modules/mod_arpg/src/Loot/LootFilter.{h,cpp}` + `Core/LootFilter` | m2b loot filter: ordered rules per character (`character_arpg_lootfilter`), applied in `PlanLoot` (sell = gold now, leave = out of the loot), `.arpg filter …` |
 | `modules/mod_arpg/src/Dungeons/InstanceScaling.{h,cpp}` + `Core/InstanceScale` | m5: party-size table x raid tier x solo role replaces AutoBalance's curve, solo tank/healer damage dealt, dungeon level selector (`character_arpg_dungeon_level`), `.arpg dungeon info|level` |
+| `modules/mod_arpg/sql/tools/gen_any_race_class.py` | generates `2026_11_23_04_arpg_any_race_class.sql` (any race x any class) + `arpg/client-patch/charbaseinfo_rows.csv` for the client CharBaseInfo |
+| `arpg/scripts/test-char-create.ps1` | headless create + check + erase of a new race x class pair (m6) |
 | `modules/mod_arpg/sql/tools/gen_monster_tags.py` | generates the Champion/Superunique tag copies of creature templates (entry +5,000,000 / +6,000,000) |
 | `modules/mod_arpg/src/Monsters/Superuniques.{h,cpp}` | m3 Superuniques: zone pools (`arpg_superunique`, `_spawn`, `_ability`), PerZone alive while a real player is in the zone, band kind 1 via `Scaling::Pin`, kit abilities at the aggro holder (% of target max health), rotation `Core::NextSuperunique`, kill → orb/blue/Unique ladder, `.arpg superunique spawn/next/info/kill/loot/fight` |
 | `modules/mod_arpg/src/Commands/cs_arpg.cpp` | `.arpg version/reload/config set/test setup/scale probe` |

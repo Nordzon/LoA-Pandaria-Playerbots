@@ -76,14 +76,14 @@
 ? ok
 ~ 4000
 > .arpg test events Arpgtest
-? scale entry=\d+ spawn=\d+ from=90 to=90 hp=\d+ tier=120\b
+* scale entry=\d+ spawn=\d+ from=90 to=90 hp=\d+ tier=120\b
 > .arpg paragon set Arpgtest 80 0
 ? ok paragon level=80
 > .arpg test events Arpgtest clear
 ? ok
 ~ 4000
 > .arpg test events Arpgtest
-? scale entry=\d+ spawn=\d+ from=90 to=90 hp=\d+ tier=200\b
+* scale entry=\d+ spawn=\d+ from=90 to=90 hp=\d+ tier=200\b
 > .arpg config set Arpg.Test.RecordEvents 0
 ? ok
 > .arpg paragon set Arpgtest 0 0

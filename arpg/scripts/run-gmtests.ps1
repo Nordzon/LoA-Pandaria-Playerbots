@@ -9,6 +9,7 @@
       ? regex                     last reply must match (case-insensitive)
       ! regex                     last reply must NOT match
       ~ 500                       wait 500 ms (respawns, ticks)
+      * regex                     like ?, but re-sends the last command every 2 s until it matches (max 20 s; timer events)
   A file passes if every ? and ! holds. Exit code = number of failed files.
 
 .EXAMPLE
@@ -30,7 +31,17 @@ foreach ($file in Get-ChildItem $Dir -Filter '*.gmtest' | Where-Object { $_.Name
     switch ($op) {
       '>' {
         # A command that throws (bad reply, SOAP down) is a failed check, not the end of the whole run.
+        $lastCmd = $arg
         try { $last = (& $gm $arg 2>&1 | Out-String) } catch { $last = "EXCEPTION: $($_.Exception.Message)"; $fails += "line ${n}: $last" }
+      }
+      '*' {
+        # Like '?', but re-runs the last command every 2 s until it matches (up to 20 s): for events that come on a timer.
+        $deadline = (Get-Date).AddSeconds(20)
+        while ($last -notmatch $arg -and (Get-Date) -lt $deadline) {
+          Start-Sleep -Seconds 2
+          try { $last = (& $gm $lastCmd 2>&1 | Out-String) } catch { $last = "EXCEPTION: $($_.Exception.Message)" }
+        }
+        if ($last -notmatch $arg) { $fails += "line ${n}: expected (within 20 s) /$arg/ in: $($last.Trim())" }
       }
       '?' { if ($last -notmatch $arg) { $fails += "line ${n}: expected /$arg/ in: $($last.Trim())" } }
       '!' { if ($last -match $arg) { $fails += "line ${n}: did not expect /$arg/ in: $($last.Trim())" } }

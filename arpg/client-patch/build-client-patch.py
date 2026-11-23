@@ -220,6 +220,21 @@ def build_suffix_dbc_from(src, path_out, suffix_rows_list):
     open(path_out, 'wb').write(out)
 
 
+def build_charbaseinfo(path_out):
+    """CharBaseInfo.dbc for the client (m6-any-race-class): one row per race x class pair from charbaseinfo_rows.csv
+    (written by modules/mod_arpg/sql/tools/gen_any_race_class.py). Layout as the stock file: uint32 id, uint8 race,
+    uint8 class, 2 bytes padding (3 fields, 8 bytes per record, empty string block)."""
+    csv = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'charbaseinfo_rows.csv')
+    pairs = []
+    for line in open(csv, encoding='utf-8').read().splitlines()[1:]:
+        if line.strip():
+            r, c = line.split(',')
+            pairs.append((int(r), int(c)))
+    recs = b''.join(struct.pack('<IBBH', i, r, c, 0) for i, (r, c) in enumerate(pairs))
+    open(path_out, 'wb').write(struct.pack('<4s4i', b'WDBC', len(pairs), 3, 8, 1) + recs + b'\0')
+    return len(pairs)
+
+
 def build_mpq(files, mpq_path):
     """files: {inner name (bytes): local path}. Plain MPQ v4 entries (the unlocked exe loads plain files)."""
     s = ctypes.WinDLL(DLL)
@@ -261,11 +276,15 @@ def main():
     srows = suffix_rows(suffix_base)
     suffix = os.path.join(OUT_DIR, 'ItemRandomSuffix.client.dbc')
     build_suffix_dbc(suffix, srows)
-    build_mpq({b'DBFilesClient\\SpellItemEnchantment.dbc': dbc, b'DBFilesClient\\ItemRandomSuffix.dbc': suffix}, mpq)
+    charbase = os.path.join(OUT_DIR, 'CharBaseInfo.client.dbc')
+    pairs = build_charbaseinfo(charbase)
+    build_mpq({b'DBFilesClient\\SpellItemEnchantment.dbc': dbc, b'DBFilesClient\\ItemRandomSuffix.dbc': suffix,
+               b'DBFilesClient\\CharBaseInfo.dbc': charbase}, mpq)
     print(f'built {mpq} ({os.path.getsize(mpq)} bytes): {rows} affix display rows (stats {base + 1}..{base + len(STATS) * stride - 1}, '
           f'effects {effect_base + EFFECT_ROWS_PER}..{effect_base + (len(EFFECTS) + 1) * EFFECT_ROWS_PER - 1})')
     print(f'  + {len(urows)} Unique power rows ({unique_base}+)')
     print(f'  + {len(srows)} random-suffix rows ({srows[0][0]}..{srows[-1][0]}) for 5 lines + item names')
+    print(f'  + CharBaseInfo: {pairs} race x class pairs (any race, any class)')
     if '--install' in sys.argv:
         shutil.copyfile(mpq, TARGET)
         print('installed', TARGET)
@@ -276,6 +295,12 @@ def main():
             shutil.copyfile(SERVER_SUFFIX_DBC, backup)
         build_suffix_dbc_from(backup, SERVER_SUFFIX_DBC, srows)
         print('server', SERVER_SUFFIX_DBC, '(original kept as .blizzard; restart the world server to load it)')
+        # Same CharBaseInfo on the server (it doesn't read it today; kept identical so both sides agree).
+        server_cb = os.path.join(os.path.dirname(SERVER_SUFFIX_DBC), 'CharBaseInfo.dbc')
+        if not os.path.exists(server_cb + '.blizzard'):
+            shutil.copyfile(server_cb, server_cb + '.blizzard')
+        shutil.copyfile(charbase, server_cb)
+        print('server', server_cb, '(original kept as .blizzard)')
 
 
 if __name__ == '__main__':

@@ -270,6 +270,11 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
 
 ### 4.9 Character creation (m6)
 - Any race with any class (e.g. Undead Monk): server SQL (playercreateinfo, spells, skills) + client `CharBaseInfo` patch.
+- *Implemented 2026-11-23:* `sql/tools/gen_any_race_class.py` adds the 43 missing pairs (165 total): start at the race's own start
+  (Death Knights: shared DK start), class action bar and start items from a reference race of the same faction family, level stats =
+  reference race's class stats + (race warrior - reference warrior) per level, race masks ORed into class skill/spell rows.
+  Client: `build-client-patch.py` packs `CharBaseInfo.dbc` (all 165 pairs) into the patch MPQ and copies it to the server DBC folder.
+  Check: `arpg/scripts/test-char-create.ps1` (headless create of an Undead Monk, DB check, erase).
 
 ### 4.10 Bots (m7, last)
 - Enable playerbots (300 → 1000). Verify: scaling bot-lock, party-size scaling with bots, bot loot rule.

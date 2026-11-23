@@ -24,6 +24,8 @@ SOAP lets scripts send GM commands to the running worldserver. Enable it in `wor
 > .arpg scale probe Arpgtest nearest
 ? scaled=85\b
 ```
+`!` = must not match, `~ 500` = wait 500 ms, `*` = like `?` but re-sends the last command every 2 s until it matches (20 s max;
+for things that happen on a timer, such as the scaling tick).
 
 SOAP has no selected target, so our debug commands always take a player name or GUID. The test
 character `Arpgtest` is created and moved by `.arpg test setup`, so tests don't depend on where you logged off.
