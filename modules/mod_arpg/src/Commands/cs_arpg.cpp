@@ -193,6 +193,7 @@ public:
             { "learnall", &HandleTestLearnAll, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "professions", &HandleTestProfessions, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "weapons",  &HandleTestWeapons,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "visual",   &HandleTestVisual,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "events",   &HandleTestEvents,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "pack",     &HandleTestPack,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "give",     &HandleTestGive,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -489,6 +490,66 @@ public:
             first = false;
         }
         return line;
+    }
+
+    // .arpg test visual <char> <spellId>|clear   (owner picks the loot beam / Champion glow) puts that spell's visual on the
+    // creature nearest to the character for 60 s: as an aura if the spell is one, else cast on itself (triggered).
+    // "clear" removes the last one shown.
+    static bool HandleTestVisual(ChatHandler* handler, char const* args)
+    {
+        static std::map<uint64, std::pair<ObjectGuid, uint32>> shown;   // player guid -> (creature, spell)
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test visual <char> <spellId>|clear");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        uint64 key = p->GetGUID().GetRawValue();
+        auto last = shown.find(key);
+        if (last != shown.end())
+        {
+            if (Creature* old = ObjectAccessor::GetCreature(*p, last->second.first))
+                old->RemoveAurasDueToSpell(last->second.second);
+            shown.erase(last);
+        }
+        if (t[1] == "clear")
+        {
+            handler->SendSysMessage("ok visual cleared");
+            return true;
+        }
+        uint32 spellId = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
+        SpellInfo const* si = sSpellMgr->GetSpellInfo(spellId);
+        if (!si)
+            return Fail(handler, "unknown spell " + t[1]);
+        Creature* c = nullptr;
+        float best = 30.0f;
+        std::list<Unit*> units;
+        Trinity::AnyUnitInObjectRangeCheck check(p, best);
+        Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(p, units, check);
+        Cell::VisitAllObjects(p, searcher, best);
+        for (Unit* u : units)
+            if (Creature* cr = u->ToCreature())
+                if (cr->IsAlive() && !cr->IsPet() && p->GetDistance(cr) < best)
+                {
+                    best = p->GetDistance(cr);
+                    c = cr;
+                }
+        if (!c)
+            return Fail(handler, "no creature within 30 yards");
+        char const* how = "aura";
+        if (Aura* a = c->AddAura(spellId, c))
+        {
+            a->SetMaxDuration(60000);
+            a->SetDuration(60000);
+        }
+        else
+        {
+            c->CastSpell(c, spellId, true);
+            how = "cast";
+        }
+        shown[key] = { c->GetGUID(), spellId };
+        handler->PSendSysMessage("ok visual spell=%u on=%s (%u) as=%s", spellId, c->GetName().c_str(), c->GetEntry(), how);
+        return true;
     }
 
     // .arpg test weapons <char> [itemId]   (m6-any-weapon) grants what's missing, then reports the proficiencies known and,

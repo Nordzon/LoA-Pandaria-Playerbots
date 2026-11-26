@@ -16,7 +16,7 @@ the addon picks up new files. GM commands go in the chat box; replace `<you>` wi
 | 52427 | WotLK Prologue Light Beam, minor |
 | 57772 | Beam of Light |
 | 114382 | Beam of Light |
-| 147974 | Pillar of Light |
+| 147974 | Pillar of Light (plays once, not a lasting aura) |
 | 120720 | Light Beam: Feralas Blue |
 | 135419 | Light Beam: Feralas Green |
 | 58042 | Treasure Sparkle |

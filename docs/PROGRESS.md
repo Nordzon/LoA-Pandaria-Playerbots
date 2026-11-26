@@ -24,7 +24,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
   sync OK when the owner isn't playing; m7: 500 bots, Dungeon Finder (any dungeon any level, bots +-3), affix-aware party bots
   (playerbots touches OK), living auction house, bot crowding; order DF -> affix bots -> AH -> crowding.
 - **QUEUE (work top-down, one change each):** (1) ~~m6-any-weapon~~ done (owner check pending); (2) ~~upstream sync~~ done 2026-11-26;
-  (3) `.arpg test visual` + candidate list + `docs/OWNER-CHECKS.md`; (4) m6-custom-items (Item-sparse hotfix rows, catalysts,
+  (3) ~~visual picker + OWNER-CHECKS~~ done; (4) m6-custom-items (Item-sparse hotfix rows, catalysts,
   essences) + m1b 2b.3 catalysts/salvage; (5) companion mount shop (gossip, gold); (6) m7: 500 bots, Dungeon Finder hook,
   affix-aware party bots, living AH, crowding; (7) typed blank bases.
 - **Blockers:** none for the queue below. Owner checks pending (bundled in `docs/OWNER-CHECKS.md` once written): creation screen any race/class, `/prof` panel, any weapon on a caster, companion windows (reforge/transmog/void open?), visual candidates for the loot beam + Champion glow. Client: `Wow-64-all.exe`.
@@ -67,6 +67,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-26 15:40 `.arpg test visual <char> <spellId>|clear` (owner picks loot beam + Champion glow; 17 candidates all apply, listed in `docs/OWNER-CHECKS.md`); test 05; full run ALL OK.
 - 2026-11-26 15:30 first upstream sync: 26 upstream commits (22 world-DB quest/event fixes + 4 core crash guards), no overlap with `// ARPG:`; backup + tag `pre-sync-20261126-1516`; full run ALL OK (21 files). Script fixes: fetch tags with --force (upstream moved `ci-playerbot`), stop servers before building (exes were locked).
 - 2026-11-26 15:20 m6-any-weapon done: 15 proficiencies at login/level-up for real players (Bots/DualWield knobs off), test 16; full run ALL OK (21 files). `docs/OWNER-CHECKS.md` written (visual candidates, spawn commands).
 - 2026-11-26 owner answered every open question (see "Owner decisions 2026-11-26"); queue set. m6-any-weapon built (change folder, `Character/AnyWeapon`, test 16).

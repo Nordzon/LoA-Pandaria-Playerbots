@@ -33,3 +33,11 @@
 
 > .arpg config set Arpg.Test.RecordEvents 0
 ? ok
+
+# --- Visual picker (owner chooses the loot beam / Champion glow): an aura visual on the nearest creature, then cleared.
+> .arpg test visual Arpgtest 66602
+? ok visual spell=66602 on=.+ as=(aura|cast)
+> .arpg test visual Arpgtest clear
+? ok visual cleared
+> .arpg test visual Arpgtest 999999999
+? unknown spell
