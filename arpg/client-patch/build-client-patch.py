@@ -235,6 +235,44 @@ def build_charbaseinfo(path_out):
     return len(pairs)
 
 
+SERVER_SPELL_DBC = r'D:\WoWMoPProject\ServerData\data\dbc\Spell.dbc'   # Blizzard's, never patched (the server ignores texts)
+
+
+def potion_descriptions():
+    """{spell id: tooltip text} for the ARPG potions (arpg_potion): the item's "Use:" line is the spell description, which
+    still said the stock flat amount (owner 2026-11-27)."""
+    text = {
+        0: 'Restores %d%% of your maximum health. Shares a 10 sec cooldown with other potions.',
+        1: 'Restores %d%% of your maximum mana (energy users half of that, rage users rage). Shares a 10 sec cooldown with other potions.',
+        2: 'Restores %d%% of your maximum health and mana. Shares a 10 sec cooldown with other potions.',
+    }
+    out = {}
+    for spell, kind, pct in db_rows('SELECT i.spellid_1, p.kind, p.pct FROM arpg_potion p JOIN item_template i ON i.entry = p.item_id '
+                                    'WHERE i.spellid_1 > 0'):
+        out[int(spell)] = text.get(int(kind), text[0]) % int(pct)
+    return out
+
+
+def build_spell_descriptions(path_out):
+    """Client Spell.dbc with new description strings (field 3) for some spells: the new strings are appended to the string
+    block and the records point at them; every other byte stays Blizzard's."""
+    texts = potion_descriptions()
+    d = open(SERVER_SPELL_DBC, 'rb').read()
+    magic, n, f, sz, ssz = struct.unpack('<4s4I', d[:20])
+    recs = bytearray(d[20:20 + n * sz])
+    strings = bytearray(d[20 + n * sz:])
+    done = 0
+    for i in range(n):
+        sid = struct.unpack_from('<I', recs, i * sz)[0]
+        if sid in texts:
+            off = len(strings)
+            strings += texts[sid].encode('utf-8') + b'\0'
+            struct.pack_into('<I', recs, i * sz + 3 * 4, off)
+            done += 1
+    open(path_out, 'wb').write(struct.pack('<4s4I', magic, n, f, sz, len(strings)) + bytes(recs) + bytes(strings))
+    return done
+
+
 def build_mpq(files, mpq_path):
     """files: {inner name (bytes): local path}. Plain MPQ v4 entries (the unlocked exe loads plain files)."""
     s = ctypes.WinDLL(DLL)
@@ -278,13 +316,16 @@ def main():
     build_suffix_dbc(suffix, srows)
     charbase = os.path.join(OUT_DIR, 'CharBaseInfo.client.dbc')
     pairs = build_charbaseinfo(charbase)
+    spell = os.path.join(OUT_DIR, 'Spell.client.dbc')
+    spells = build_spell_descriptions(spell)
     build_mpq({b'DBFilesClient\\SpellItemEnchantment.dbc': dbc, b'DBFilesClient\\ItemRandomSuffix.dbc': suffix,
-               b'DBFilesClient\\CharBaseInfo.dbc': charbase}, mpq)
+               b'DBFilesClient\\CharBaseInfo.dbc': charbase, b'DBFilesClient\\Spell.dbc': spell}, mpq)
     print(f'built {mpq} ({os.path.getsize(mpq)} bytes): {rows} affix display rows (stats {base + 1}..{base + len(STATS) * stride - 1}, '
           f'effects {effect_base + EFFECT_ROWS_PER}..{effect_base + (len(EFFECTS) + 1) * EFFECT_ROWS_PER - 1})')
     print(f'  + {len(urows)} Unique power rows ({unique_base}+)')
     print(f'  + {len(srows)} random-suffix rows ({srows[0][0]}..{srows[-1][0]}) for 5 lines + item names')
     print(f'  + CharBaseInfo: {pairs} race x class pairs (any race, any class)')
+    print(f'  + Spell: {spells} potion tooltips (% heal / mana, shared cooldown)')
     if '--install' in sys.argv:
         shutil.copyfile(mpq, TARGET)
         print('installed', TARGET)
