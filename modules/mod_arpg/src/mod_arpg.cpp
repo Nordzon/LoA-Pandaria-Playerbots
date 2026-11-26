@@ -20,6 +20,7 @@
 #include "Loot/MountShop.h"
 #include "Bots/BotItemScore.h"
 #include "Loot/AuctionRolls.h"
+#include "Loot/LootBeam.h"
 
 #include "Chat.h"
 #include "Player.h"
@@ -81,6 +82,7 @@ void AddSC_mod_arpg()
     Arpg::Loot::InstallCatalystDrops();
     Arpg::Bots::InstallBotItemScore();
     Arpg::Loot::InstallAuctionRolls();
+    Arpg::Loot::InstallLootBeam();
     Arpg::Loot::InstallLootPlanner();   // last kill script: plans corpse loot after the others added items and pity
     AddSC_arpg_commandscript();
 }

@@ -31,6 +31,7 @@
 #include "Loot/MountShop.h"
 #include "Bots/BotItemScore.h"
 #include "Loot/AuctionRolls.h"
+#include "Loot/LootBeam.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "StatsWeightCalculator.h"
@@ -203,6 +204,7 @@ public:
             { "weapons",  &HandleTestWeapons,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "visual",   &HandleTestVisual,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "entries",  &HandleTestEntries,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "beams",    &HandleTestBeams,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "count",    &HandleTestCount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "salvage",  &HandleTestSalvage,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "mount",    &HandleTestMount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -726,6 +728,19 @@ public:
             return Fail(handler, "character not online");
         uint32 itemId = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
         handler->PSendSysMessage("ok item=%u count=%u", itemId, p->GetItemCount(itemId, true));
+        return true;
+    }
+
+    // .arpg test beams <char>   loot beams currently up over that character's kills
+    static bool HandleTestBeams(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 1 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test beams <char>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        handler->PSendSysMessage("ok beams=%d", Arpg::Loot::ActiveBeams(p));
         return true;
     }
 

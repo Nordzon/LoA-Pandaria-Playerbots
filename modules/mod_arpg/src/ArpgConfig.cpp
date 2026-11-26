@@ -33,7 +33,7 @@ namespace
         "Arpg.Superunique.Enabled", "Arpg.Superunique.PerZone", "Arpg.Superunique.RespawnDelay", "Arpg.Superunique.UniqueChance",
         "Arpg.Superunique.UniqueBadLuckStep", "Arpg.Superunique.Scale", "Arpg.Champion.EntryOffset", "Arpg.Superunique.EntryOffset",
         "Arpg.Superunique.PatrolRadius", "Arpg.Superunique.Announce",
-        "Arpg.Champion.Enabled", "Arpg.Champion.Chance", "Arpg.Champion.Scale", "Arpg.Champion.VisualAura", "Arpg.Champion.LootBlueChance",
+        "Arpg.Champion.Enabled", "Arpg.Champion.Chance", "Arpg.Champion.Scale", "Arpg.Champion.VisualAura", "Arpg.Superunique.VisualAura", "Arpg.Loot.BeamAura", "Arpg.Loot.BeamMinQuality", "Arpg.Champion.LootBlueChance",
         "Arpg.Champion.ChillSpell", "Arpg.Champion.SparkChance", "Arpg.Champion.NukeSpell", "Arpg.Champion.NukeEveryMs",
         "Arpg.Champion.ExplosionRadius", "Arpg.Champion.ExplosionDelayMs",
     };
@@ -134,9 +134,12 @@ namespace Arpg
         s.championEntryOffset = uint32_t(std::max(0, file.GetInt("Arpg.Champion.EntryOffset", 400000)));
         s.superuniqueEntryOffset = uint32_t(std::max(0, file.GetInt("Arpg.Superunique.EntryOffset", 700000)));
         s.championEnabled = file.GetBool("Arpg.Champion.Enabled", true);
-        s.championChancePct = std::max(0.0f, file.GetFloat("Arpg.Champion.Chance", 2.0f));
+        s.championChancePct = std::max(0.0f, file.GetFloat("Arpg.Champion.Chance", 5.0f));
         s.championScale = std::max(0.0f, file.GetFloat("Arpg.Champion.Scale", 1.25f));
-        s.championVisualAura = uint32(std::max(0, file.GetInt("Arpg.Champion.VisualAura", 0)));
+        s.championVisualAura = uint32_t(std::max(0, file.GetInt("Arpg.Champion.VisualAura", 117230)));
+        s.superuniqueVisualAura = uint32_t(std::max(0, file.GetInt("Arpg.Superunique.VisualAura", 117230)));
+        s.lootBeamAura = uint32_t(std::max(0, file.GetInt("Arpg.Loot.BeamAura", 120720)));
+        s.lootBeamMinQuality = uint32_t(std::max(0, std::min(5, file.GetInt("Arpg.Loot.BeamMinQuality", 2))));
         s.championLootBlueChancePct = std::max(0.0f, file.GetFloat("Arpg.Champion.LootBlueChance", 25.0f));
         s.championChillSpell = uint32_t(std::max(0, file.GetInt("Arpg.Champion.ChillSpell", 6136)));
         s.championSparkChancePct = std::max(0.0f, file.GetFloat("Arpg.Champion.SparkChance", 25.0f));

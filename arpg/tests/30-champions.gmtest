@@ -120,6 +120,13 @@
 ? ok .* killed champion
 > .arpg test events Arpgtest
 ? champion killed entry=299 .*floor_green=[1-9]\d* floor_blue=[1-9]\d*
+# Loot beam (owner pick 120720): the corpse holds a green and a blue -> a beam goes up; looting it takes the beam down.
+? loot beam corpse=(400)?299\b
+> .arpg champion loot Arpgtest
+? ok
+~ 2500
+> .arpg test beams Arpgtest
+? ok beams=0
 > .arpg test setup Arpgtest 20 elwynn-northshire
 ? ok .*\(online\)
 ~ 6000

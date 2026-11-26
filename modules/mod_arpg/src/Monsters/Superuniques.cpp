@@ -101,6 +101,8 @@ namespace
         TempSummon* c = map->SummonCreature(entry, pos);
         if (!c) { out = "could not spawn entry " + std::to_string(def.entry); return false; }
         c->setActive(true, ActiveFlags::Script);
+        if (uint32 glow = sArpgConfig.Get().superuniqueVisualAura)   // owner pick 2026-11-26 (117230 "Empowered")
+            c->AddAura(glow, c);
         // Patrol (m3 3.4): roams around its spawn point instead of standing still.
         Arpg::Settings const& ps = sArpgConfig.Get();
         if (ps.superuniquePatrolRadius > 0.0f)

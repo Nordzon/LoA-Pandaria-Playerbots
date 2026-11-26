@@ -10,6 +10,7 @@
 #include "Loot/ZoneLevels.h"
 #include "Loot/BossPity.h"
 #include "Loot/Crafting.h"
+#include "Loot/LootBeam.h"
 #include "Loot/LootFilter.h"
 #include "Monsters/Champions.h"
 #include "Dungeons/InstanceScaling.h"
@@ -201,6 +202,7 @@ namespace
                 return;
             Arpg::Loot::PlanLoot(killer, killed->loot, ItemPickupSourceType::CreatureLoot, killed->GetEntry(),
                 Arpg::Monsters::WasChampionKill(killed));
+            Arpg::Loot::MaybeBeamCorpse(killer, killed);   // light beam over a corpse worth looting (owner pick)
         }
     };
 }

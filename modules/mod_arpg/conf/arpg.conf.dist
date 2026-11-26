@@ -210,9 +210,14 @@ Arpg.Champion.Enabled = 1
 #    "Unique <name>" rank Rare Elite) made by sql/tools/gen_monster_tags.py with these offsets; 0 = no tag (keep the name)
 Arpg.Champion.EntryOffset = 400000
 Arpg.Superunique.EntryOffset = 700000
-Arpg.Champion.Chance = 2.0
+Arpg.Champion.Chance = 5.0
 Arpg.Champion.Scale = 1.25
-Arpg.Champion.VisualAura = 0
+Arpg.Champion.VisualAura = 117230
+#    Arpg.Superunique.VisualAura   the same kind of glow on Superuniques (0 = none)
+Arpg.Superunique.VisualAura = 117230
+#    Arpg.Loot.BeamAura            light beam over a corpse that still holds an item of BeamMinQuality or better (0 = none)
+Arpg.Loot.BeamAura = 120720
+Arpg.Loot.BeamMinQuality = 2
 Arpg.Champion.LootBlueChance = 25
 
 #    Monster affixes (damage is always a % of the player's max health from arpg_monster_band.affix_damage_pct, never a kill):
