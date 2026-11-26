@@ -54,6 +54,9 @@ namespace Arpg
         bool superuniqueAnnounce = true;           // Arpg.Superunique.Announce (zone message on spawn)
         uint32_t companionNpcFlags = 0;        // computed from Arpg.Companion.* (vendor, repair, bank, mail, reforge, transmog, void)
         bool companionInCombat = false;        // Arpg.Companion.InCombat (roles also work in combat)
+        bool anyWeaponEnabled = true;          // Arpg.AnyWeapon.Enabled (every weapon proficiency + Shield for real players)
+        bool anyWeaponBots = false;            // Arpg.AnyWeapon.Bots
+        bool anyWeaponDualWield = false;       // Arpg.AnyWeapon.DualWield
         bool lootPetEnabled = true;            // Arpg.LootPet.Enabled (players may turn their companion on)
         bool lootPetWaitForCombatEnd = true;   // Arpg.LootPet.WaitForCombatEnd
         uint32_t lootPetReachTimeoutMs = 3000; // Arpg.LootPet.ReachTimeoutMs (then loots from where it is)

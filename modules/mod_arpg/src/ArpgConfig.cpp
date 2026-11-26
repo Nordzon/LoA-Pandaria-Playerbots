@@ -20,6 +20,7 @@ namespace
         "Arpg.Companion.Vendor", "Arpg.Companion.Repair", "Arpg.Companion.Bank", "Arpg.Companion.Mail",
         "Arpg.Companion.Reforge", "Arpg.Companion.Transmog", "Arpg.Companion.VoidStorage", "Arpg.Companion.InCombat",
         "Arpg.LootPet.Enabled", "Arpg.LootPet.WaitForCombatEnd", "Arpg.LootPet.ReachTimeoutMs",
+        "Arpg.AnyWeapon.Enabled", "Arpg.AnyWeapon.Bots", "Arpg.AnyWeapon.DualWield",
         "Arpg.Dungeon.Enabled", "Arpg.Dungeon.SoloNonTankDamage", "Arpg.Dungeon.SoloTankDamageDealt",
         "Arpg.Dungeon.SoloHealerDamageDealt", "Arpg.Dungeon.RaidTierStep",
         "Arpg.Paragon.Enabled", "Arpg.Paragon.XpBase", "Arpg.Paragon.XpGrowth", "Arpg.Paragon.QuestXpPct",
@@ -76,6 +77,9 @@ namespace Arpg
             s.companionNpcFlags = f;
         }
         s.companionInCombat = file.GetBool("Arpg.Companion.InCombat", false);
+        s.anyWeaponEnabled = file.GetBool("Arpg.AnyWeapon.Enabled", true);
+        s.anyWeaponBots = file.GetBool("Arpg.AnyWeapon.Bots", false);
+        s.anyWeaponDualWield = file.GetBool("Arpg.AnyWeapon.DualWield", false);
         s.lootPetEnabled = file.GetBool("Arpg.LootPet.Enabled", true);
         s.lootPetWaitForCombatEnd = file.GetBool("Arpg.LootPet.WaitForCombatEnd", true);
         s.lootPetReachTimeoutMs = uint32_t(std::max(500, file.GetInt("Arpg.LootPet.ReachTimeoutMs", 3000)));

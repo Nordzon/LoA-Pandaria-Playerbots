@@ -1,0 +1,19 @@
+# Any weapon (change m6-any-weapon, SPEC 4.9): every real player knows every weapon type and Shield.
+# The test character is a Human Warrior: stock MoP warriors can't use wands, so the Fire Wand (5069, level 7) shows it.
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 4000
+> .arpg test weapons Arpgtest 5069
+? ok proficiencies=15/15 dualwield=\d applies=1 added=\d+ item=5069 canuse=0\b
+# A shield too (equip result 0 = can equip).
+> .arpg test weapons Arpgtest 1201
+? proficiencies=15/15 .* canuse=0\b
+
+# Feature off: no longer applies (nothing is taken away until the next login).
+> .arpg config set Arpg.AnyWeapon.Enabled 0
+? ok
+> .arpg test weapons Arpgtest
+? applies=0 added=0\b
+> .arpg config set Arpg.AnyWeapon.Enabled 1
+? ok

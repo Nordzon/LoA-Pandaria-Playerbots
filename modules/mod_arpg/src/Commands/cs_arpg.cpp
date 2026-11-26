@@ -26,6 +26,7 @@
 
 #include "ObjectMgr.h"
 #include "TemporarySummon.h"
+#include "Character/AnyWeapon.h"
 #include <map>
 
 #include "CellImpl.h"
@@ -191,6 +192,7 @@ public:
             { "setup",    &HandleTestSetup,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "learnall", &HandleTestLearnAll, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "professions", &HandleTestProfessions, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "weapons",  &HandleTestWeapons,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "events",   &HandleTestEvents,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "pack",     &HandleTestPack,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "give",     &HandleTestGive,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -487,6 +489,30 @@ public:
             first = false;
         }
         return line;
+    }
+
+    // .arpg test weapons <char> [itemId]   (m6-any-weapon) grants what's missing, then reports the proficiencies known and,
+    // with an item id, whether the character could equip it (equip error code; 0 = yes)
+    static bool HandleTestWeapons(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.empty() || t.size() > 2 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test weapons <char> [itemId]");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        int added = Arpg::Character::ApplyAnyWeapon(p);
+        std::string line = "ok " + Arpg::Character::DescribeAnyWeapon(p) + " added=" + std::to_string(added);
+        if (t.size() == 2)
+        {
+            uint32 itemId = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
+            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+            if (!proto)
+                return Fail(handler, "unknown item " + t[1]);
+            line += " item=" + std::to_string(itemId) + " canuse=" + std::to_string(uint32(p->CanUseItem(proto)));
+        }
+        handler->SendSysMessage(line.c_str());
+        return true;
     }
 
     // .arpg test professions <char>   the professions panel line of an online character

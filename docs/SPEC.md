@@ -275,6 +275,10 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   reference race's class stats + (race warrior - reference warrior) per level, race masks ORed into class skill/spell rows.
   Client: `build-client-patch.py` packs `CharBaseInfo.dbc` (all 165 pairs) into the patch MPQ and copies it to the server DBC folder.
   Check: `arpg/scripts/test-char-create.ps1` (headless create of an Undead Monk, DB check, erase).
+- **Any weapon** (owner 2026-11-26, change `m6-any-weapon`): any class can equip any weapon type and a shield. Every real
+  player gets every weapon proficiency + Shield (spell for the client, skill at the level max for the server's equip check)
+  at login and on level change. `Arpg.AnyWeapon.Enabled` (1), `.Bots` (0: bots keep their class's weapons), `.DualWield`
+  (0). Not covered: items limited to a class by the item itself (`AllowableClass`) and class abilities tied to a weapon.
 
 ### 4.10 Bots (m7, last)
 - Enable playerbots (300 → 1000). Verify: scaling bot-lock, party-size scaling with bots, bot loot rule.
