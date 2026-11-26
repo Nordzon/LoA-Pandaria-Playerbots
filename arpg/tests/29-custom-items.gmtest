@@ -1,0 +1,21 @@
+# Custom items (change m6-custom-items): ids 700000+ from item_template (no client patch); trade goods, no affixes, stack 999.
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 4000
+> .arpg test clearbags Arpgtest
+? ok Arpgtest destroyed=\d+
+> .arpg test give Arpgtest 700001
+? ok Arpgtest item=700001 .* quality=2 affixes=0\b
+> .arpg test give Arpgtest 700002
+? item=700002 .* quality=3 affixes=0\b
+> .arpg test give Arpgtest 700003
+? item=700003 .* quality=4 affixes=0\b
+> .arpg test give Arpgtest 700010
+? item=700010 .* quality=1 affixes=0\b
+> .arpg test give Arpgtest 700010
+? item=700010
+> .arpg test count Arpgtest 700010
+? ok item=700010 count=2\b
+> .arpg test clearbags Arpgtest
+? ok

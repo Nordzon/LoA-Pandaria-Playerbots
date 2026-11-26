@@ -67,6 +67,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-26 15:55 m6-custom-items: items 700001-700003 (Lesser/Greater/Grand Catalyst), 700010 (Salvaged Essence) via item_template + hotfix_data; `.arpg test count`; `Core/Salvage` + 4 unit tests (83); test 29; full run ALL OK (22 files). NEXT: catalyst drops + auto-use in crafts (2.1/2.2).
 - 2026-11-26 15:40 `.arpg test visual <char> <spellId>|clear` (owner picks loot beam + Champion glow; 17 candidates all apply, listed in `docs/OWNER-CHECKS.md`); test 05; full run ALL OK.
 - 2026-11-26 15:30 first upstream sync: 26 upstream commits (22 world-DB quest/event fixes + 4 core crash guards), no overlap with `// ARPG:`; backup + tag `pre-sync-20261126-1516`; full run ALL OK (21 files). Script fixes: fetch tags with --force (upstream moved `ci-playerbot`), stop servers before building (exes were locked).
 - 2026-11-26 15:20 m6-any-weapon done: 15 proficiencies at login/level-up for real players (Bots/DualWield knobs off), test 16; full run ALL OK (21 files). `docs/OWNER-CHECKS.md` written (visual candidates, spawn commands).

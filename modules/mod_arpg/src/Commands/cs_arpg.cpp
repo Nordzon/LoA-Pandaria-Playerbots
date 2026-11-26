@@ -194,6 +194,7 @@ public:
             { "professions", &HandleTestProfessions, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "weapons",  &HandleTestWeapons,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "visual",   &HandleTestVisual,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "count",    &HandleTestCount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "events",   &HandleTestEvents,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "pack",     &HandleTestPack,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "give",     &HandleTestGive,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -490,6 +491,20 @@ public:
             first = false;
         }
         return line;
+    }
+
+    // .arpg test count <char> <itemId>   how many of that item the character carries (bags + bank)
+    static bool HandleTestCount(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test count <char> <itemId>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        uint32 itemId = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
+        handler->PSendSysMessage("ok item=%u count=%u", itemId, p->GetItemCount(itemId, true));
+        return true;
     }
 
     // .arpg test visual <char> <spellId>|clear   (owner picks the loot beam / Champion glow) puts that spell's visual on the
