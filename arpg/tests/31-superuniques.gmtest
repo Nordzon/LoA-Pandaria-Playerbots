@@ -71,3 +71,22 @@
 ? ok
 > .arpg config set Arpg.Test.RecordEvents 0
 ? ok
+
+# --- The whole world (owner 2026-11-27, gen_superuniques.py): every open-world zone has a pool of its own rares. In the Jade
+# Forest (5785, 8 rares) the pool is loaded and one of them spawns.
+> .arpg test setup Arpgtest 85 jadeforest-dawnsblossom
+? ok .*\(online\)
+# far teleport (Pandaria): give the client time to arrive, then the zone tick spawns one
+~ 15000
+# (Bots questing there may have killed the zone's one already - it then waits out the respawn delay - so spawn one now.)
+> .arpg superunique info Arpgtest
+? superunique zone=5785 pool=8 
+> .arpg superunique spawn Arpgtest
+? ok
+> .arpg superunique info Arpgtest
+? zone=5785 pool=8 alive=1
+> .arpg superunique kill Arpgtest
+? ok
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 6000
