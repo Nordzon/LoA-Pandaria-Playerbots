@@ -89,7 +89,6 @@ for i = 1, MAX_ROWS do
     local del = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
     del:SetSize(22, 20); del:SetPoint("TOPRIGHT", -28, y + 3); del:SetText("x")
     del:SetScript("OnClick", function() Send(".lootfilter remove " .. i) end)
-    label:SetScript("OnEnter", nil)
     rows[i] = { label = label, up = up, down = down, del = del }
 end
 

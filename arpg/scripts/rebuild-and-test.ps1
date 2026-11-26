@@ -40,6 +40,8 @@ if (Get-Process MSBuild -ErrorAction SilentlyContinue) { Done 10 'FAIL another b
 
 & powershell -ExecutionPolicy Bypass -File (Join-Path $Scripts 'restart-world.ps1') -Stop *>> $Log
 Say 'servers stopped'
+# Client addons: keep the client's copy in step with arpg/addons (it is a copy, not a link; never while the client runs).
+if (-not (Get-Process | Where-Object { $_.ProcessName -match '^wow' })) { & powershell -ExecutionPolicy Bypass -File (Join-Path $Scripts 'install-addons.ps1') *>> $Log }
 
 $env:BOOST_ROOT = 'C:/local/boost_1_87_0'
 cmake -S . -B build *>> (Join-Path $Work 'rebuild-build.log')
