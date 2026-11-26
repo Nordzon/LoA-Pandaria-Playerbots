@@ -68,7 +68,7 @@ if ($dirty) { Fail "uncommitted changes. Commit or stash first:`n$dirty" }
 # 2. Fetch + incoming
 Step "Fetching $Remote/$Branch"
 if (-not (git remote | Where-Object { $_ -eq $Remote })) { Fail "no remote '$Remote'. Add it: git remote add $Remote <upstream repo url>" }
-Invoke-Git fetch $Remote --tags
+Invoke-Git fetch $Remote --tags --force   # upstream may move its own tags (ci-playerbot)
 
 if ($CherryPick) {
   Step "Cherry-picking $CherryPick"
