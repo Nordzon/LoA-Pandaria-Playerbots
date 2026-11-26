@@ -32,7 +32,10 @@ if (-not $row) {
   exit 1
 }
 $f = $row -split "`t"
-Write-Host "OK created $Name race=$($f[0]) class=$($f[1]) level=$($f[2]) map=$($f[3])"
+# Starter gear (owner 2026-11-26: new pairs started naked): equipped items saved at creation.
+$gear = Q "SELECT COUNT(*) FROM characters.character_inventory ci JOIN characters.characters c ON c.guid = ci.guid WHERE c.name = '$Name' AND ci.bag = 0 AND ci.slot < 19"
+Write-Host "OK created $Name race=$($f[0]) class=$($f[1]) level=$($f[2]) map=$($f[3]) equipped=$gear"
 & (Join-Path $PSScriptRoot 'gm.ps1') ".character erase $Name" | Out-Null
 if ([int]$f[0] -ne $Race -or [int]$f[1] -ne $Class) { Write-Host 'FAIL: wrong race/class stored'; exit 1 }
+if ([int]$gear -lt 1) { Write-Host 'FAIL: no starter gear equipped'; exit 1 }
 exit 0

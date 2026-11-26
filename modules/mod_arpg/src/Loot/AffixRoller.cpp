@@ -25,6 +25,7 @@
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "Item.h"
+#include "ItemEnchantmentMgr.h"
 #include "Creature.h"
 #include "LootMgr.h"
 #include "ScriptMgr.h"
@@ -738,7 +739,9 @@ namespace Arpg::Loot
                 continue;   // no display rows: nothing to show in the loot window - roll at pickup as before
             plan.planned = true;
             li.randomPropertyId = rp;   // the loot window shows the final name ("X of the Whale", "X - <Unique>")
-            li.randomSuffix = 0;
+            // The suffix factor too, as the core gives an item with a suffix (Item::UpdateItemSuffixFactor): with 0 the client
+            // shows the plain name in the loot window (owner 2026-11-27: the name only appeared in the bags).
+            li.randomSuffix = GenerateEnchSuffixFactor(li.itemid);
             {
                 std::lock_guard<std::mutex> l(g_lock);
                 // Drop plans nobody picked up for an hour (corpses despawn long before), and cap the store.

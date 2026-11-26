@@ -25,7 +25,7 @@ invisible / plain (creature ids were too large for the client) - sections 1-4; p
    Sell and repair, Bank, Mailbox, Change appearance (pick a look - the companion changes).
 4. Right-click the **L** button: the loot filter panel opens.
 
-> Result:
+> Result: Working very well!
 
 ## 2. Salvage and catalysts (companion dialogue)
 1. `.arpg test give Lokond 2317` twice (two affixed greens in your bags).
@@ -33,7 +33,7 @@ invisible / plain (creature ids were too large for the client) - sections 1-4; p
    Essence.
 3. "Buy catalysts": Lesser / Greater / Grand with essence prices; buying one with enough essences works.
 
-> Result:
+> Result: Works
 
 ## 3. Mount shop (companion dialogue)
 1. Gold: target yourself, `.modify money 60000000`.
@@ -41,7 +41,7 @@ invisible / plain (creature ids were too large for the client) - sections 1-4; p
 3. Click one: a price popup (5000 g); after buying, the mount is in your mount journal and gone from the list.
    (Riding needs the riding skill as always: `.character level Lokond 20` then a riding trainer, or just check the journal.)
 
-> Result: (and: does 5000 g feel right?)
+> Result: (and: does 5000 g feel right?): Mounts work, let's leave 5000 for now. Can you make the UI a vendor one instead of a dialogue one?
 
 ## 4. Champion and Unique tags, potion tooltip (Goldshire)
 1. `.tele goldshire`
@@ -52,25 +52,25 @@ invisible / plain (creature ids were too large for the client) - sections 1-4; p
 4. `.additem 118 5` and hover the potion: besides the stock "Use:" line, a yellow line "ARPG: heals 10% of your maximum health.
    10 sec shared cooldown." (if not: restart the client once - it may have cached the old text).
 
-> Result:
+> Result: Champtions work very well! And drop nice greens. Superuniques also work and drop items as required. I am still noticing that the items get updated within my inventory instead of the corpses themselves. This is a small issue as the pet will loot for us anyway, but add to fix pile. Potions still have the incorrect tooltip, but do restore the correct amounts. (tooltip says restores some flat amount of health, using the potion restores % health as we planned, cooldown works.)
 
 ## 5. Loot names on the corpse
 Kill a few things near your level (with the companion off: click **L** again). Affixed greens/blues already show their full
 name in the loot window ("... of the Bear") before you take them; the item in your bags is the same.
 
-> Result:
+> Result: Does not work correctly, loot gets updated in my bag,
 
 ## 6. New character starts normally
 Make a new character of a pair stock MoP doesn't allow (e.g. Night Elf Monk or Tauren Rogue), enter the world: you can move
 right away (no "lying on the ground"). Known, being fixed: such pairs start without their class's starter gear.
 
-> Result:
+> Result: Characters start normally, but some class/race combos are naked (ex: Goblin Monk)
 
 ## 7. Paragon (needs level 90 - use another character if you want Lokond to stay low)
 1. `.character level Lokond 90`, then `.arpg paragon set Lokond 10` (10 Paragon levels = 10 points).
 2. The **P** button or `/paragon`: the window shows the points; spending one changes your stats.
 
-> Result:
+> Result: Working as expected.
 
 ## 8. Later (not now): auction house
 `.tele stormwind`, Trade District auctioneer: mostly materials, some gear, about a third of the green-epic gear with affixes.

@@ -7,6 +7,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 1 AND class = 7;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 1, 7, button, action, type FROM playercreateinfo_action WHERE race = 3 AND class = 7;
 DELETE FROM `playercreateinfo_item` WHERE race = 1 AND class = 7;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 1, 7, itemid, amount FROM playercreateinfo_item WHERE race = 3 AND class = 7;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (1, 7, 52538, 1), (1, 7, 52539, 1), (1, 7, 52540, 1), (1, 7, 36, 1), (1, 7, 2362, 1), (1, 7, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 1 AND class = 7;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 1, 7, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 1 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 3 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 3 AND s.class = 7;
 
@@ -16,6 +17,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 1 AND class = 11;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 1, 11, button, action, type FROM playercreateinfo_action WHERE race = 4 AND class = 11;
 DELETE FROM `playercreateinfo_item` WHERE race = 1 AND class = 11;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 1, 11, itemid, amount FROM playercreateinfo_item WHERE race = 4 AND class = 11;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (1, 11, 3661, 1), (1, 11, 6123, 1), (1, 11, 6124, 1), (1, 11, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 1 AND class = 11;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 1, 11, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 1 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 4 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 4 AND s.class = 11;
 
@@ -25,6 +27,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 2 AND class = 2;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 2, 2, button, action, type FROM playercreateinfo_action WHERE race = 6 AND class = 2;
 DELETE FROM `playercreateinfo_item` WHERE race = 2 AND class = 2;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 2, 2, itemid, amount FROM playercreateinfo_item WHERE race = 6 AND class = 2;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (2, 2, 58248, 1), (2, 2, 52549, 1), (2, 2, 2361, 1), (2, 2, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 2 AND class = 2;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 2, 2, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 2 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 6 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 6 AND s.class = 2;
 
@@ -34,6 +37,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 2 AND class = 5;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 2, 5, button, action, type FROM playercreateinfo_action WHERE race = 5 AND class = 5;
 DELETE FROM `playercreateinfo_item` WHERE race = 2 AND class = 5;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 2, 5, itemid, amount FROM playercreateinfo_item WHERE race = 5 AND class = 5;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (2, 5, 6144, 1), (2, 5, 52, 1), (2, 5, 35, 1), (2, 5, 51, 1), (2, 5, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 2 AND class = 5;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 2, 5, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 2 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 5 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 5 AND s.class = 5;
 
@@ -43,6 +47,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 2 AND class = 11;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 2, 11, button, action, type FROM playercreateinfo_action WHERE race = 6 AND class = 11;
 DELETE FROM `playercreateinfo_item` WHERE race = 2 AND class = 11;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 2, 11, itemid, amount FROM playercreateinfo_item WHERE race = 6 AND class = 11;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (2, 11, 35, 1), (2, 11, 6139, 1), (2, 11, 6124, 1), (2, 11, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 2 AND class = 11;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 2, 11, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 2 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 6 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 6 AND s.class = 11;
 
@@ -52,6 +57,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 3 AND class = 11;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 3, 11, button, action, type FROM playercreateinfo_action WHERE race = 4 AND class = 11;
 DELETE FROM `playercreateinfo_item` WHERE race = 3 AND class = 11;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 3, 11, itemid, amount FROM playercreateinfo_item WHERE race = 4 AND class = 11;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (3, 11, 3661, 1), (3, 11, 6123, 1), (3, 11, 6124, 1), (3, 11, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 3 AND class = 11;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 3, 11, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 3 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 4 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 4 AND s.class = 11;
 
@@ -61,6 +67,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 4 AND class = 2;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 4, 2, button, action, type FROM playercreateinfo_action WHERE race = 1 AND class = 2;
 DELETE FROM `playercreateinfo_item` WHERE race = 4 AND class = 2;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 4, 2, itemid, amount FROM playercreateinfo_item WHERE race = 1 AND class = 2;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (4, 2, 58233, 1), (4, 2, 43, 1), (4, 2, 44, 1), (4, 2, 6948, 1), (4, 2, 52557, 1);
 DELETE FROM `player_levelstats` WHERE race = 4 AND class = 2;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 4, 2, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 4 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 1 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 1 AND s.class = 2;
 
@@ -70,6 +77,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 4 AND class = 7;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 4, 7, button, action, type FROM playercreateinfo_action WHERE race = 3 AND class = 7;
 DELETE FROM `playercreateinfo_item` WHERE race = 4 AND class = 7;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 4, 7, itemid, amount FROM playercreateinfo_item WHERE race = 3 AND class = 7;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (4, 7, 52538, 1), (4, 7, 52539, 1), (4, 7, 52540, 1), (4, 7, 36, 1), (4, 7, 2362, 1), (4, 7, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 4 AND class = 7;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 4, 7, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 4 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 3 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 3 AND s.class = 7;
 
@@ -79,6 +87,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 4 AND class = 9;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 4, 9, button, action, type FROM playercreateinfo_action WHERE race = 1 AND class = 9;
 DELETE FROM `playercreateinfo_item` WHERE race = 4 AND class = 9;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 4, 9, itemid, amount FROM playercreateinfo_item WHERE race = 1 AND class = 9;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (4, 9, 57, 1), (4, 9, 1396, 1), (4, 9, 35, 1), (4, 9, 59, 1), (4, 9, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 4 AND class = 9;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 4, 9, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 4 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 1 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 1 AND s.class = 9;
 
@@ -88,6 +97,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 5 AND class = 2;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 5, 2, button, action, type FROM playercreateinfo_action WHERE race = 6 AND class = 2;
 DELETE FROM `playercreateinfo_item` WHERE race = 5 AND class = 2;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 5, 2, itemid, amount FROM playercreateinfo_item WHERE race = 6 AND class = 2;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (5, 2, 58248, 1), (5, 2, 52549, 1), (5, 2, 2361, 1), (5, 2, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 5 AND class = 2;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 5, 2, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 5 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 6 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 6 AND s.class = 2;
 
@@ -97,6 +107,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 5 AND class = 7;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 5, 7, button, action, type FROM playercreateinfo_action WHERE race = 2 AND class = 7;
 DELETE FROM `playercreateinfo_item` WHERE race = 5 AND class = 7;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 5, 7, itemid, amount FROM playercreateinfo_item WHERE race = 2 AND class = 7;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (5, 7, 52544, 1), (5, 7, 52545, 1), (5, 7, 6948, 1), (5, 7, 36, 1), (5, 7, 2362, 1);
 DELETE FROM `player_levelstats` WHERE race = 5 AND class = 7;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 5, 7, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 5 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 2 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 2 AND s.class = 7;
 
@@ -106,6 +117,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 5 AND class = 11;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 5, 11, button, action, type FROM playercreateinfo_action WHERE race = 6 AND class = 11;
 DELETE FROM `playercreateinfo_item` WHERE race = 5 AND class = 11;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 5, 11, itemid, amount FROM playercreateinfo_item WHERE race = 6 AND class = 11;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (5, 11, 35, 1), (5, 11, 6139, 1), (5, 11, 6124, 1), (5, 11, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 5 AND class = 11;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 5, 11, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 5 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 6 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 6 AND s.class = 11;
 
@@ -115,6 +127,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 6 AND class = 4;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 6, 4, button, action, type FROM playercreateinfo_action WHERE race = 2 AND class = 4;
 DELETE FROM `playercreateinfo_item` WHERE race = 6 AND class = 4;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 6, 4, itemid, amount FROM playercreateinfo_item WHERE race = 2 AND class = 4;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (6, 4, 58246, 1), (6, 4, 120, 1), (6, 4, 121, 1), (6, 4, 37, 1), (6, 4, 50055, 1), (6, 4, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 6 AND class = 4;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 6, 4, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 6 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 2 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 2 AND s.class = 4;
 
@@ -124,6 +137,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 6 AND class = 8;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 6, 8, button, action, type FROM playercreateinfo_action WHERE race = 2 AND class = 8;
 DELETE FROM `playercreateinfo_item` WHERE race = 6 AND class = 8;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 6, 8, itemid, amount FROM playercreateinfo_item WHERE race = 2 AND class = 8;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (6, 8, 52546, 1), (6, 8, 52681, 1), (6, 8, 35, 1), (6, 8, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 6 AND class = 8;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 6, 8, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 6 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 2 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 2 AND s.class = 8;
 
@@ -133,6 +147,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 6 AND class = 9;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 6, 9, button, action, type FROM playercreateinfo_action WHERE race = 2 AND class = 9;
 DELETE FROM `playercreateinfo_item` WHERE race = 6 AND class = 9;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 6, 9, itemid, amount FROM playercreateinfo_item WHERE race = 2 AND class = 9;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (6, 9, 52543, 1), (6, 9, 52679, 1), (6, 9, 35, 1), (6, 9, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 6 AND class = 9;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 6, 9, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 6 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 2 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 2 AND s.class = 9;
 
@@ -142,6 +157,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 7 AND class = 2;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 7, 2, button, action, type FROM playercreateinfo_action WHERE race = 1 AND class = 2;
 DELETE FROM `playercreateinfo_item` WHERE race = 7 AND class = 2;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 7, 2, itemid, amount FROM playercreateinfo_item WHERE race = 1 AND class = 2;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (7, 2, 58233, 1), (7, 2, 43, 1), (7, 2, 44, 1), (7, 2, 6948, 1), (7, 2, 52557, 1);
 DELETE FROM `player_levelstats` WHERE race = 7 AND class = 2;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 7, 2, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 7 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 1 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 1 AND s.class = 2;
 
@@ -151,6 +167,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 7 AND class = 3;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 7, 3, button, action, type FROM playercreateinfo_action WHERE race = 1 AND class = 3;
 DELETE FROM `playercreateinfo_item` WHERE race = 7 AND class = 3;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 7, 3, itemid, amount FROM playercreateinfo_item WHERE race = 1 AND class = 3;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (7, 3, 58232, 1), (7, 3, 147, 1), (7, 3, 129, 1), (7, 3, 23347, 1), (7, 3, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 7 AND class = 3;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 7, 3, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 7 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 1 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 1 AND s.class = 3;
 
@@ -160,6 +177,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 7 AND class = 7;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 7, 7, button, action, type FROM playercreateinfo_action WHERE race = 3 AND class = 7;
 DELETE FROM `playercreateinfo_item` WHERE race = 7 AND class = 7;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 7, 7, itemid, amount FROM playercreateinfo_item WHERE race = 3 AND class = 7;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (7, 7, 52538, 1), (7, 7, 52539, 1), (7, 7, 52540, 1), (7, 7, 36, 1), (7, 7, 2362, 1), (7, 7, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 7 AND class = 7;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 7, 7, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 7 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 3 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 3 AND s.class = 7;
 
@@ -169,6 +187,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 7 AND class = 11;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 7, 11, button, action, type FROM playercreateinfo_action WHERE race = 4 AND class = 11;
 DELETE FROM `playercreateinfo_item` WHERE race = 7 AND class = 11;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 7, 11, itemid, amount FROM playercreateinfo_item WHERE race = 4 AND class = 11;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (7, 11, 3661, 1), (7, 11, 6123, 1), (7, 11, 6124, 1), (7, 11, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 7 AND class = 11;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 7, 11, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 7 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 4 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 4 AND s.class = 11;
 
@@ -178,6 +197,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 8 AND class = 2;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 8, 2, button, action, type FROM playercreateinfo_action WHERE race = 6 AND class = 2;
 DELETE FROM `playercreateinfo_item` WHERE race = 8 AND class = 2;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 8, 2, itemid, amount FROM playercreateinfo_item WHERE race = 6 AND class = 2;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (8, 2, 58248, 1), (8, 2, 52549, 1), (8, 2, 2361, 1), (8, 2, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 8 AND class = 2;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 8, 2, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 8 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 6 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 6 AND s.class = 2;
 
@@ -187,6 +207,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 9 AND class = 2;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 9, 2, button, action, type FROM playercreateinfo_action WHERE race = 6 AND class = 2;
 DELETE FROM `playercreateinfo_item` WHERE race = 9 AND class = 2;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 9, 2, itemid, amount FROM playercreateinfo_item WHERE race = 6 AND class = 2;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (9, 2, 58248, 1), (9, 2, 52549, 1), (9, 2, 2361, 1), (9, 2, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 9 AND class = 2;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 9, 2, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 9 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 6 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 6 AND s.class = 2;
 
@@ -196,6 +217,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 9 AND class = 10;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 9, 10, button, action, type FROM playercreateinfo_action WHERE race = 2 AND class = 10;
 DELETE FROM `playercreateinfo_item` WHERE race = 9 AND class = 10;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 9, 10, itemid, amount FROM playercreateinfo_item WHERE race = 2 AND class = 10;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (9, 10, 72019, 1), (9, 10, 72020, 1), (9, 10, 77526, 1), (9, 10, 73209, 1), (9, 10, 77509, 1), (9, 10, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 9 AND class = 10;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 9, 10, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 9 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 2 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 2 AND s.class = 10;
 
@@ -205,6 +227,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 9 AND class = 11;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 9, 11, button, action, type FROM playercreateinfo_action WHERE race = 6 AND class = 11;
 DELETE FROM `playercreateinfo_item` WHERE race = 9 AND class = 11;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 9, 11, itemid, amount FROM playercreateinfo_item WHERE race = 6 AND class = 11;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (9, 11, 35, 1), (9, 11, 6139, 1), (9, 11, 6124, 1), (9, 11, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 9 AND class = 11;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 9, 11, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 9 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 6 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 6 AND s.class = 11;
 
@@ -214,6 +237,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 10 AND class = 7;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 10, 7, button, action, type FROM playercreateinfo_action WHERE race = 2 AND class = 7;
 DELETE FROM `playercreateinfo_item` WHERE race = 10 AND class = 7;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 10, 7, itemid, amount FROM playercreateinfo_item WHERE race = 2 AND class = 7;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (10, 7, 52544, 1), (10, 7, 52545, 1), (10, 7, 6948, 1), (10, 7, 36, 1), (10, 7, 2362, 1);
 DELETE FROM `player_levelstats` WHERE race = 10 AND class = 7;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 10, 7, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 10 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 2 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 2 AND s.class = 7;
 
@@ -223,6 +247,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 10 AND class = 11;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 10, 11, button, action, type FROM playercreateinfo_action WHERE race = 6 AND class = 11;
 DELETE FROM `playercreateinfo_item` WHERE race = 10 AND class = 11;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 10, 11, itemid, amount FROM playercreateinfo_item WHERE race = 6 AND class = 11;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (10, 11, 35, 1), (10, 11, 6139, 1), (10, 11, 6124, 1), (10, 11, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 10 AND class = 11;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 10, 11, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 10 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 6 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 6 AND s.class = 11;
 
@@ -232,6 +257,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 11 AND class = 4;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 11, 4, button, action, type FROM playercreateinfo_action WHERE race = 1 AND class = 4;
 DELETE FROM `playercreateinfo_item` WHERE race = 11 AND class = 4;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 11, 4, itemid, amount FROM playercreateinfo_item WHERE race = 1 AND class = 4;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (11, 4, 58234, 1), (11, 4, 47, 1), (11, 4, 48, 1), (11, 4, 25, 1), (11, 4, 50055, 1), (11, 4, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 11 AND class = 4;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 11, 4, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 11 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 1 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 1 AND s.class = 4;
 
@@ -241,6 +267,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 11 AND class = 9;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 11, 9, button, action, type FROM playercreateinfo_action WHERE race = 1 AND class = 9;
 DELETE FROM `playercreateinfo_item` WHERE race = 11 AND class = 9;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 11, 9, itemid, amount FROM playercreateinfo_item WHERE race = 1 AND class = 9;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (11, 9, 57, 1), (11, 9, 1396, 1), (11, 9, 35, 1), (11, 9, 59, 1), (11, 9, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 11 AND class = 9;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 11, 9, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 11 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 1 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 1 AND s.class = 9;
 
@@ -250,6 +277,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 11 AND class = 11;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 11, 11, button, action, type FROM playercreateinfo_action WHERE race = 4 AND class = 11;
 DELETE FROM `playercreateinfo_item` WHERE race = 11 AND class = 11;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 11, 11, itemid, amount FROM playercreateinfo_item WHERE race = 4 AND class = 11;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (11, 11, 3661, 1), (11, 11, 6123, 1), (11, 11, 6124, 1), (11, 11, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 11 AND class = 11;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 11, 11, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 11 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 4 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 4 AND s.class = 11;
 
@@ -259,6 +287,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 22 AND class = 2;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 22, 2, button, action, type FROM playercreateinfo_action WHERE race = 1 AND class = 2;
 DELETE FROM `playercreateinfo_item` WHERE race = 22 AND class = 2;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 22, 2, itemid, amount FROM playercreateinfo_item WHERE race = 1 AND class = 2;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (22, 2, 58233, 1), (22, 2, 43, 1), (22, 2, 44, 1), (22, 2, 6948, 1), (22, 2, 52557, 1);
 DELETE FROM `player_levelstats` WHERE race = 22 AND class = 2;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 22, 2, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 22 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 1 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 1 AND s.class = 2;
 
@@ -268,6 +297,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 22 AND class = 7;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 22, 7, button, action, type FROM playercreateinfo_action WHERE race = 3 AND class = 7;
 DELETE FROM `playercreateinfo_item` WHERE race = 22 AND class = 7;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 22, 7, itemid, amount FROM playercreateinfo_item WHERE race = 3 AND class = 7;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (22, 7, 52538, 1), (22, 7, 52539, 1), (22, 7, 52540, 1), (22, 7, 36, 1), (22, 7, 2362, 1), (22, 7, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 22 AND class = 7;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 22, 7, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 22 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 3 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 3 AND s.class = 7;
 
@@ -277,6 +307,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 22 AND class = 10;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 22, 10, button, action, type FROM playercreateinfo_action WHERE race = 1 AND class = 10;
 DELETE FROM `playercreateinfo_item` WHERE race = 22 AND class = 10;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 22, 10, itemid, amount FROM playercreateinfo_item WHERE race = 1 AND class = 10;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (22, 10, 72019, 1), (22, 10, 72020, 1), (22, 10, 77526, 1), (22, 10, 73209, 1), (22, 10, 77509, 1), (22, 10, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 22 AND class = 10;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 22, 10, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 22 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 1 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 1 AND s.class = 10;
 
@@ -286,6 +317,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 24 AND class = 2;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 24, 2, button, action, type FROM playercreateinfo_action WHERE race = 6 AND class = 2;
 DELETE FROM `playercreateinfo_item` WHERE race = 24 AND class = 2;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 24, 2, itemid, amount FROM playercreateinfo_item WHERE race = 6 AND class = 2;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (24, 2, 58248, 1), (24, 2, 52549, 1), (24, 2, 2361, 1), (24, 2, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 24 AND class = 2;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 24, 2, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 24 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 6 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 6 AND s.class = 2;
 
@@ -295,6 +327,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 24 AND class = 6;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 24, 6, button, action, type FROM playercreateinfo_action WHERE race = 2 AND class = 6;
 DELETE FROM `playercreateinfo_item` WHERE race = 24 AND class = 6;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 24, 6, itemid, amount FROM playercreateinfo_item WHERE race = 2 AND class = 6;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (24, 6, 34652, 1), (24, 6, 34655, 1), (24, 6, 34659, 1), (24, 6, 34650, 1), (24, 6, 34653, 1), (24, 6, 34649, 1), (24, 6, 34651, 1), (24, 6, 34656, 1), (24, 6, 34648, 1), (24, 6, 34657, 1), (24, 6, 34658, 1), (24, 6, 38145, 1), (24, 6, 38145, 1), (24, 6, 38145, 1), (24, 6, 38145, 1), (24, 6, 38147, 1), (24, 6, 41751, 1), (24, 6, 40582, 1);
 DELETE FROM `player_levelstats` WHERE race = 24 AND class = 6;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 24, 6, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 24 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 2 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 2 AND s.class = 6;
 
@@ -304,6 +337,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 24 AND class = 9;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 24, 9, button, action, type FROM playercreateinfo_action WHERE race = 2 AND class = 9;
 DELETE FROM `playercreateinfo_item` WHERE race = 24 AND class = 9;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 24, 9, itemid, amount FROM playercreateinfo_item WHERE race = 2 AND class = 9;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (24, 9, 52543, 1), (24, 9, 52679, 1), (24, 9, 35, 1), (24, 9, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 24 AND class = 9;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 24, 9, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 24 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 2 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 2 AND s.class = 9;
 
@@ -313,6 +347,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 24 AND class = 11;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 24, 11, button, action, type FROM playercreateinfo_action WHERE race = 6 AND class = 11;
 DELETE FROM `playercreateinfo_item` WHERE race = 24 AND class = 11;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 24, 11, itemid, amount FROM playercreateinfo_item WHERE race = 6 AND class = 11;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (24, 11, 35, 1), (24, 11, 6139, 1), (24, 11, 6124, 1), (24, 11, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 24 AND class = 11;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 24, 11, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 24 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 6 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 6 AND s.class = 11;
 
@@ -322,6 +357,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 25 AND class = 2;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 25, 2, button, action, type FROM playercreateinfo_action WHERE race = 1 AND class = 2;
 DELETE FROM `playercreateinfo_item` WHERE race = 25 AND class = 2;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 25, 2, itemid, amount FROM playercreateinfo_item WHERE race = 1 AND class = 2;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (25, 2, 58233, 1), (25, 2, 43, 1), (25, 2, 44, 1), (25, 2, 6948, 1), (25, 2, 52557, 1);
 DELETE FROM `player_levelstats` WHERE race = 25 AND class = 2;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 25, 2, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 25 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 1 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 1 AND s.class = 2;
 
@@ -331,6 +367,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 25 AND class = 6;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 25, 6, button, action, type FROM playercreateinfo_action WHERE race = 1 AND class = 6;
 DELETE FROM `playercreateinfo_item` WHERE race = 25 AND class = 6;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 25, 6, itemid, amount FROM playercreateinfo_item WHERE race = 1 AND class = 6;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (25, 6, 34652, 1), (25, 6, 34655, 1), (25, 6, 34659, 1), (25, 6, 34650, 1), (25, 6, 34653, 1), (25, 6, 34649, 1), (25, 6, 34651, 1), (25, 6, 34656, 1), (25, 6, 34648, 1), (25, 6, 34657, 1), (25, 6, 34658, 1), (25, 6, 38145, 1), (25, 6, 38145, 1), (25, 6, 38145, 1), (25, 6, 38145, 1), (25, 6, 38147, 1), (25, 6, 41751, 1), (25, 6, 40582, 1);
 DELETE FROM `player_levelstats` WHERE race = 25 AND class = 6;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 25, 6, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 25 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 1 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 1 AND s.class = 6;
 
@@ -340,6 +377,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 25 AND class = 9;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 25, 9, button, action, type FROM playercreateinfo_action WHERE race = 1 AND class = 9;
 DELETE FROM `playercreateinfo_item` WHERE race = 25 AND class = 9;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 25, 9, itemid, amount FROM playercreateinfo_item WHERE race = 1 AND class = 9;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (25, 9, 57, 1), (25, 9, 1396, 1), (25, 9, 35, 1), (25, 9, 59, 1), (25, 9, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 25 AND class = 9;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 25, 9, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 25 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 1 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 1 AND s.class = 9;
 
@@ -349,6 +387,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 25 AND class = 11;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 25, 11, button, action, type FROM playercreateinfo_action WHERE race = 4 AND class = 11;
 DELETE FROM `playercreateinfo_item` WHERE race = 25 AND class = 11;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 25, 11, itemid, amount FROM playercreateinfo_item WHERE race = 4 AND class = 11;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (25, 11, 3661, 1), (25, 11, 6123, 1), (25, 11, 6124, 1), (25, 11, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 25 AND class = 11;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 25, 11, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 25 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 4 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 4 AND s.class = 11;
 
@@ -358,6 +397,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 26 AND class = 2;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 26, 2, button, action, type FROM playercreateinfo_action WHERE race = 6 AND class = 2;
 DELETE FROM `playercreateinfo_item` WHERE race = 26 AND class = 2;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 26, 2, itemid, amount FROM playercreateinfo_item WHERE race = 6 AND class = 2;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (26, 2, 58248, 1), (26, 2, 52549, 1), (26, 2, 2361, 1), (26, 2, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 26 AND class = 2;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 26, 2, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 26 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 6 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 6 AND s.class = 2;
 
@@ -367,6 +407,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 26 AND class = 6;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 26, 6, button, action, type FROM playercreateinfo_action WHERE race = 2 AND class = 6;
 DELETE FROM `playercreateinfo_item` WHERE race = 26 AND class = 6;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 26, 6, itemid, amount FROM playercreateinfo_item WHERE race = 2 AND class = 6;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (26, 6, 34652, 1), (26, 6, 34655, 1), (26, 6, 34659, 1), (26, 6, 34650, 1), (26, 6, 34653, 1), (26, 6, 34649, 1), (26, 6, 34651, 1), (26, 6, 34656, 1), (26, 6, 34648, 1), (26, 6, 34657, 1), (26, 6, 34658, 1), (26, 6, 38145, 1), (26, 6, 38145, 1), (26, 6, 38145, 1), (26, 6, 38145, 1), (26, 6, 38147, 1), (26, 6, 41751, 1), (26, 6, 40582, 1);
 DELETE FROM `player_levelstats` WHERE race = 26 AND class = 6;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 26, 6, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 26 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 2 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 2 AND s.class = 6;
 
@@ -376,6 +417,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 26 AND class = 9;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 26, 9, button, action, type FROM playercreateinfo_action WHERE race = 2 AND class = 9;
 DELETE FROM `playercreateinfo_item` WHERE race = 26 AND class = 9;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 26, 9, itemid, amount FROM playercreateinfo_item WHERE race = 2 AND class = 9;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (26, 9, 52543, 1), (26, 9, 52679, 1), (26, 9, 35, 1), (26, 9, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 26 AND class = 9;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 26, 9, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 26 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 2 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 2 AND s.class = 9;
 
@@ -385,6 +427,7 @@ DELETE FROM `playercreateinfo_action` WHERE race = 26 AND class = 11;
 INSERT INTO `playercreateinfo_action` (race, class, button, action, type) SELECT 26, 11, button, action, type FROM playercreateinfo_action WHERE race = 6 AND class = 11;
 DELETE FROM `playercreateinfo_item` WHERE race = 26 AND class = 11;
 INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT 26, 11, itemid, amount FROM playercreateinfo_item WHERE race = 6 AND class = 11;
+INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES (26, 11, 35, 1), (26, 11, 6139, 1), (26, 11, 6124, 1), (26, 11, 6948, 1);
 DELETE FROM `player_levelstats` WHERE race = 26 AND class = 11;
 INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) SELECT 26, 11, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), LEAST(255, GREATEST(1, s.sta + w.sta - rw.sta)), LEAST(255, GREATEST(1, s.inte + w.inte - rw.inte)), LEAST(255, GREATEST(1, s.spi + w.spi - rw.spi)) FROM player_levelstats s JOIN player_levelstats w ON w.race = 26 AND w.class = 1 AND w.level = s.level JOIN player_levelstats rw ON rw.race = 6 AND rw.class = 1 AND rw.level = s.level WHERE s.race = 6 AND s.class = 11;
 

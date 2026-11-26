@@ -417,7 +417,15 @@ namespace
                     uid = Arpg::Loot::RandomUniqueId();
                 uint32 inv = 0, armor = 0;
                 if (uid && Arpg::Loot::UniqueSlot(uid, inv, armor))
-                    uniqueBase = Arpg::Loot::FindBaseItem(inv, armor, ITEM_QUALITY_RARE, Arpg::Loot::LootLevelFor(killer));
+                {
+                    int lvl = Arpg::Loot::LootLevelFor(killer);
+                    uniqueBase = Arpg::Loot::FindBaseItem(inv, armor, ITEM_QUALITY_RARE, lvl);
+                    // Low levels have hardly any blues: a green base of the slot, else a blue a little higher up.
+                    if (!uniqueBase)
+                        uniqueBase = Arpg::Loot::FindBaseItem(inv, armor, ITEM_QUALITY_UNCOMMON, lvl);
+                    for (int up = 1; !uniqueBase && up <= 10; ++up)
+                        uniqueBase = Arpg::Loot::FindBaseItem(inv, armor, ITEM_QUALITY_RARE, lvl + up);
+                }
                 if (uniqueBase)
                 {
                     Arpg::Monsters::AddLootItem(killed->loot, uniqueBase);

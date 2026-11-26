@@ -119,14 +119,28 @@ namespace Arpg::Monsters
                                              INVTYPE_FEET, INVTYPE_WRISTS, INVTYPE_HANDS };
         static uint32 const anySlots[] = { INVTYPE_NECK, INVTYPE_FINGER, INVTYPE_CLOAK, INVTYPE_WEAPON, INVTYPE_2HWEAPON };
         int level = Arpg::Loot::LootLevelFor(p);
-        for (int attempt = 0; attempt < 8; ++attempt)
+        auto tryAt = [&](uint32 q, int lvl) -> uint32
         {
-            uint32 pick = Rand(13);
-            uint32 id = pick < 8 ? Arpg::Loot::FindBaseItem(armorSlots[pick], ArmorSubclassFor(p), quality, level)
-                                 : Arpg::Loot::FindBaseItem(anySlots[pick - 8], 0, quality, level);
-            if (id)
+            for (int attempt = 0; attempt < 8; ++attempt)
+            {
+                uint32 pick = Rand(13);
+                uint32 id = pick < 8 ? Arpg::Loot::FindBaseItem(armorSlots[pick], ArmorSubclassFor(p), q, lvl)
+                                     : Arpg::Loot::FindBaseItem(anySlots[pick - 8], 0, q, lvl);
+                if (id)
+                    return id;
+            }
+            return 0;
+        };
+        if (uint32 id = tryAt(quality, level))
+            return id;
+        // Low levels have hardly any blues (owner 2026-11-27: a level-4 Superunique kill dropped only a catalyst): one
+        // quality lower at this level, else the asked quality a little higher up (wearable soon).
+        if (quality > ITEM_QUALITY_UNCOMMON)
+            if (uint32 id = tryAt(quality - 1, level))
                 return id;
-        }
+        for (int up = 1; up <= 10; ++up)
+            if (uint32 id = tryAt(quality, level + up))
+                return id;
         return 0;
     }
 

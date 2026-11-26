@@ -105,6 +105,21 @@
 ? champion entry=49871 tag=Champion Blackrock Battle Worg level=90 band=60 hp=\d+ minions=[2-4] affixes=2 \[
 > .arpg champion kill Arpgtest
 ? ok .* killed champion
+# Low level (owner 2026-11-27: a level-4 kill dropped no floor items - hardly any blues exist that low): the blue floor
+# falls back to a green at the level, so both floor items are there.
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg test setup Arpgtest 4 elwynn-northshire
+? ok .*\(online\)
+~ 6000
+> .arpg champion make Arpgtest 299
+? champion entry=299
+> .arpg test events Arpgtest clear
+? ok
+> .arpg champion kill Arpgtest
+? ok .* killed champion
+> .arpg test events Arpgtest
+? champion killed entry=299 .*floor_green=[1-9]\d* floor_blue=[1-9]\d*
 > .arpg test setup Arpgtest 20 elwynn-northshire
 ? ok .*\(online\)
 ~ 6000

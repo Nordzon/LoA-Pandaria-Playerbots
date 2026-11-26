@@ -27,9 +27,19 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
   glow = 117230 (Empowered); any weapon OK; catalyst item OK; creation OK but (a) new race/class pairs spawn without starter
   gear, (b) "Monks should always start in Pandaria", (c) some characters lay "sleeping" unable to stand (NE Monk, UD Rogue) -
   made before the cast_spell fix; owner to re-check with new characters.
+- **OVERNIGHT QUEUE (owner 2026-11-27 ~01:00, asleep; no input needed):** (1) finish the 00:50 run, Goblin Monk creation test,
+  commit; (2) Superuniques in every open-world zone (generated from each zone's rare creatures + their spawn points, kits
+  round-robin, tag copies regenerated); (3) Champions everywhere (tag copies for every open-world creature that can roll,
+  higher Arpg.Champion.Chance); (4) visuals: loot beam 120720 on corpses with loot worth picking up, glow 117230 on Champion
+  leaders + Superuniques; (5) potion tooltip via a client-patch Spell.dbc description override; then typed blank bases.
+  Restarts are fine (owner asleep); commit + push after each green run.
+- **Owner check 3 (2026-11-27):** companion + dialogue, salvage/catalysts, Champion/Unique tags + drops, Paragon, new-character
+  start: OK. Mounts OK (5000 g stays). FIX PILE: (1) loot window shows plain names (suffix only in bags) - suffix factor now
+  sent with planned loot; (2) mount shop as a vendor window - done (Mount Merchant list 1000002, copies 800000+id); (3) some new
+  pairs naked (Goblin Monk) - starter gear live with this restart; (4) potion "Use:" tooltip = client spell text -> needs a
+  client-patch Spell.dbc description override (open).
 - **QUEUE ADDITIONS (before typed blank bases):** (A) visuals: beam 120720 on corpses with loot worth picking up, glow 117230
-  on Champion leaders and Superuniques (m2b 2.4, m3 glow); (B) starter gear for the 43 new pairs (reference race's
-  CharStartOutfit items -> playercreateinfo_item); (C) monk start: owner 2026-11-26 chose "own racial start" (stock
+  on Champion leaders and Superuniques (m2b 2.4, m3 glow); (B) ~~starter gear~~ in the DB (generator reads CharStartOutfit.dbc; live after a restart); (C) monk start: owner 2026-11-26 chose "own racial start" (stock
   behaviour, nothing to build) - only starter gear (B) and the sleeping bug (fixed; re-check) remain.
 - **QUEUE (work top-down, one change each):** (1) ~~m6-any-weapon~~ done (owner check pending); (2) ~~upstream sync~~ done 2026-11-26;
   (3) ~~visual picker + OWNER-CHECKS~~ done; (4) ~~m6-custom-items + catalysts/salvage~~ done (owner check 4.1); (5) ~~companion mount shop~~ done; (6) m7: ~~500 bots, Dungeon Finder, affix-aware party bots v1~~ done + party bots' affixed gear + living AH + crowding done (corpse-loot scoring later);
@@ -75,6 +85,10 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-27 00:52 owner check 3 fixes building: suffix factor on planned loot (loot window names), mount vendor window (`2026_11_27_01_arpg_mount_vendor.sql`, applied), loot-filter empty-marker, low-level floor fallback, starter gear. Potion tooltip needs a client patch (open).
+- 2026-11-27 00:55 owner: corpses not lootable without the companion = mob tagging (a Superunique killed by .arpg command without a hit is not the player's); companion loots through the server, so it worked. Owner: not worth chasing (test commands only). Found on the way: deleting every loot-filter rule re-armed the default sell rule after a restart - fixed (empty marker row; Lokond marked), unbuilt.
+- 2026-11-27 00:35 owner: Superuniques drop only catalysts at level 4 - the blue floor/Unique base find no blue that low (and the loot table substitutes down to greys, which the default filter sells). FloorItem now falls back to a green at the level, then a blue up to +10 levels; test 30 low-level check. Unbuilt (owner playing).
+- 2026-11-27 00:25 m6 starter gear: gen_any_race_class.py adds the reference race's CharStartOutfit items as playercreateinfo_item for all 43 new pairs; SQL applied to the DB (owner playing: live at the next restart, then creation test + commit).
 - 2026-11-26 23:50 owner check 2: companion + Superunique invisible, no Champion tags = MoP creature GUID holds 20 bits of the entry; our entries 5M/6M/7,000,001 were cut. Renumbered: Champion copies +400,000, Unique +700,000, companion 1,000,001 (gen_monster_tags, config, LootPet, SQL applied; `2026_11_27_00_arpg_entry_fix.sql` drops 7000001 + potion description text); range checks 300,000 wide; `.arpg test entries` + smoke check. Professions panel OK; AH skipped by owner. Unbuilt until the owner allows a restart.
 - 2026-11-26 23:30 m7 bot crowding (dynamic level brackets, config only; 215/500 bots moved to the player's bracket); `.arpg champion clear` + test 10 keeps its probe plain (it had rolled Champion); test 51 queues at 90 (where crowding puts the bots); `.arpg progress` + run-gmtests prints per-file progress in the worldserver console. Full run ALL OK (26 files); owner client opened 23:29.
 - 2026-11-26 22:55 rebuild runs died silently twice (19:41, 22:24) right after the stop step: Start-Process from Claude's PowerShell tool shares its process tree. Relaunched via CIM Win32_Process.Create (survived); method in Environment facts.

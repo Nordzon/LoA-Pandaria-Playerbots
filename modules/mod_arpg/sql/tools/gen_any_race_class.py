@@ -2,7 +2,7 @@
 For each missing (race, class) pair it adds, from the world DB as it is now:
   playercreateinfo         start position: the race's own start (its warrior row); Death Knights: the shared DK start
   playercreateinfo_action  the class's action bar from a reference race that has the class
-  playercreateinfo_item    the class's start items from the reference race
+  playercreateinfo_item    the class's start items from the reference race + its starting outfit (CharStartOutfit.dbc)
   player_levelstats        reference race's class stats + (this race's warrior stats - reference race's warrior stats) per level
   skills / spells by mask  rows that name the class AND a race mask get this race's bit (class skills, weapon skills);
                            never the race-specific intro spells in playercreateinfo_cast_spell
@@ -42,6 +42,17 @@ _dbc = open(_dbc_path, 'rb').read()
 _n, _f, _sz = struct.unpack('<3I', _dbc[4:16])
 existing = {(_dbc[20 + i * _sz + 4], _dbc[20 + i * _sz + 5]) for i in range(_n)}
 missing = [(r, c) for r in RACES for c in CLASSES if (r, c) not in existing]
+
+# Starting outfits (CharStartOutfit.dbc: id, race|class<<8|sex<<16|outfit<<24, ItemID[24], ...), male rows (the items are
+# the same for both sexes).
+_out = open(os.path.join(os.path.dirname(_dbc_path), 'CharStartOutfit.dbc'), 'rb').read()
+_on, _of, _osz = struct.unpack('<3I', _out[4:16])
+OUTFITS = {}
+for _i in range(_on):
+    _v = struct.unpack('<%dI' % (_osz // 4), _out[20 + _i * _osz: 20 + (_i + 1) * _osz])
+    _race, _cls, _sex = _v[1] & 0xFF, (_v[1] >> 8) & 0xFF, (_v[1] >> 16) & 0xFF
+    if _sex == 0:
+        OUTFITS[(_race, _cls)] = [x for x in _v[2:26] if x and x != 0xFFFFFFFF]
 by_class = {}
 for r, c in sorted(existing):
     by_class.setdefault(c, []).append(r)
@@ -71,6 +82,12 @@ for race, cls in missing:
     sql.append('DELETE FROM `playercreateinfo_item` WHERE race = %d AND class = %d;' % (race, cls))
     sql.append('INSERT INTO `playercreateinfo_item` (race, class, itemid, amount) SELECT %d, %d, itemid, amount '
                'FROM playercreateinfo_item WHERE race = %d AND class = %d;' % (race, cls, ref, cls))
+    # Starter outfit (owner 2026-11-26: new pairs started naked): the server dresses a new character from CharStartOutfit.dbc,
+    # which has no row for a new pair - so the reference race's outfit for this class becomes start items (equipped at create).
+    outfit = OUTFITS.get((ref, cls), [])
+    if outfit:
+        sql.append('INSERT IGNORE INTO `playercreateinfo_item` (race, class, itemid, amount) VALUES %s;'
+                   % ', '.join('(%d, %d, %d, 1)' % (race, cls, item) for item in outfit))
     sql.append('DELETE FROM `player_levelstats` WHERE race = %d AND class = %d;' % (race, cls))
     sql.append('INSERT INTO `player_levelstats` (race, class, level, str, agi, sta, inte, spi) '
                'SELECT %d, %d, s.level, LEAST(255, GREATEST(1, s.str + w.str - rw.str)), LEAST(255, GREATEST(1, s.agi + w.agi - rw.agi)), '

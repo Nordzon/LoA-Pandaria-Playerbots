@@ -656,6 +656,12 @@ public:
             handler->PSendSysMessage("ok %s", out.c_str());
             return true;
         }
+        if (t[1] == "vendor" && t.size() == 2)   // the vendor window's list (Mount Merchant, entry 1000002)
+        {
+            VendorItemData const* v = sObjectMgr->GetNpcVendorItemList(1000002);
+            handler->PSendSysMessage("ok mount vendor items=%u", v ? uint32(v->GetItemCount()) : 0u);
+            return true;
+        }
         if (t[1] == "forget" && t.size() == 3)
         {
             p->RemoveSpell(uint32(std::strtoul(t[2].c_str(), nullptr, 10)));

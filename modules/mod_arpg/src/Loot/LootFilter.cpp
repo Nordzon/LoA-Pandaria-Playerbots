@@ -37,7 +37,9 @@ namespace
             any = true;
             do
             {
-                rules.push_back(r->Fetch()[0].GetString());
+                std::string rule = r->Fetch()[0].GetString();
+                if (!rule.empty())   // "" = the player deleted every rule on purpose (no default then)
+                    rules.push_back(rule);
             } while (r->NextRow());
         }
         if (!any)
@@ -55,6 +57,10 @@ namespace
         }
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         trans->PAppend("DELETE FROM character_arpg_lootfilter WHERE guid = %u", guid);
+        // No rules at all: one empty row, so the next load doesn't hand out the default rule again (owner 2026-11-27: after
+        // deleting every rule, a restart brought back "Grey and below: sell" and low-level corpses came up empty).
+        if (rules.empty())
+            trans->PAppend("INSERT INTO character_arpg_lootfilter (guid, position, rule) VALUES (%u, 0, '')", guid);
         for (size_t i = 0; i < rules.size(); ++i)
         {
             std::string esc = rules[i];

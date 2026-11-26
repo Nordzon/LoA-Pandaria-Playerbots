@@ -24,3 +24,7 @@
 ? ok forgot
 > .arpg test money Arpgtest 0
 ? ok money gold=0
+
+# The vendor window (owner 2026-11-27): "Mounts for gold" opens the Mount Merchant list - 64 copies without reputation.
+> .arpg test mount Arpgtest vendor
+? ok mount vendor items=64\s*$
