@@ -1,78 +1,58 @@
 # Owner checks (in game) - character: Lokond
 
-Things only a person in the real client can confirm. Work top-down; write the result under each section (`> Result: ...`;
-"ok" or "no: what happened" is enough). Client: `Wow-64-all.exe` (the addon is reinstalled by every rebuild; `/reload` once
-after login). Commands go in the chat box exactly as written.
+Work top-down; write the result under each section (`> Result: ...`; "ok" or "no: what happened" is enough). Start the
+client fresh (`Wow-64-all.exe`): the client patch changed overnight (potion tooltips), and the addon is reinstalled by every
+rebuild. Commands go in the chat box exactly as written.
 
-**Confirmed and removed:** visuals picked (loot beam 120720, Champion/Superunique glow 117230 - being built), any weapon on a
-caster, character creation, catalyst item, professions panel (T button), potions work (heal/cooldown/stacking).
-**Fixed since the last round (2026-11-27 00:03), needs a re-check:** the companion, Superuniques and Champion tags were
-invisible / plain (creature ids were too large for the client) - sections 1-4; potion tooltip text - section 4.
+**Confirmed and removed:** companion + dialogue, salvage/catalysts, Champion/Unique tags and drops, Paragon, professions panel,
+any weapon, character creation, catalysts, potion effects, mount purchase.
 
 ## 0. Handy commands
 | What | Command |
 | --- | --- |
 | Set level (1-90) | `.character level Lokond 20` |
-| One level / several | `.levelup` (yourself), `.levelup Lokond 5` |
 | Gold (6000 g) | target yourself, then `.modify money 60000000` |
 | Teleport | `.tele goldshire`, `.tele stormwind`, `.tele ValeofEternalBlossoms` |
-| Stuck lying on the ground (characters made before 2026-11-26 22:00) | `.unaura 73523` |
 
-## 1. Loot companion: visible, loots, dialogue
-1. Click the **L** button: the companion appears next to you (a small mechanical squirrel) and follows you.
-2. Kill a few things: it walks to each corpse and the loot lands in your bags.
-3. Right-click the companion itself: a dialogue opens. Try each option and note whether its window opens:
-   Sell and repair, Bank, Mailbox, Change appearance (pick a look - the companion changes).
-4. Right-click the **L** button: the loot filter panel opens.
-
-> Result: Working very well!
-
-## 2. Salvage and catalysts (companion dialogue)
-1. `.arpg test give Lokond 2317` twice (two affixed greens in your bags).
-2. Right-click the companion: "Salvage 2 affixed item(s) for N essence(s)" -> a confirm box -> both items turn into Salvaged
-   Essence.
-3. "Buy catalysts": Lesser / Greater / Grand with essence prices; buying one with enough essences works.
-
-> Result: Works
-
-## 3. Mount shop (companion dialogue)
-1. Gold: target yourself, `.modify money 60000000`.
-2. Right-click the companion -> "Mounts for gold": pages of 15, "More mounts..." at the bottom.
-3. Click one: a price popup (5000 g); after buying, the mount is in your mount journal and gone from the list.
-   (Riding needs the riding skill as always: `.character level Lokond 20` then a riding trainer, or just check the journal.)
-
-> Result: (and: does 5000 g feel right?): Mounts work, let's leave 5000 for now. Can you make the UI a vendor one instead of a dialogue one?
-
-## 4. Champion and Unique tags, potion tooltip (Goldshire)
-1. `.tele goldshire`
-2. `.arpg champion make Lokond 299` -> a Young Wolf pack next to you. Target the leader: "Champion Young Wolf" with the silver
-   dragon (Rare) portrait. `.arpg champion kill Lokond all` clears it.
-3. `.arpg superunique spawn Lokond` -> a visible, targetable "Unique <name>" with the winged gold dragon (Rare Elite) portrait.
-   `.arpg superunique fight Lokond` makes it attack you; `.arpg superunique kill Lokond` removes it.
-4. `.additem 118 5` and hover the potion: besides the stock "Use:" line, a yellow line "ARPG: heals 10% of your maximum health.
-   10 sec shared cooldown." (if not: restart the client once - it may have cached the old text).
-
-> Result: Champtions work very well! And drop nice greens. Superuniques also work and drop items as required. I am still noticing that the items get updated within my inventory instead of the corpses themselves. This is a small issue as the pet will loot for us anyway, but add to fix pile. Potions still have the incorrect tooltip, but do restore the correct amounts. (tooltip says restores some flat amount of health, using the potion restores % health as we planned, cooldown works.)
-
-## 5. Loot names on the corpse
-Kill a few things near your level (with the companion off: click **L** again). Affixed greens/blues already show their full
-name in the loot window ("... of the Bear") before you take them; the item in your bags is the same.
-
-> Result: Does not work correctly, loot gets updated in my bag,
-
-## 6. New character starts normally
-Make a new character of a pair stock MoP doesn't allow (e.g. Night Elf Monk or Tauren Rogue), enter the world: you can move
-right away (no "lying on the ground"). Known, being fixed: such pairs start without their class's starter gear.
-
-> Result: Characters start normally, but some class/race combos are naked (ex: Goblin Monk)
-
-## 7. Paragon (needs level 90 - use another character if you want Lokond to stay low)
-1. `.character level Lokond 90`, then `.arpg paragon set Lokond 10` (10 Paragon levels = 10 points).
-2. The **P** button or `/paragon`: the window shows the points; spending one changes your stats.
-
-> Result: Working as expected.
-
-## 8. Later (not now): auction house
-`.tele stormwind`, Trade District auctioneer: mostly materials, some gear, about a third of the green-epic gear with affixes.
+## 1. Loot names on the corpse (fixed overnight)
+Companion off (click **L**). Kill things near your level: affixed greens/blues show their full name in the loot window
+("... of the Bear") before you take them, and the bag item is the same.
 
 > Result:
+
+## 2. Loot beam and Champion glow (new - your picks)
+1. `.tele goldshire`, `.arpg champion make Lokond 299`: the pack leader has the "Empowered" glow (117230).
+2. Kill the pack: corpses holding a green or better item get a blue light beam (120720) until you loot them.
+3. `.arpg superunique spawn Lokond`: the Superunique has the same glow.
+
+> Result: (too loud / too quiet / fine?)
+
+## 3. Superuniques everywhere and more Champions (new)
+Go to any other zone (e.g. `.tele stormwind` then ride out, or `.tele ValeofEternalBlossoms`): a Superunique of that zone's
+own rares appears somewhere in it ("Unique <name>"); Champion packs are now 5% of monsters (was 2%).
+
+> Result: (enough / too many Champions?)
+
+## 4. Mount shop as a vendor window (changed overnight)
+Right-click the companion -> "Mounts for gold": a normal vendor window with all 64 mounts at 5000 g; buying teaches the mount.
+
+> Result:
+
+## 5. Potion tooltip (client patch, new)
+`.additem 118 5`, hover: "Use: Restores 10% of your maximum health. Shares a 10 sec cooldown with other potions."
+
+> Result:
+
+## 6. New character starter gear (fixed overnight)
+A new Goblin Monk (or another unusual pair) starts dressed in its class's starting outfit.
+
+> Result:
+
+## 7. Question for you (no testing): typed blank bases
+What should they be for: (a) a drop that always rolls the most affixes for its quality, (b) the crafting wheel's target items
+(craft a blank of your armour type, it rolls), (c) sold by the companion for essences, or (d) all of these?
+
+> Answer:
+
+## Later: auction house
+`.tele stormwind`, Trade District auctioneer: mostly materials, some gear, about a third of the green-epic gear with affixes.

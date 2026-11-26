@@ -27,7 +27,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
   glow = 117230 (Empowered); any weapon OK; catalyst item OK; creation OK but (a) new race/class pairs spawn without starter
   gear, (b) "Monks should always start in Pandaria", (c) some characters lay "sleeping" unable to stand (NE Monk, UD Rogue) -
   made before the cast_spell fix; owner to re-check with new characters.
-- **OVERNIGHT QUEUE (owner 2026-11-27 ~01:00, asleep; no input needed):** (1) finish the 00:50 run, Goblin Monk creation test,
+- **OVERNIGHT QUEUE DONE 01:40 (owner 2026-11-27, asleep):** items 1-5 committed (a6419667..2be78430); item 7 (typed blank bases) waits for the owner's answer in OWNER-CHECKS 7. (1) finish the 00:50 run, Goblin Monk creation test,
   commit; (2) Superuniques in every open-world zone (generated from each zone's rare creatures + their spawn points, kits
   round-robin, tag copies regenerated); (3) Champions everywhere (tag copies for every open-world creature that can roll,
   higher Arpg.Champion.Chance); (4) visuals: loot beam 120720 on corpses with loot worth picking up, glow 117230 on Champion
@@ -85,6 +85,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-27 01:40 overnight queue done and pushed: world Superuniques (461/83 zones), Champions 5%, glow + loot beam (test 30), potion tooltips (client patch installed). OWNER-CHECKS rewritten for the morning. Waiting: blank-bases answer.
 - 2026-11-27 01:35 overnight: Superuniques in all open-world zones (gen_superuniques.py: 461 in 83 zones, Unique copies regenerated), Champion chance 5%; visuals: Champion + Superunique glow 117230 (Arpg.*.VisualAura), loot beam 120720 on corpses with green+ items (Loot/LootBeam, invisible marker); potion tooltips via the client patch (Spell.dbc descriptions of the 15 potion spells; built + installed, live at the next client start). Build of all of it running.
 - 2026-11-27 00:52 owner check 3 fixes building: suffix factor on planned loot (loot window names), mount vendor window (`2026_11_27_01_arpg_mount_vendor.sql`, applied), loot-filter empty-marker, low-level floor fallback, starter gear. Potion tooltip needs a client patch (open).
 - 2026-11-27 00:55 owner: corpses not lootable without the companion = mob tagging (a Superunique killed by .arpg command without a hit is not the player's); companion loots through the server, so it worked. Owner: not worth chasing (test commands only). Found on the way: deleting every loot-filter rule re-armed the default sell rule after a restart - fixed (empty marker row; Lokond marked), unbuilt.
