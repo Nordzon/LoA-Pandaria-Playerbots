@@ -28,6 +28,14 @@ namespace Arpg::Loot
     // Recipe data + the crafter's skill. Consumes a pending test override for this player (one craft).
     CraftInfo CraftFor(Player* player, uint32 spellId);
 
+    // Catalyst items (custom items 700001-700003, sql 2026_11_26_00) by band 1-3; 0 for other bands.
+    uint32 CatalystItemForBand(int band);
+    // If the craft has no catalyst yet and the crafter carries one whose band covers itemTier, uses up the lowest such one
+    // and turns the craft's catalyst on (+1 tier, x2 Unique chance). Returns the item used (0 = none).
+    uint32 UseCatalyst(Player* player, CraftInfo& craft, int itemTier);
+    // Kill drops: Champion leaders / Superuniques drop a catalyst of their band (Arpg.Catalyst.*).
+    void InstallCatalystDrops();
+
     // Crafted-Unique ladder for (player, profession): rolls, stores the misses, returns true on a Unique.
     bool RollCraftUnique(Player* player, CraftInfo const& craft);
     int CraftUniqueMisses(Player* player, uint32 skillLine);

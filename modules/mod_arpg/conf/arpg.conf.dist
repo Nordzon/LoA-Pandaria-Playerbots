@@ -81,6 +81,12 @@ Arpg.AnyWeapon.Enabled = 1
 Arpg.AnyWeapon.Bots = 0
 Arpg.AnyWeapon.DualWield = 0
 
+# --- Catalysts (SPEC 4.8, change m6-custom-items) ---------------------------------------------
+#    A Champion leader / Superunique drops a catalyst of its tier band (Lesser T1-T2, Greater T3-T4, Grand T5+) with
+#    this % chance. The next craft that rolls affixes uses up the lowest fitting one from the bags: +1 tier, x2 Unique chance.
+Arpg.Catalyst.ChampionChance = 25
+Arpg.Catalyst.SuperuniqueChance = 100
+
 # --- Loot companion (SPEC 4.7, change m2b) -------------------------------------------------
 #    A non-combat follower (.arpg lootpet on <char>) that, out of combat (WaitForCombatEnd), walks to each of the
 #    player's kills and moves the loot into the bags (loot filter applies). Unreachable after ReachTimeoutMs: it loots

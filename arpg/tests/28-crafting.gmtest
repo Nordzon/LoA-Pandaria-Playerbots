@@ -44,6 +44,17 @@
 ? colour=orange .* catalyst=1 tier_bonus=2\b
 > .arpg loot last Arpgtest
 ! T5=
+# Catalyst item in the bags (m6-custom-items): the next craft uses up one Lesser Catalyst (fits T1-T2 at level 20).
+> .arpg test give Arpgtest 700001
+? item=700001
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test craft Arpgtest 3293 skill 60
+? ok Arpgtest spell=3293
+> .arpg test events Arpgtest
+? catalyst used item=700001 tier=2\b
+> .arpg test count Arpgtest 700001
+? count=0\b
 
 # Max skill (lowered for the test): one extra affix, never past the quality's max -> a green always rolls 2.
 > .arpg config set Arpg.Craft.MaxSkill 70

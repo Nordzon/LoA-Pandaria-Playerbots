@@ -31,6 +31,8 @@ namespace Arpg::Loot
     std::string LoadAffixData();
     // Startup: removes affix rows of items that no longer exist.
     void CleanOrphanAffixes();
+    // The highest affix tier (T1-T5) that unlocks at this level (arpg_affix_tier).
+    int MaxAffixTierAtLevel(int level);
     // Tests: the character's next roll counts as a drop in a raid of this tier (Ascended tiers).
     void SetTestRaidTier(Player* player, int tier);
 

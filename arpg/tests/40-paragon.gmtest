@@ -61,7 +61,8 @@
 
 # --- World tier (the Vale, uncapped): +2% monster health/damage per Paragon level (cap +100%). The scaling tick re-scales
 # level-90 Vale mobs near the character; the event recorder shows the tier (mobs already fighting NPCs are left alone,
-# so no single fixed probe).
+# so no single fixed probe). Events are cleared BEFORE the Paragon change: a tick between the change and a later clear
+# would rescale and lose the events, and nothing changes again after that.
 > .arpg paragon respec Arpgtest
 ? ok respec
 > .arpg config set Arpg.Test.RecordEvents 1
@@ -70,17 +71,17 @@
 ? ok .*\(online\)
 # far teleport (Pandaria): give the client time to arrive
 ~ 15000
-> .arpg paragon set Arpgtest 10 0
-? ok paragon level=10
 > .arpg test events Arpgtest clear
 ? ok
+> .arpg paragon set Arpgtest 10 0
+? ok paragon level=10
 ~ 4000
 > .arpg test events Arpgtest
 * scale entry=\d+ spawn=\d+ from=90 to=90 hp=\d+ tier=120\b
-> .arpg paragon set Arpgtest 80 0
-? ok paragon level=80
 > .arpg test events Arpgtest clear
 ? ok
+> .arpg paragon set Arpgtest 80 0
+? ok paragon level=80
 ~ 4000
 > .arpg test events Arpgtest
 * scale entry=\d+ spawn=\d+ from=90 to=90 hp=\d+ tier=200\b

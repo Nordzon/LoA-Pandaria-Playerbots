@@ -221,6 +221,12 @@ namespace Arpg::Loot
         g_ascendedPct = pct;
     }
 
+    int MaxAffixTierAtLevel(int level)
+    {
+        std::lock_guard<std::mutex> l(g_lock);
+        return Core::MaxTierForLevel(g_tiers, level);
+    }
+
     void SetTestRaidTier(Player* player, int tier)
     {
         std::lock_guard<std::mutex> l(g_lock);
@@ -437,6 +443,7 @@ namespace Arpg::Loot
         CraftInfo craft;
         if (source == ItemPickupSourceType::Spell && (craft = CraftFor(player, sourceId)).isCraft)
         {
+            UseCatalyst(player, craft, Core::MaxTierForLevel(tiers, lootLevel));   // a catalyst in the bags is used up here
             req.tierBonus += craft.mods.tierBonus;
             req.extraCount = craft.mods.extraAffixes;
             req.tierCap = craft.mods.tierCap;

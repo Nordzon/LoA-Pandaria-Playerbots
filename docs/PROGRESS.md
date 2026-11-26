@@ -67,6 +67,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-26 16:12 m6-custom-items 2.1/2.2: catalyst drops (Champion leader 25%, Superunique 100%, band by level tier) + next craft uses up the lowest fitting catalyst; tests 28/30. Test 40 race fixed (events cleared before the Paragon change). Full run 21/22 + test 40 rerun OK. NEXT: salvage + buy catalysts in the companion dialogue (3.2/3.3).
 - 2026-11-26 15:55 m6-custom-items: items 700001-700003 (Lesser/Greater/Grand Catalyst), 700010 (Salvaged Essence) via item_template + hotfix_data; `.arpg test count`; `Core/Salvage` + 4 unit tests (83); test 29; full run ALL OK (22 files). NEXT: catalyst drops + auto-use in crafts (2.1/2.2).
 - 2026-11-26 15:40 `.arpg test visual <char> <spellId>|clear` (owner picks loot beam + Champion glow; 17 candidates all apply, listed in `docs/OWNER-CHECKS.md`); test 05; full run ALL OK.
 - 2026-11-26 15:30 first upstream sync: 26 upstream commits (22 world-DB quest/event fixes + 4 core crash guards), no overlap with `// ARPG:`; backup + tag `pre-sync-20261126-1516`; full run ALL OK (21 files). Script fixes: fetch tags with --force (upstream moved `ci-playerbot`), stop servers before building (exes were locked).

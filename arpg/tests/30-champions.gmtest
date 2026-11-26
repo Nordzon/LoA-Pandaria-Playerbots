@@ -23,6 +23,8 @@
 ? champion entry=49871 tag=Champion Blackrock Battle Worg level=21 .* alive=1 pinned=1
 
 # Kill: health orb (from 50% health), loot floor = a green + a blue added to its loot.
+> .arpg config set Arpg.Catalyst.ChampionChance 100
+? ok
 > .arpg test events Arpgtest clear
 ? ok
 > .arpg champion kill Arpgtest
@@ -31,6 +33,10 @@
 ? champion killed entry=49871 orb_health=[1-9]\d* orb_power=\d+ floor_green=[1-9]\d* floor_blue=[1-9]\d*
 # Rolled at the kill: each corpse item carries its final name (suffix id) before anyone loots it.
 ? loot plan item=\d+ rp=-30\d\d\d n=[1-5] unique=0 champion
+# Catalyst of its band (level 21 -> T2 -> Lesser), forced to 100% for the test.
+? catalyst drop item=700001 tier=2\b
+> .arpg config set Arpg.Catalyst.ChampionChance 25
+? ok
 
 # Items looted from the Champion roll with +1 tier (event marked "champion").
 > .arpg champion loot Arpgtest

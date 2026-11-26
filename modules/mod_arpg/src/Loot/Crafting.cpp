@@ -1,12 +1,18 @@
 #include "Loot/Crafting.h"
 
 #include "ArpgConfig.h"
+#include "Core/Salvage.h"
+#include "Loot/AffixRoller.h"
+#include "Monsters/Champions.h"
+#include "Scaling/WorldScaling.h"
 #include "Test/TestEvents.h"
 
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "Creature.h"
 #include "Player.h"
 #include "Random.h"
+#include "ScriptMgr.h"
 #include "SpellMgr.h"
 
 #include <mutex>
@@ -63,6 +69,36 @@ namespace Arpg::Loot
         return c;
     }
 
+    uint32 CatalystItemForBand(int band)
+    {
+        switch (band)
+        {
+            case 1: return 700001;   // Lesser Catalyst
+            case 2: return 700002;   // Greater Catalyst
+            case 3: return 700003;   // Grand Catalyst
+            default: return 0;
+        }
+    }
+
+    uint32 UseCatalyst(Player* player, CraftInfo& craft, int itemTier)
+    {
+        if (!craft.isCraft || craft.catalyst)
+            return 0;
+        for (int band = std::max(1, Core::CatalystBandForTier(itemTier)); band <= 3; ++band)
+        {
+            uint32 item = CatalystItemForBand(band);
+            if (!player->HasItemCount(item, 1))
+                continue;
+            player->DestroyItemCount(item, 1, true);
+            craft.catalyst = true;
+            craft.mods = Core::CraftModsFor(craft.colour, craft.atMaxSkill, true);
+            Arpg::TestEvents::Record(player->GetGUID().GetCounter(), "catalyst used item=" + std::to_string(item) +
+                " tier=" + std::to_string(itemTier));
+            return item;
+        }
+        return 0;
+    }
+
     int CraftUniqueMisses(Player* player, uint32 skillLine)
     {
         QueryResult r = CharacterDatabase.PQuery("SELECT misses FROM character_arpg_craft_pity WHERE guid = %u AND skill_line = %u",
@@ -101,5 +137,47 @@ namespace Arpg::Loot
             std::to_string(c.mods.extraAffixes) + " cap=" + std::to_string(c.mods.tierCap) + " unique_eligible=" +
             (c.mods.uniqueEligible ? "1" : "0") + " skill_line=" + std::to_string(c.skillLine) + " unique_misses=" +
             std::to_string(CraftUniqueMisses(player, c.skillLine));
+    }
+}
+
+namespace
+{
+    class ArpgCatalystDropScript : public PlayerScript
+    {
+    public:
+        ArpgCatalystDropScript() : PlayerScript("arpg_catalyst_drops") { }
+
+        void OnCreatureKill(Player* killer, Creature* killed) override
+        {
+            if (!killer || !killed)
+                return;
+            Arpg::Settings const& s = sArpgConfig.Get();
+            if (!s.lootEnabled || (!Arpg::Scaling::IsRealPlayer(killer) && !s.affixBotItems))
+                return;
+            uint32 entry = killed->GetEntry();
+            float chance = 0.0f;
+            if (s.superuniqueEntryOffset && entry >= s.superuniqueEntryOffset && entry < s.superuniqueEntryOffset + 1000000)
+                chance = s.catalystSuperuniqueChancePct;
+            else if (Arpg::Monsters::WasChampionKill(killed))
+                chance = s.catalystChampionChancePct;
+            if (chance <= 0.0f || float(rand_chance()) >= chance)
+                return;
+            int tier = Arpg::Loot::MaxAffixTierAtLevel(int(killed->GetLevel()));
+            uint32 item = Arpg::Loot::CatalystItemForBand(Arpg::Core::CatalystBandForTier(tier));
+            if (!item)
+                return;
+            Arpg::Monsters::AddLootItem(killed->loot, item);
+            killed->SetFlag(OBJECT_FIELD_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            Arpg::TestEvents::Record(killer->GetGUID().GetCounter(), "catalyst drop item=" + std::to_string(item) +
+                " tier=" + std::to_string(tier));
+        }
+    };
+}
+
+namespace Arpg::Loot
+{
+    void InstallCatalystDrops()
+    {
+        new ArpgCatalystDropScript();
     }
 }

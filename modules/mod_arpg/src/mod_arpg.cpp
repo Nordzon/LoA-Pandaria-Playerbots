@@ -16,6 +16,7 @@
 #include "Dungeons/InstanceScaling.h"
 #include "Loot/LootPet.h"
 #include "Character/AnyWeapon.h"
+#include "Loot/Crafting.h"
 
 #include "Chat.h"
 #include "Player.h"
@@ -73,6 +74,7 @@ void AddSC_mod_arpg()
     Arpg::Dungeons::InstallInstanceScaling();
     Arpg::Loot::InstallLootPet();
     Arpg::Character::InstallAnyWeapon();
+    Arpg::Loot::InstallCatalystDrops();
     Arpg::Loot::InstallLootPlanner();   // last kill script: plans corpse loot after the others added items and pity
     AddSC_arpg_commandscript();
 }

@@ -21,6 +21,7 @@ namespace
         "Arpg.Companion.Reforge", "Arpg.Companion.Transmog", "Arpg.Companion.VoidStorage", "Arpg.Companion.InCombat",
         "Arpg.LootPet.Enabled", "Arpg.LootPet.WaitForCombatEnd", "Arpg.LootPet.ReachTimeoutMs",
         "Arpg.AnyWeapon.Enabled", "Arpg.AnyWeapon.Bots", "Arpg.AnyWeapon.DualWield",
+        "Arpg.Catalyst.ChampionChance", "Arpg.Catalyst.SuperuniqueChance",
         "Arpg.Dungeon.Enabled", "Arpg.Dungeon.SoloNonTankDamage", "Arpg.Dungeon.SoloTankDamageDealt",
         "Arpg.Dungeon.SoloHealerDamageDealt", "Arpg.Dungeon.RaidTierStep",
         "Arpg.Paragon.Enabled", "Arpg.Paragon.XpBase", "Arpg.Paragon.XpGrowth", "Arpg.Paragon.QuestXpPct",
@@ -62,6 +63,8 @@ namespace Arpg
         s.sellCopperPerAffixLevel = uint32_t(std::max(0, file.GetInt("Arpg.Loot.SellCopperPerAffixLevel", 200)));
         s.godRollPityEvery = std::max(1, file.GetInt("Arpg.Loot.GodRollPityEvery", 3));
         s.craftMaxSkill = std::max(1, file.GetInt("Arpg.Craft.MaxSkill", 600));
+        s.catalystChampionChancePct = std::max(0.0f, file.GetFloat("Arpg.Catalyst.ChampionChance", 25.0f));
+        s.catalystSuperuniqueChancePct = std::max(0.0f, file.GetFloat("Arpg.Catalyst.SuperuniqueChance", 100.0f));
         s.potionDropMult = std::max(0.0f, file.GetFloat("Arpg.Potion.DropMult", 1.0f));
         {
             // NPC flags (UnitDefines.h): gossip 0x1, vendor 0x80, repair 0x1000, banker 0x20000, mailbox 0x4000000,

@@ -10,7 +10,7 @@
 ## 2b. Crafting wheel (owner 2026-11-22, SPEC 4.8)
 - [x] 2b.1 Recipe colour → tier bonus / affix count (orange/yellow +1 tier, max skill +1 affix, grey T1); craft source detection in the roll
 - [x] 2b.2 Crafted Uniques: `Arpg.Craft.UniqueChance` + per-profession pity; needs m3 Uniques (BALANCE §8b)
-- [ ] 2b.3 Catalysts from Champions/Superuniques (+1 tier, x2 Unique chance); salvage → essences; vendor prices
+- [~] 2b.3 Catalysts from Champions/Superuniques (+1 tier, x2 Unique chance); salvage → essences; vendor prices
 - [x] 2b.4 `.arpg test craft <char> <spellId> [skill <n>] [catalyst]` + `28-crafting.gmtest` (2026-11-22: `Core/Craft` + 4 unit tests, `Loot/Crafting`; catalyst flag works, catalyst ITEMS come with 2b.3)
 
 ## 3. Tests

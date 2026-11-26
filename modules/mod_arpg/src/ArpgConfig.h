@@ -78,6 +78,8 @@ namespace Arpg
         int paragonMoveSpeedCap = 1000;        // Arpg.Paragon.MoveSpeedCap (+10%)
         int paragonFindPerPoint = 500;         // Arpg.Paragon.FindPerPoint (magic/gold find, hundredths of %)
         int paragonMagicFindCap = 10000;       // Arpg.Paragon.MagicFindCap (+100%)
+        float catalystChampionChancePct = 25.0f;     // Arpg.Catalyst.ChampionChance (% per Champion leader kill)
+        float catalystSuperuniqueChancePct = 100.0f; // Arpg.Catalyst.SuperuniqueChance
         float potionDropMult = 1.0f;     // Arpg.Potion.DropMult (x arpg_potion_drop.chance_pct; tests set 100 to force)
         int craftMaxSkill = 600;         // Arpg.Craft.MaxSkill (at or above: crafted items roll +1 affix)
         float craftUniqueChancePct = 2.0f;   // Arpg.Craft.UniqueChance (orange/yellow craft -> Unique of its slot)

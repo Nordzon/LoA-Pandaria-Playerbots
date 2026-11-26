@@ -5,8 +5,8 @@
 - [x] 1.2 GM test: give each item, it lands in the bags with the right stack size
 
 ## 2. Catalysts (m1b 2b.3)
-- [ ] 2.1 Config `Arpg.Catalyst.*`; drops from Champion leaders / Superuniques by tier band
-- [ ] 2.2 Craft uses up one fitting catalyst automatically (+1 tier, x2 Unique chance); `28-crafting` covers it
+- [x] 2.1 Config `Arpg.Catalyst.*`; drops from Champion leaders / Superuniques by tier band
+- [x] 2.2 Craft uses up one fitting catalyst automatically (+1 tier, x2 Unique chance); `28-crafting` covers it
 
 ## 3. Salvage
 - [x] 3.1 `Core/Salvage`: essences for an item (affix count, Unique, Ascended) + unit test
