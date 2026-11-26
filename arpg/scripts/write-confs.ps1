@@ -18,7 +18,7 @@ param(
   [string]$DataDir = 'D:/WoWMoPProject/ServerData/data',
   [string]$LogsDir = 'D:/WoWMoPProject/ServerData/logs',
   [ValidateSet('on', 'off')][string]$Bots = 'off',   # off for ARPG feature testing; on for play (needs mmaps)
-  [int]$BotCount = 300,                              # SPEC 4.10: start at 300
+  [int]$BotCount = 500,                              # SPEC 4.10 / owner 2026-11-26: 500 (was 300)
   [double]$XpRate = 1.5,                             # SPEC 2: slightly faster levelling (kill/quest/explore/gather)
   [int]$MaxProfessions = 11,                         # SPEC 4.8 (m1b): all 11 primary professions on one character
   # "Condensed experience" (SPEC 2, owner 2026-11-22; analysis in docs/BALANCE.md)
@@ -85,6 +85,10 @@ $overrides = @{
       'SkillChance.Green'      = '50'                 # default 25
       'AutoBalance.Enable.Global' = '1'             # m5: dungeon/raid scaling (mod_arpg replaces the player-count curve)
       'Instance.IgnoreRaid'    = '1'                # m5: raids are soloable (SPEC 4.6) - no raid group needed to enter
+      # m7 Dungeon Finder (owner 2026-11-26: any dungeon at any level, bots +-3): upstream's #702 switch, no code of ours.
+      'LFG.AnyLevel.Enable'    = '1'
+      'LFG.AnyLevel.Random'    = '1'                # random 5-man queues too (pick from the entry's whole expansion group)
+      'LFG.AnyLevel.Scenarios' = '1'
     }
   }
   'playerbots.conf' = @{
@@ -93,6 +97,8 @@ $overrides = @{
       'AiPlayerbot.Enabled'       = $(if ($Bots -eq 'on') { '1' } else { '0' })
       'AiPlayerbot.MinRandomBots' = "$BotCount"
       'AiPlayerbot.MaxRandomBots' = "$BotCount"
+      'AiPlayerbot.LfgAnyLevel.Enable'      = '1'   # m7: random bots fill an any-level queue
+      'AiPlayerbot.LfgAnyLevel.LevelWindow' = '3'   # within +-3 levels of the player (SPEC 4.10)
     }
   }
 }

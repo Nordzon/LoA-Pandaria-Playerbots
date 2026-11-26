@@ -290,6 +290,9 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   (0). Not covered: items limited to a class by the item itself (`AllowableClass`) and class abilities tied to a weapon.
 
 ### 4.10 Bots (m7, last)
+- *Implemented 2026-11-26:* 500 random bots (write-confs default). Dungeon Finder any level = upstream's switches, set by
+  write-confs: `LFG.AnyLevel.Enable/Random/Scenarios` = 1, `AiPlayerbot.LfgAnyLevel.Enable` = 1, `.LevelWindow` = 3 (no code of
+  ours; out-of-range dungeons scale through AutoBalance + our m5 hook). Raid Finder stays off (raids are entered solo, m5).
 - Enable playerbots (300 → 1000). Verify: scaling bot-lock, party-size scaling with bots, bot loot rule.
 - Dungeon Finder hook: real player queuing → any dungeon at any level; bots matched to player level ±`Arpg.LFG.BotLevelWindow` (3).
 - Optional: bot crowding (idle bots of the zone's level range move to the player's zone).

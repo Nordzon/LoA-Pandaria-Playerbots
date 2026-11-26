@@ -29,7 +29,7 @@ param(
   [int]$MmapThreads = 16,
   [string]$CharName = 'Headlessone',
   [ValidateSet('on', 'off')][string]$Bots = 'on',   # for the final start (after mmaps); smoke always runs bots off
-  [int]$BotCount = 300
+  [int]$BotCount = 500
 )
 $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path

@@ -24,10 +24,10 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
   sync OK when the owner isn't playing; m7: 500 bots, Dungeon Finder (any dungeon any level, bots +-3), affix-aware party bots
   (playerbots touches OK), living auction house, bot crowding; order DF -> affix bots -> AH -> crowding.
 - **QUEUE (work top-down, one change each):** (1) ~~m6-any-weapon~~ done (owner check pending); (2) ~~upstream sync~~ done 2026-11-26;
-  (3) ~~visual picker + OWNER-CHECKS~~ done; (4) ~~m6-custom-items + catalysts/salvage~~ done (owner check 4.1); (5) ~~companion mount shop~~ done; (6) m7: 500 bots, Dungeon Finder hook,
+  (3) ~~visual picker + OWNER-CHECKS~~ done; (4) ~~m6-custom-items + catalysts/salvage~~ done (owner check 4.1); (5) ~~companion mount shop~~ done; (6) m7: ~~500 bots, Dungeon Finder~~ done;
   affix-aware party bots, living AH, crowding; (7) typed blank bases.
 - **Blockers:** none for the queue below. Owner checks pending (bundled in `docs/OWNER-CHECKS.md` once written): creation screen any race/class, `/prof` panel, any weapon on a caster, companion windows (reforge/transmog/void open?), visual candidates for the loot beam + Champion glow. Client: `Wow-64-all.exe`.
-- **Bots:** on for play (300) via start-stack / final stage; off for ARPG feature tests. Bot rules in m7.
+- **Bots:** on for play (500 since 2026-11-26; 300 before) via start-stack / final stage; off for ARPG feature tests. Bot rules in m7.
 
 ## Roadmap (one change folder each; propose the backlog ones from the spec Doc when their turn comes)
 | # | Change | Status |
@@ -66,6 +66,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-26 17:40 m7: 500 bots (mean 44 ms / median 13 / p95 119, 4.8 GB); Dungeon Finder any level via upstream LFG.AnyLevel + AiPlayerbot.LfgAnyLevel (window 3) in write-confs, no code; test 51 (level 50 queues Deadmines, bots fill -> proposal). Full run 23/24 + test 51 rerun OK. NEXT: affix-aware party bots (one playerbots hook).
 - 2026-11-26 17:10 m2b-mount-shop: companion "Mounts for gold" (64 reputation mounts, 5000 g, pages + price popup); test 35; full run ALL OK (23 files). NEXT: m7 bots (500, Dungeon Finder first).
 - 2026-11-26 16:40 m6-custom-items 3.2/3.3: companion Salvage (preview + confirm, essences by affix) and Buy catalysts (10/30/90); `.arpg test salvage`; test 29; full run ALL OK (22 files, 83 unit). Only owner check 4.1 left. NEXT: companion mount shop.
 - 2026-11-26 16:12 m6-custom-items 2.1/2.2: catalyst drops (Champion leader 25%, Superunique 100%, band by level tier) + next craft uses up the lowest fitting catalyst; tests 28/30. Test 40 race fixed (events cleared before the Paragon change). Full run 21/22 + test 40 rerun OK. NEXT: salvage + buy catalysts in the companion dialogue (3.2/3.3).

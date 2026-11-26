@@ -1,8 +1,8 @@
 # Tasks — m7-bots
 
 ## 1. Enable
-- [ ] 1.1 playerbots conf: enable, `MaxRandomBots` 300 first, then 1000; first start creates bot characters (slow)
-- [ ] 1.2 `.server info` update time acceptable with the client running; record numbers in PROGRESS
+- [x] 1.1 playerbots conf: enable, `MaxRandomBots` 300 first, then 1000; first start creates bot characters (slow) - owner 2026-11-26: 500 (write-confs default)
+- [x] 1.2 `.server info` update time acceptable with the client running; record numbers in PROGRESS (500 bots, no client: mean 44 ms, median 13, p95 119; 4.8 GB)
 
 ## 2. Verify earlier features with bots
 - [ ] 2.1 Scaling: level-85 player arrives where a low-level bot is fighting; the bot's mob keeps its level (m1 requirement "Bots are not disturbed")
@@ -10,8 +10,8 @@
 - [ ] 2.3 Loot: bots roll only on items the player's class can't use; bot items have no affixes (m2)
 
 ## 3. Dungeon Finder hook
-- [ ] 3.1 Real player queuing: dungeon level limits lifted; bots matched to player level ±`Arpg.LFG.BotLevelWindow`
-- [ ] 3.2 `.botscenario` test: level-50 test character queues Deadmines; matched bots are 47–53; instance scales to 50
+- [x] 3.1 Real player queuing: dungeon level limits lifted; bots matched to player level ±`Arpg.LFG.BotLevelWindow` (upstream's LFG.AnyLevel + AiPlayerbot.LfgAnyLevel, window 3, via write-confs - no code)
+- [x] 3.2 `.botscenario` test: level-50 test character queues Deadmines; matched bots are 47–53; instance scales to 50 (`51-dungeon-finder`: queued, bots fill -> proposal; scaling to the group = m5 test 50)
 
 ## 4. Optional
 - [ ] 4.1 Bot crowding (idle bots of the zone's level range move to the player's zone)
