@@ -10,12 +10,18 @@
 # The sections below test the scaling rules without the zone cap (task 4.9), which is tested at the end.
 > .arpg config set Arpg.Scale.ZoneCapAbove 100
 ? ok
+# The probe creatures must stay plain: no Champion rolls during this file, and undo one that rolled before it.
+> .arpg config set Arpg.Champion.Chance 0
+? ok
 
 # --- Level choices: low zone rises to the player's level ---------------------------------
 > .arpg test setup Arpgtest 85 elwynn-northshire
 ? ok .*\(online\)
 # teleport + grid load + one scaling tick (Arpg.Scale.TickMs)
 ~ 6000
+> .arpg champion clear Arpgtest 178359
+? ok
+~ 3000
 > .arpg scale probe Arpgtest 178359
 ? scaled=85\b
 
@@ -111,4 +117,6 @@
 > .arpg scale probe Arpgtest 178359
 ? scaled=60\b
 > .arpg config set Arpg.Scale.UncappedZones 5840
+? ok
+> .arpg config set Arpg.Champion.Chance 2
 ? ok

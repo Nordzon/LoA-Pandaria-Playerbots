@@ -520,6 +520,39 @@ namespace Arpg::Monsters
         return it == g_champions.end() ? std::vector<uint64>() : it->second.minions;
     }
 
+    bool UnmakeChampion(Creature* c, std::string& out)
+    {
+        if (!c)
+        {
+            out = "no creature";
+            return false;
+        }
+        uint64 raw = c->GetGUID().GetRawValue();
+        ChampionInfo info;
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            auto it = g_champions.find(raw);
+            if (it == g_champions.end())
+            {
+                out = "not a champion";
+                return true;   // nothing to undo
+            }
+            info = it->second;
+            g_champions.erase(it);
+        }
+        for (uint64 m : info.minions)
+            if (Creature* minion = ObjectAccessor::GetCreature(*c, ObjectGuid(m)))
+                minion->DespawnOrUnsummon();
+        Arpg::Settings const& s = sArpgConfig.Get();
+        if (s.championVisualAura)
+            c->RemoveAurasDueToSpell(s.championVisualAura);
+        Arpg::Scaling::Forget(raw);                  // before the entry change: the level hook must not see the pin
+        c->UpdateEntry(BaseEntry(c->GetEntry()));    // template level, health and size again
+        c->SetObjectScale(c->GetCreatureTemplate() ? c->GetCreatureTemplate()->scale : 1.0f);
+        out = "unmade champion entry=" + std::to_string(c->GetEntry()) + " level=" + std::to_string(c->GetLevel());
+        return true;
+    }
+
     bool IsChampion(Creature* c)
     {
         std::lock_guard<std::mutex> l(g_lock);

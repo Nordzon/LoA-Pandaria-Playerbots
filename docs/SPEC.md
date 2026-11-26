@@ -293,6 +293,8 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
 - *Implemented 2026-11-26:* 500 random bots (write-confs default). Dungeon Finder any level = upstream's switches, set by
   write-confs: `LFG.AnyLevel.Enable/Random/Scenarios` = 1, `AiPlayerbot.LfgAnyLevel.Enable` = 1, `.LevelWindow` = 3 (no code of
   ours; out-of-range dungeons scale through AutoBalance + our m5 hook). Raid Finder stays off (raids are entered solo, m5).
+- *Bot crowding (2026-11-26):* upstream's dynamic level brackets (`AiPlayerbot.LevelBrackets.*` via write-confs, real-player
+  weight 10, factions synced) put many more random bots at the real player's level; they quest and grind in that level's zones.
 - *Bots understand affixes (2026-11-26, v1):* playerbots `StatsWeightCalculator` got one hook (`ExtraItemStats`, // ARPG:);
   mod_arpg adds the affix stats of the item a party bot (a bot in a real player's group) owns, weighted by the bot's spec, so
   it equips the better roll. `Arpg.Bots.AffixScoring` (1). When anyone joins a group that has a real player, each bot's

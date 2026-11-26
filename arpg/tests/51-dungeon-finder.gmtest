@@ -1,9 +1,10 @@
 # Dungeon Finder any level (m7, owner 2026-11-26): upstream's LFG.AnyLevel + AiPlayerbot.LfgAnyLevel (write-confs), no code
-# of ours. A level-50 character queues Deadmines (326, level 15-21) as a tank: stock rules reject it (too high level); with
+# of ours. A level-90 character queues Deadmines (326, level 15-21) as a tank: stock rules reject it (too high level); with
 # AnyLevel it queues, and random bots within +-3 levels (AiPlayerbot.LfgAnyLevel.LevelWindow) fill the group -> proposal (3)
 # or in the dungeon (5). LFG states: 0 none, 1 role check, 2 queued, 3 proposal, 5 dungeon.
+# Level 90: bot crowding (dynamic level brackets) gathers most bots in the test character's bracket, which is 90 for most of a run.
 
-> .arpg test setup Arpgtest 50 elwynn-northshire
+> .arpg test setup Arpgtest 90 elwynn-northshire
 ? ok .*\(online\)
 ~ 4000
 > .botscenario Arpgtest lfgleave

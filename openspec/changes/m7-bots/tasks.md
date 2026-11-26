@@ -20,7 +20,7 @@
 - [x] 3b.4 Party bots wear affixed gear one tier below the player (`Arpg.Bots.PartyAffixTierOffset`)
 
 ## 4. Optional
-- [ ] 4.1 Bot crowding (idle bots of the zone's level range move to the player's zone)
+- [x] 4.1 Bot crowding (idle bots of the zone's level range move to the player's zone) - upstream dynamic level brackets (write-confs, weight 10, factions synced): 215 of 500 bots in the player's bracket after one run
 
 ## 5. Docs
 - [ ] 5.1 Update docs/CODEMAP.md

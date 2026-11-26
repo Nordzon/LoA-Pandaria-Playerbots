@@ -23,8 +23,16 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
   companion = gossip dialogue with the roles + a gold sink: reputation mounts for gold (start 5,000 g each, tune later); upstream
   sync OK when the owner isn't playing; m7: 500 bots, Dungeon Finder (any dungeon any level, bots +-3), affix-aware party bots
   (playerbots touches OK), living auction house, bot crowding; order DF -> affix bots -> AH -> crowding.
+- **Owner quality gate 2026-11-26 (OWNER-CHECKS):** loot beam = 120720 (Light Beam: Feralas Blue), Champion + Superunique
+  glow = 117230 (Empowered); any weapon OK; catalyst item OK; creation OK but (a) new race/class pairs spawn without starter
+  gear, (b) "Monks should always start in Pandaria", (c) some characters lay "sleeping" unable to stand (NE Monk, UD Rogue) -
+  made before the cast_spell fix; owner to re-check with new characters.
+- **QUEUE ADDITIONS (before typed blank bases):** (A) visuals: beam 120720 on corpses with loot worth picking up, glow 117230
+  on Champion leaders and Superuniques (m2b 2.4, m3 glow); (B) starter gear for the 43 new pairs (reference race's
+  CharStartOutfit items -> playercreateinfo_item); (C) monk start: owner 2026-11-26 chose "own racial start" (stock
+  behaviour, nothing to build) - only starter gear (B) and the sleeping bug (fixed; re-check) remain.
 - **QUEUE (work top-down, one change each):** (1) ~~m6-any-weapon~~ done (owner check pending); (2) ~~upstream sync~~ done 2026-11-26;
-  (3) ~~visual picker + OWNER-CHECKS~~ done; (4) ~~m6-custom-items + catalysts/salvage~~ done (owner check 4.1); (5) ~~companion mount shop~~ done; (6) m7: ~~500 bots, Dungeon Finder, affix-aware party bots v1~~ done + party bots' affixed gear + living AH done (next: crowding; corpse-loot scoring later);
+  (3) ~~visual picker + OWNER-CHECKS~~ done; (4) ~~m6-custom-items + catalysts/salvage~~ done (owner check 4.1); (5) ~~companion mount shop~~ done; (6) m7: ~~500 bots, Dungeon Finder, affix-aware party bots v1~~ done + party bots' affixed gear + living AH + crowding done (corpse-loot scoring later);
   affix-aware party bots, living AH, crowding; (7) typed blank bases.
 - **Blockers:** none for the queue below. Owner checks pending (bundled in `docs/OWNER-CHECKS.md` once written): creation screen any race/class, `/prof` panel, any weapon on a caster, companion windows (reforge/transmog/void open?), visual candidates for the loot beam + Champion glow. Client: `Wow-64-all.exe`.
 - **Bots:** on for play (500 since 2026-11-26; 300 before) via start-stack / final stage; off for ARPG feature tests. Bot rules in m7.
@@ -62,10 +70,14 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | WoW client | `D:\WoWMoPProject\MOP-5.4.8.18414-enUS-Repack`, 5.4.8 build 18414 enUS. **Run `Wow-64-all.exe`** (unlocked: custom MPQs, from wowmodding.net file 367, audited) - fallback `Wow-64.exe` (from the owner's `D:\Downloads\Client-…-001.zip`; small private-server patch, classic login). `Wow-SF*.exe` = Stormforge builds, force Battle.net login → don't work. `Config.wtf`: only `SET realmlist "127.0.0.1"`, no portal (start-stack enforces it). Spare exes: `D:\WoWMoPProject\client-exes` |
 | Toolchain | MSVC 14.44 (VS Build Tools 17.14), Windows SDK 10.0.22621 + 10.0.26100 |
 | Machine | 24 logical CPUs, 32 GB RAM, fixed 26 GB pagefile. Build capped: `cmake --build build --config RelWithDebInfo -- /m:2 /p:CL_MPCount=6 /nodeReuse:false` (`--parallel` → out of memory, C3859/C1076) |
+| Detached launches | Start long scripts with `Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = 'pwsh -NoProfile -ExecutionPolicy Bypass -WindowStyle Minimized -File "<script>"'; CurrentDirectory = '<repo>' }`. `Start-Process` from Claude's PowerShell tool can die with the tool's process tree (two rebuilds vanished mid-run on 2026-11-26) |
 | Git remotes | origin = `git@github.com:Nordzon/LoA-Pandaria-Playerbots.git`, upstream = 1LineAtaTime (https) |
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-26 23:30 m7 bot crowding (dynamic level brackets, config only; 215/500 bots moved to the player's bracket); `.arpg champion clear` + test 10 keeps its probe plain (it had rolled Champion); test 51 queues at 90 (where crowding puts the bots); `.arpg progress` + run-gmtests prints per-file progress in the worldserver console. Full run ALL OK (26 files); owner client opened 23:29.
+- 2026-11-26 22:55 rebuild runs died silently twice (19:41, 22:24) right after the stop step: Start-Process from Claude's PowerShell tool shares its process tree. Relaunched via CIM Win32_Process.Create (survived); method in Environment facts.
+- 2026-11-26 22:35 owner checks read: visuals picked (120720 beam, 117230 glow), any weapon OK, catalyst OK, creation findings (starter gear, monk start, sleeping) queued; OWNER-CHECKS rewritten (done sections removed, handy commands table, auction house added). Bot crowding = upstream dynamic level brackets (write-confs, weight 10, factions synced) - run in progress.
 - 2026-11-26 22:05 full run ALL OK (26 files); creation tests: Undead Monk + Pandaren Warlock OK (Pandaren DK refused by the stock level-55 rule, not a bug). rebuild-and-test now reinstalls the client addon when the client is closed. Committed: race/class fix, ArpgUI fix, living AH.
 - 2026-11-26 21:55 owner quality gate (in game): BUG m6-any-race-class - generator ORed new races into race-specific intro spells (playercreateinfo_cast_spell): new Pandaren got Undead 'Rigor Mortis' (rooted on the ground). Fixed: table restored from the 11-21 dump (`2026_11_26_02_arpg_fix_cast_spell.sql`, applied to the DB, live after a restart), generator skips it and reads `CharBaseInfo.dbc.blizzard`. ArpgUI Loot.lua: label:SetScript error stopped the file (no L button) - fixed; client had an old addon copy -> hot-installed (Professions appended to the installed Loot.lua; run install-addons.ps1 at the next client restart). OWNER-CHECKS: handy commands (level, tele, unaura). Uncommitted until the next green run.
 - 2026-11-26 21:10 m7-living-ah written, NOT built (owner playing since 20:47): write-confs AHBot seller on (materials-weighted), hook `ArpgHooks::AuctionBotItem` in AuctionHouseBotSeller.cpp (// ARPG:), `Loot/AuctionRolls` + playerless `RollForAuction` (ApplyRoll -> ApplyRollAt, player nullable), `.arpg test ah`, test 53. NEXT: when the client is closed, full rebuild-and-test, fix, commit.

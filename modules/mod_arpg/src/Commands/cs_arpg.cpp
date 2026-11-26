@@ -48,6 +48,7 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "Log.h"
 #include "World.h"
 #include "WorldSession.h"
 
@@ -249,6 +250,7 @@ public:
         {
             { "make", &HandleChampionMake, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "info", &HandleChampionInfo, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "clear",  &HandleChampionClear,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "kill", &HandleChampionKill, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "loot", &HandleChampionLoot, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "strike", &HandleChampionStrike, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -326,6 +328,7 @@ public:
             { "loot",    lootTable,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "pity",    pityTable,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "version", &HandleVersion,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "progress", &HandleProgress, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "reload",  &HandleReload,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "config",  configTable,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "test",    testTable,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -344,6 +347,16 @@ public:
             { "professions", playerProfessionsTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
         };
         return commandTable;
+    }
+
+    // .arpg progress <text>   (owner 2026-11-26) prints "[ARPG] <text>" in the worldserver console and Server.log: the test
+    // runner reports each GM test file there, so the owner can follow a run in the server window.
+    static bool HandleProgress(ChatHandler* handler, char const* args)
+    {
+        std::string text = args ? args : "";
+        TC_LOG_INFO("server.worldserver", "[ARPG] %s", text.c_str());
+        handler->SendSysMessage("ok");
+        return true;
     }
 
     // .arpg version
@@ -1321,6 +1334,35 @@ public:
         int n = Arpg::Loot::RollForItem(p, item, ItemPickupSourceType::Spell, why, spellId);
         handler->PSendSysMessage("ok %s spell=%u item=%u guid=%u quality=%u affixes=%d %s%s", p->GetName().c_str(), spellId, itemId,
             item->GetGUID().GetCounter(), uint32(item->GetTemplate()->Quality), n, report.c_str(), n ? "" : (" (" + why + ")").c_str());
+        return true;
+    }
+
+    // .arpg champion clear <char> <spawnId>   turns that spawn (near the character) back into its plain creature if it rolled
+    // Champion (tests keep their probe creatures plain)
+    static bool HandleChampionClear(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg champion clear <char> <spawnId>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        uint32 spawnId = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
+        float radius = sArpgConfig.Get().scaleRadius;
+        Creature* c = nullptr;
+        std::list<Unit*> units;
+        Trinity::AnyUnitInObjectRangeCheck check(p, radius);
+        Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(p, units, check);
+        Cell::VisitAllObjects(p, searcher, radius);
+        for (Unit* u : units)
+            if (Creature* cr = u->ToCreature())
+                if (cr->GetDBTableGUIDLow() == spawnId)
+                    c = cr;
+        if (!c)
+            return Fail(handler, "spawn " + t[1] + " not near " + p->GetName());
+        std::string out;
+        Arpg::Monsters::UnmakeChampion(c, out);
+        handler->PSendSysMessage("ok %s", out.c_str());
         return true;
     }
 

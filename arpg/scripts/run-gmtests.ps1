@@ -22,7 +22,16 @@ $ErrorActionPreference = 'Stop'
 $gm = Join-Path $PSScriptRoot 'gm.ps1'
 $failedFiles = 0
 
-foreach ($file in Get-ChildItem $Dir -Filter '*.gmtest' | Where-Object { $_.Name -like "*$Filter*" }) {
+# Progress in the worldserver console (owner 2026-11-26): ".arpg progress <text>" prints a line there. Never fails a test
+# (an older server without the command just answers with an error).
+function Show-Progress([string]$text) { try { & $gm ".arpg progress $text" | Out-Null } catch { } }
+
+$files = @(Get-ChildItem $Dir -Filter '*.gmtest' | Where-Object { $_.Name -like "*$Filter*" })
+$index = 0
+Show-Progress "tests start: $($files.Count) files"
+foreach ($file in $files) {
+  $index++
+  Show-Progress "tests $index/$($files.Count) $($file.Name) ..."
   $last = ''; $fails = @(); $n = 0
   foreach ($line in Get-Content $file.FullName) {
     $n++
@@ -53,11 +62,13 @@ foreach ($file in Get-ChildItem $Dir -Filter '*.gmtest' | Where-Object { $_.Name
       default { $fails += "line ${n}: unknown directive '$op'" }
     }
   }
-  if ($fails.Count -eq 0) { Write-Host "PASS  $($file.Name)" -ForegroundColor Green }
+  if ($fails.Count -eq 0) { Write-Host "PASS  $($file.Name)" -ForegroundColor Green; Show-Progress "tests $index/$($files.Count) $($file.Name) PASS" }
   else {
     $failedFiles++
     Write-Host "FAIL  $($file.Name)" -ForegroundColor Red
     $fails | ForEach-Object { Write-Host "      $_" }
+    Show-Progress "tests $index/$($files.Count) $($file.Name) FAIL ($($fails.Count) checks)"
   }
 }
+Show-Progress "tests done: $($files.Count - $failedFiles) passed, $failedFiles failed"
 exit $failedFiles
