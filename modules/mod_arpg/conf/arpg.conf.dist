@@ -94,6 +94,10 @@ Arpg.Catalyst.EssenceCostGrand = 90
 # --- Bots (m7) --------------------------------------------------------------------------------
 #    AffixScoring 1 = bots in your group count an item's affixes (with their spec's stat weights) when choosing gear.
 Arpg.Bots.AffixScoring = 1
+#    PartyGear 1 = when a bot is in a group with you, its equipped greens/blues/epics without affixes roll affixes once,
+#    PartyAffixTierOffset tiers from yours (-1 = one tier below). Random bots out in the world stay vanilla.
+Arpg.Bots.PartyGear = 1
+Arpg.Bots.PartyAffixTierOffset = -1
 
 # --- Mount shop (companion dialogue; owner 2026-11-26: a gold sink) ----------------------------
 #    Reputation mounts (arpg_mount_shop, 64 rows) for gold, no reputation needed. Price in gold; a row's price_gold overrides.

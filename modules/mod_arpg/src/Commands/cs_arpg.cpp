@@ -517,10 +517,22 @@ public:
         Player* bot = nullptr;
         if (t[1] == "any")   // the first online random bot that isn't grouped with someone else
         {
-            // Bot sessions live with playerbots, not in the world's session list: look through every online player.
+            // Bot sessions live with playerbots, not in the world's session list: look through every online player. The bot
+            // must wear a green-epic item without stock random stats (low-level bots in white gear have nothing to roll).
+            auto wearsGreen = [](Player* b) -> bool
+            {
+                for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+                    if (Item* it = b->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+                    {
+                        ItemTemplate const* t = it->GetTemplate();   // stock random-stat items ("of the Bear") never roll
+                        if (t->Quality >= ITEM_QUALITY_UNCOMMON && t->Quality <= ITEM_QUALITY_EPIC && !t->RandomProperty && !t->RandomSuffix)
+                            return true;
+                    }
+                return false;
+            };
             for (auto const& [guid, b] : ObjectAccessor::GetPlayers())
                 if (b && b != p && !Arpg::Scaling::IsRealPlayer(b) && b->IsInWorld() && b->IsAlive() &&
-                    (!b->GetGroup() || (p && b->GetGroup() == p->GetGroup())))
+                    (!b->GetGroup() || (p && b->GetGroup() == p->GetGroup())) && wearsGreen(b))
                 {
                     bot = b;
                     break;
@@ -571,8 +583,8 @@ public:
         StatsWeightCalculator::ExtraItemStats = hook;
         std::string input;
         int sum = Arpg::Bots::AffixScoreInput(bot, itemId, rp, input);
-        handler->PSendSysMessage("ok botscore bot=%s item=%u affixes=%d affix_sum=%d (%s) with=%.1f without=%.1f",
-            bot->GetName().c_str(), itemId, n, sum, input.c_str(), with, without);
+        handler->PSendSysMessage("ok botscore bot=%s item=%u affixes=%d affix_sum=%d (%s) with=%.1f without=%.1f gain=%.1f equipped_affixed=%d",
+            bot->GetName().c_str(), itemId, n, sum, input.c_str(), with, without, with - without, Arpg::Bots::AffixedEquipped(bot));
         return true;
     }
 

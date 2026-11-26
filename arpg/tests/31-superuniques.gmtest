@@ -40,6 +40,8 @@
 ? superunique hit spell=\d+ dmg=[1-9]
 
 # Kill with full Unique pity: 40% orb (from 50% health), a guaranteed blue, a Unique base in the loot.
+# Her hits may have killed the character during the 6 s above (a dead character gets no orb): bring it back first.
+> .revive Arpgtest
 > .arpg pity set Arpgtest unique 99 18
 ? ok unique_misses boss=99 = 18
 > .arpg test events Arpgtest clear

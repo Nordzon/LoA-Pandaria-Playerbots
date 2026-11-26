@@ -3,6 +3,10 @@
 #include "ArpgConfig.h"
 #include "Loot/AffixRoller.h"
 #include "Scaling/WorldScaling.h"
+#include "Loot/Uniques.h"
+#include "Test/TestEvents.h"
+
+#include "ScriptMgr.h"
 
 #include "Bag.h"
 #include "Group.h"
@@ -97,11 +101,83 @@ namespace
     }
 }
 
+namespace
+{
+    bool HasAffixes(Item* it)
+    {
+        uint32 g = it->GetGUID().GetCounter();
+        return !Arpg::Loot::ItemStatLines(g, true).empty() || Arpg::Loot::UniqueOf(g).uniqueId != 0;
+    }
+
+    class ArpgPartyGearScript : public GroupScript
+    {
+    public:
+        ArpgPartyGearScript() : GroupScript("arpg_party_bot_gear") { }
+
+        void OnAddMember(Group* group, ObjectGuid /*guid*/) override
+        {
+            if (!group || !sArpgConfig.Get().botPartyGear)
+                return;
+            bool hasReal = false;
+            std::vector<Player*> bots;
+            for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+                if (Player* m = ref->GetSource())
+                {
+                    if (Arpg::Scaling::IsRealPlayer(m))
+                        hasReal = true;
+                    else
+                        bots.push_back(m);
+                }
+            if (!hasReal)
+                return;
+            for (Player* b : bots)
+                Arpg::Bots::GearUpPartyBot(b);
+        }
+    };
+}
+
 namespace Arpg::Bots
 {
     void InstallBotItemScore()
     {
         StatsWeightCalculator::ExtraItemStats = &ExtraItemStatsHook;
+        new ArpgPartyGearScript();
+    }
+
+    int GearUpPartyBot(Player* bot)
+    {
+        if (!bot || !bot->IsInWorld() || Arpg::Scaling::IsRealPlayer(bot))
+            return 0;
+        int offset = sArpgConfig.Get().botPartyTierOffset;
+        int rolled = 0;
+        for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+        {
+            Item* it = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+            if (!it || HasAffixes(it))
+                continue;
+            uint32 q = it->GetTemplate()->Quality;
+            if (q < ITEM_QUALITY_UNCOMMON || q > ITEM_QUALITY_EPIC)
+                continue;
+            bot->_ApplyItemMods(it, slot, false);   // re-applied below with the affixes
+            Arpg::Loot::AllowNextBotRoll(bot, offset);
+            std::string why;
+            if (Arpg::Loot::RollForItem(bot, it, ItemPickupSourceType::CreatureLoot, why) > 0)
+                ++rolled;
+            bot->_ApplyItemMods(it, slot, true);
+        }
+        if (rolled)
+            Arpg::TestEvents::Record(bot->GetGUID().GetCounter(), "party bot gear rolled=" + std::to_string(rolled));
+        return rolled;
+    }
+
+    int AffixedEquipped(Player* bot)
+    {
+        int n = 0;
+        for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+            if (Item* it = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+                if (HasAffixes(it))
+                    ++n;
+        return n;
     }
 
     int AffixScoreInput(Player* bot, unsigned itemId, int randomPropertyId, std::string& why)

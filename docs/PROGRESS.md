@@ -24,7 +24,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
   sync OK when the owner isn't playing; m7: 500 bots, Dungeon Finder (any dungeon any level, bots +-3), affix-aware party bots
   (playerbots touches OK), living auction house, bot crowding; order DF -> affix bots -> AH -> crowding.
 - **QUEUE (work top-down, one change each):** (1) ~~m6-any-weapon~~ done (owner check pending); (2) ~~upstream sync~~ done 2026-11-26;
-  (3) ~~visual picker + OWNER-CHECKS~~ done; (4) ~~m6-custom-items + catalysts/salvage~~ done (owner check 4.1); (5) ~~companion mount shop~~ done; (6) m7: ~~500 bots, Dungeon Finder, affix-aware party bots v1~~ done (next: party bots' affixed gear, corpse-loot scoring);
+  (3) ~~visual picker + OWNER-CHECKS~~ done; (4) ~~m6-custom-items + catalysts/salvage~~ done (owner check 4.1); (5) ~~companion mount shop~~ done; (6) m7: ~~500 bots, Dungeon Finder, affix-aware party bots v1~~ done + party bots' affixed gear done (next: living AH, crowding; corpse-loot scoring later);
   affix-aware party bots, living AH, crowding; (7) typed blank bases.
 - **Blockers:** none for the queue below. Owner checks pending (bundled in `docs/OWNER-CHECKS.md` once written): creation screen any race/class, `/prof` panel, any weapon on a caster, companion windows (reforge/transmog/void open?), visual candidates for the loot beam + Champion glow. Client: `Wow-64-all.exe`.
 - **Bots:** on for play (500 since 2026-11-26; 300 before) via start-stack / final stage; off for ARPG feature tests. Bot rules in m7.
@@ -66,6 +66,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-26 20:50 m7 party bot gear: GroupScript OnAddMember rolls a party bot's equipped greens-epics once at tier -1 (`AllowNextBotRoll`); test 52 picks a bot with rollable gear, checks gain >= 0; test 31 revives before the kill (flaky death). Quality gate: full run ALL OK (25 files), owner client started 20:47. Owner playing: no restarts until he says.
 - 2026-11-26 19:05 m7 bots understand affixes v1: playerbots `StatsWeightCalculator::ExtraItemStats` hook (5 lines, // ARPG:) + mod_arpg `Bots/BotItemScore`; `.arpg test botscore`; test 52. Test infra: hold 1200 s (run now > 10 min), `*<secs> regex`, test 51 polls the proposal. Full run 24/25 + test 51 rerun OK.
 - 2026-11-26 17:40 m7: 500 bots (mean 44 ms / median 13 / p95 119, 4.8 GB); Dungeon Finder any level via upstream LFG.AnyLevel + AiPlayerbot.LfgAnyLevel (window 3) in write-confs, no code; test 51 (level 50 queues Deadmines, bots fill -> proposal). Full run 23/24 + test 51 rerun OK. NEXT: affix-aware party bots (one playerbots hook).
 - 2026-11-26 17:10 m2b-mount-shop: companion "Mounts for gold" (64 reputation mounts, 5000 g, pages + price popup); test 35; full run ALL OK (23 files). NEXT: m7 bots (500, Dungeon Finder first).

@@ -31,6 +31,8 @@ namespace Arpg::Loot
     std::string LoadAffixData();
     // Startup: removes affix rows of items that no longer exist.
     void CleanOrphanAffixes();
+    // Party bot gear (m7): the bot's next roll passes the "bots don't roll" gate, with this tier offset (e.g. -1).
+    void AllowNextBotRoll(Player* bot, int tierOffset);
     // The highest affix tier (T1-T5) that unlocks at this level (arpg_affix_tier).
     int MaxAffixTierAtLevel(int level);
     // Tests: the character's next roll counts as a drop in a raid of this tier (Ascended tiers).

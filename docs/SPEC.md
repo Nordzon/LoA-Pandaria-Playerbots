@@ -295,7 +295,9 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   ours; out-of-range dungeons scale through AutoBalance + our m5 hook). Raid Finder stays off (raids are entered solo, m5).
 - *Bots understand affixes (2026-11-26, v1):* playerbots `StatsWeightCalculator` got one hook (`ExtraItemStats`, // ARPG:);
   mod_arpg adds the affix stats of the item a party bot (a bot in a real player's group) owns, weighted by the bot's spec, so
-  it equips the better roll. `Arpg.Bots.AffixScoring` (1). Not yet: corpse loot (Need rolls), party bots' own affixed gear.
+  it equips the better roll. `Arpg.Bots.AffixScoring` (1). When anyone joins a group that has a real player, each bot's
+  equipped greens-epics without affixes roll once, `Arpg.Bots.PartyAffixTierOffset` (-1) tiers from the player's
+  (`Arpg.Bots.PartyGear` 1). Not yet: corpse loot (Need rolls) scored by planned affixes.
 - Enable playerbots (300 → 1000). Verify: scaling bot-lock, party-size scaling with bots, bot loot rule.
 - Dungeon Finder hook: real player queuing → any dungeon at any level; bots matched to player level ±`Arpg.LFG.BotLevelWindow` (3).
 - Optional: bot crowding (idle bots of the zone's level range move to the player's zone).

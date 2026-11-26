@@ -63,6 +63,7 @@ namespace
     std::vector<AffixInfo> g_affixes;
     std::map<std::pair<uint32, int>, Arpg::Core::TierRange> g_ranges;    // (affix, tier) -> range
     std::vector<Arpg::Core::TierRule> g_tiers;
+    std::unordered_map<uint32, int> g_botRoll;   // bot guid -> tier offset for its next roll (party gear)
     std::unordered_map<uint64, uint64> g_lastItem;                      // player guid -> item guid
     std::map<std::pair<uint32, int32>, std::deque<Arpg::Loot::RollPlan>> g_plans;   // (item id, suffix id) -> loot plans
     std::vector<Arpg::Core::AscendedRule> g_ascended;    // T6-T8 gates (arpg_ascended_tier)
@@ -219,6 +220,12 @@ namespace Arpg::Loot
         std::lock_guard<std::mutex> l(g_lock);
         g_ascended = rules;
         g_ascendedPct = pct;
+    }
+
+    void AllowNextBotRoll(Player* bot, int tierOffset)
+    {
+        std::lock_guard<std::mutex> l(g_lock);
+        g_botRoll[bot->GetGUID().GetCounter()] = tierOffset;
     }
 
     int MaxAffixTierAtLevel(int level)
@@ -382,7 +389,19 @@ namespace Arpg::Loot
         Arpg::Settings s = sArpgConfig.Get();
         if (!s.lootEnabled) { why = "loot disabled"; return false; }
         if (!player || !proto) { why = "no player/item"; return false; }
-        if (!Arpg::Scaling::IsRealPlayer(player) && !s.affixBotItems) { why = "bot"; return false; }
+        int botTierOffset = 0;
+        bool botAllowed = false;
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            auto it = g_botRoll.find(player->GetGUID().GetCounter());
+            if (it != g_botRoll.end())
+            {
+                botAllowed = true;
+                botTierOffset = it->second;
+                g_botRoll.erase(it);
+            }
+        }
+        if (!Arpg::Scaling::IsRealPlayer(player) && !s.affixBotItems && !botAllowed) { why = "bot"; return false; }
         if (!SourceRolls(source)) { why = "source does not roll"; return false; }
         if (proto->Quality < ITEM_QUALITY_UNCOMMON || proto->Quality > ITEM_QUALITY_EPIC) { why = "quality"; return false; }
         if (proto->RandomProperty || proto->RandomSuffix) { why = "has Blizzard random stats"; return false; }
@@ -439,6 +458,7 @@ namespace Arpg::Loot
         // Champion loot (m3 task 3.3): +1 affix tier for items from a Champion's corpse.
         if (championLoot)
             req.tierBonus += 1;
+        req.tierBonus += botTierOffset;   // party bot gear: below the player's tier
         // Crafting wheel (SPEC 4.8): a tradeskill recipe's colour sets the roll; orange/yellow may make a Unique.
         CraftInfo craft;
         if (source == ItemPickupSourceType::Spell && (craft = CraftFor(player, sourceId)).isCraft)
