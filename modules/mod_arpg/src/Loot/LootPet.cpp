@@ -22,6 +22,7 @@
 #include "Chat.h"
 #include "ScriptedGossip.h"
 #include "Loot/Salvage.h"
+#include "Loot/MountShop.h"
 #include "WorldSession.h"
 
 #include <cstdio>
@@ -289,7 +290,24 @@ namespace
 
     // Right-click on the companion: its owner gets a menu of the enabled roles; each opens the game's own window.
     enum CompanionAction : uint32 { ACT_VENDOR = 1, ACT_BANK = 2, ACT_MAIL = 3, ACT_LOOKS = 4, ACT_SALVAGE = 5, ACT_CATALYSTS = 6,
-        ACT_BUY_BASE = 50, ACT_MODEL_BASE = 100 };
+        ACT_BUY_BASE = 50, ACT_MODEL_BASE = 100, ACT_MOUNT_PAGE_BASE = 500000, ACT_MOUNT_BUY_BASE = 1000000 };
+    uint32 const MountsPerPage = 15;
+
+    // Mount shop page: mounts the player doesn't have, with a price popup (the client checks the money too).
+    void SendMountPage(Player* player, Creature* creature, uint32 page)
+    {
+        std::vector<Arpg::Loot::ShopMount> list = Arpg::Loot::MountsForSale(player);
+        uint32 first = page * MountsPerPage;
+        for (uint32 i = first; i < list.size() && i < first + MountsPerPage; ++i)
+            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, list[i].name + " - " + std::to_string(list[i].priceGold) + " g",
+                GOSSIP_SENDER_MAIN, ACT_MOUNT_BUY_BASE + list[i].spellId, "Buy " + list[i].name + "?",
+                list[i].priceGold * 10000, false);
+        if (first + MountsPerPage < list.size())
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "More mounts...", GOSSIP_SENDER_MAIN, ACT_MOUNT_PAGE_BASE + page + 1);
+        if (list.empty())
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "You have every mount I sell.", GOSSIP_SENDER_MAIN, ACT_MOUNT_PAGE_BASE);
+        SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+    }
 
     class ArpgCompanionCreatureScript : public CreatureScript
     {
@@ -320,6 +338,8 @@ namespace
                     "Uniques are kept.", 0, false);
             AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Buy catalysts (" + std::to_string(player->GetItemCount(700010)) +
                 " essences)", GOSSIP_SENDER_MAIN, ACT_CATALYSTS);
+            if (sArpgConfig.Get().mountShopEnabled)
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Mounts for gold", GOSSIP_SENDER_MAIN, ACT_MOUNT_PAGE_BASE);
             AddGossipItemFor(player, GOSSIP_ICON_TABARD, "Change appearance", GOSSIP_SENDER_MAIN, ACT_LOOKS);
             SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             return true;
@@ -328,6 +348,19 @@ namespace
         bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
         {
             ClearGossipMenuFor(player);
+            if (action >= ACT_MOUNT_BUY_BASE)
+            {
+                CloseGossipMenuFor(player);
+                std::string out;
+                Arpg::Loot::BuyMount(player, action - ACT_MOUNT_BUY_BASE, out);
+                ChatHandler(player->GetSession()).SendSysMessage(out.c_str());
+                return true;
+            }
+            if (action >= ACT_MOUNT_PAGE_BASE)
+            {
+                SendMountPage(player, creature, action - ACT_MOUNT_PAGE_BASE);
+                return true;
+            }
             if (action == ACT_CATALYSTS)
             {
                 static char const* const names[] = { "", "Lesser Catalyst (tiers 1-2)", "Greater Catalyst (tiers 3-4)",

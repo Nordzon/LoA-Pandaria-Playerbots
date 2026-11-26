@@ -58,7 +58,12 @@ mount shop). Answer for each: opens / doesn't: Sell+repair, Bank, Mailbox, Refor
 `.arpg test give <you> 2317` twice), right-click the companion: "Salvage 2 affixed item(s) for N essence(s)" asks to confirm and
 turns them into Salvaged Essence; "Buy catalysts" lists the three with prices. Answer: names/icons ok, dialogue ok / what's off.
 
-## 7. Earlier items still unconfirmed
+## 7. Mount shop
+Give yourself gold (`.modify money 60000000` = 6000 g with yourself targeted), right-click the companion -> "Mounts for gold".
+Pages of 15 with "More mounts..."; clicking one shows a price popup; after buying, the mount is in your mount journal and gone
+from the list. Answer: ok / what's off (and whether 5000 g feels right).
+
+## 8. Earlier items still unconfirmed
 Do these in Elwynn Forest (`.tele goldshire`): Superuniques only live in Elwynn, Dun Morogh and Westfall.
 
 **Champion tag.** `.arpg champion make <you> 6` spawns a Kobold Vermin next to you as a Champion pack (leader + minions; any

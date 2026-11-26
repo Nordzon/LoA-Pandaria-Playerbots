@@ -28,6 +28,7 @@
 #include "TemporarySummon.h"
 #include "Character/AnyWeapon.h"
 #include "Loot/Salvage.h"
+#include "Loot/MountShop.h"
 #include <map>
 
 #include "CellImpl.h"
@@ -197,6 +198,8 @@ public:
             { "visual",   &HandleTestVisual,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "count",    &HandleTestCount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "salvage",  &HandleTestSalvage,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "mount",    &HandleTestMount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "money",    &HandleTestMoney,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "events",   &HandleTestEvents,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "pack",     &HandleTestPack,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "give",     &HandleTestGive,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -359,8 +362,9 @@ public:
         std::string pot = Arpg::Loot::LoadPotionData();
         std::string dun = Arpg::Dungeons::LoadInstanceData();
         std::string comp = Arpg::Loot::LoadCompanionModels();
-        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
-            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str());
+        std::string mounts = Arpg::Loot::LoadMountShop();
+        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
+            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str(), mounts.c_str());
         return ok;
     }
 
@@ -493,6 +497,56 @@ public:
             first = false;
         }
         return line;
+    }
+
+    // .arpg test mount <char> list|buy <spellId>   the companion's mount shop over SOAP
+    static bool HandleTestMount(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        char const* usage = "usage: .arpg test mount <char> list|buy <spellId>|forget <spellId>";
+        if (t.size() < 2 || !IsNameLike(t[0]))
+            return Fail(handler, usage);
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        if (t[1] == "list" && t.size() == 2)
+        {
+            std::vector<Arpg::Loot::ShopMount> m = Arpg::Loot::MountsForSale(p);
+            std::string first = m.empty() ? "" : (" first=" + std::to_string(m[0].spellId) + " (" + m[0].name + ") price=" +
+                std::to_string(m[0].priceGold));
+            handler->PSendSysMessage("ok mountshop for_sale=%u%s", uint32(m.size()), first.c_str());
+            return true;
+        }
+        if (t[1] == "buy" && t.size() == 3)
+        {
+            std::string out;
+            if (!Arpg::Loot::BuyMount(p, uint32(std::strtoul(t[2].c_str(), nullptr, 10)), out))
+                return Fail(handler, out);
+            handler->PSendSysMessage("ok %s", out.c_str());
+            return true;
+        }
+        if (t[1] == "forget" && t.size() == 3)
+        {
+            p->RemoveSpell(uint32(std::strtoul(t[2].c_str(), nullptr, 10)));
+            handler->SendSysMessage("ok forgot");
+            return true;
+        }
+        return Fail(handler, usage);
+    }
+
+    // .arpg test money <char> <gold>   sets the character's money (tests)
+    static bool HandleTestMoney(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test money <char> <gold>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        uint64 copper = uint64(std::strtoull(t[1].c_str(), nullptr, 10)) * 10000;
+        p->SetMoney(copper);
+        handler->PSendSysMessage("ok money gold=%u", uint32(copper / 10000));
+        return true;
     }
 
     // .arpg test salvage <char> preview|do|buy <band>   the companion's Salvage / Buy catalysts, by name over SOAP

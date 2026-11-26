@@ -91,6 +91,11 @@ Arpg.Catalyst.EssenceCostLesser = 10
 Arpg.Catalyst.EssenceCostGreater = 30
 Arpg.Catalyst.EssenceCostGrand = 90
 
+# --- Mount shop (companion dialogue; owner 2026-11-26: a gold sink) ----------------------------
+#    Reputation mounts (arpg_mount_shop, 64 rows) for gold, no reputation needed. Price in gold; a row's price_gold overrides.
+Arpg.MountShop.Enabled = 1
+Arpg.MountShop.Price = 5000
+
 # --- Salvage (companion dialogue) -------------------------------------------------------------
 #    Takes affixed items from the bags (never equipped gear or the bank) up to MaxQuality (3 = blue); Uniques only with
 #    IncludeUniques = 1. Essences per item = affixes x EssencePerAffix (+ UniqueBonus, + AscendedBonus for T6+ affixes).

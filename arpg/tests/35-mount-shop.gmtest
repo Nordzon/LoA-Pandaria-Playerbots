@@ -1,0 +1,26 @@
+# Companion mount shop (owner 2026-11-26, gold sink): reputation mounts for gold (Arpg.MountShop.Price 5000), no reputation.
+# Same code as the companion dialogue, over SOAP. Swift Violet Ram (65643) is the first row (Ironforge).
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 4000
+> .arpg test mount Arpgtest forget 65643
+? ok forgot
+> .arpg test mount Arpgtest list
+? ok mountshop for_sale=(\d+) first=65643 \(Swift Violet Ram\) price=5000
+> .arpg test money Arpgtest 100
+? ok money gold=100
+> .arpg test mount Arpgtest buy 65643
+? not enough gold: Swift Violet Ram costs 5000 gold
+> .arpg test money Arpgtest 6000
+? ok money gold=6000
+> .arpg test mount Arpgtest buy 65643
+? ok bought mount spell=65643 \(Swift Violet Ram\) for gold=5000
+> .arpg test mount Arpgtest buy 65643
+? you already have Swift Violet Ram
+> .arpg test mount Arpgtest list
+! first=65643
+> .arpg test mount Arpgtest forget 65643
+? ok forgot
+> .arpg test money Arpgtest 0
+? ok money gold=0

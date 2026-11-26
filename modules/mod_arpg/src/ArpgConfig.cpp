@@ -21,6 +21,7 @@ namespace
         "Arpg.Companion.Reforge", "Arpg.Companion.Transmog", "Arpg.Companion.VoidStorage", "Arpg.Companion.InCombat",
         "Arpg.LootPet.Enabled", "Arpg.LootPet.WaitForCombatEnd", "Arpg.LootPet.ReachTimeoutMs",
         "Arpg.AnyWeapon.Enabled", "Arpg.AnyWeapon.Bots", "Arpg.AnyWeapon.DualWield",
+        "Arpg.MountShop.Enabled", "Arpg.MountShop.Price",
         "Arpg.Catalyst.ChampionChance", "Arpg.Catalyst.SuperuniqueChance", "Arpg.Catalyst.EssenceCostLesser",
         "Arpg.Catalyst.EssenceCostGreater", "Arpg.Catalyst.EssenceCostGrand", "Arpg.Salvage.EssencePerAffix",
         "Arpg.Salvage.UniqueBonus", "Arpg.Salvage.AscendedBonus", "Arpg.Salvage.MaxQuality", "Arpg.Salvage.IncludeUniques",
@@ -65,6 +66,8 @@ namespace Arpg
         s.sellCopperPerAffixLevel = uint32_t(std::max(0, file.GetInt("Arpg.Loot.SellCopperPerAffixLevel", 200)));
         s.godRollPityEvery = std::max(1, file.GetInt("Arpg.Loot.GodRollPityEvery", 3));
         s.craftMaxSkill = std::max(1, file.GetInt("Arpg.Craft.MaxSkill", 600));
+        s.mountShopEnabled = file.GetBool("Arpg.MountShop.Enabled", true);
+        s.mountShopPriceGold = uint32_t(std::max(0, file.GetInt("Arpg.MountShop.Price", 5000)));
         s.salvageEssencePerAffix = std::max(0, file.GetInt("Arpg.Salvage.EssencePerAffix", 1));
         s.salvageUniqueBonus = std::max(0, file.GetInt("Arpg.Salvage.UniqueBonus", 5));
         s.salvageAscendedBonus = std::max(0, file.GetInt("Arpg.Salvage.AscendedBonus", 3));

@@ -17,6 +17,7 @@
 #include "Loot/LootPet.h"
 #include "Character/AnyWeapon.h"
 #include "Loot/Crafting.h"
+#include "Loot/MountShop.h"
 
 #include "Chat.h"
 #include "Player.h"
@@ -54,6 +55,7 @@ namespace
             Arpg::Loot::LoadPotionData();
             Arpg::Dungeons::LoadInstanceData();
             Arpg::Loot::LoadCompanionModels();
+            Arpg::Loot::LoadMountShop();
         }
     };
 }

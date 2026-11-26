@@ -16,6 +16,7 @@ What's where, and what we've touched. All paths below were checked against this 
 | `modules/mod_arpg/src/Loot/LootFilter.{h,cpp}` + `Core/LootFilter` | m2b loot filter: ordered rules per character (`character_arpg_lootfilter`), applied in `PlanLoot` (sell = gold now, leave = out of the loot), `.arpg filter …` |
 | `modules/mod_arpg/src/Dungeons/InstanceScaling.{h,cpp}` + `Core/InstanceScale` | m5: party-size table x raid tier x solo role replaces AutoBalance's curve, solo tank/healer damage dealt, dungeon level selector (`character_arpg_dungeon_level`), `.arpg dungeon info|level` |
 | `modules/mod_arpg/sql/tools/gen_any_race_class.py` | generates `2026_11_23_04_arpg_any_race_class.sql` (any race x any class) + `arpg/client-patch/charbaseinfo_rows.csv` for the client CharBaseInfo |
+| `modules/mod_arpg/src/Loot/MountShop.{h,cpp}` | companion "Mounts for gold" (`arpg_mount_shop`, `Arpg.MountShop.*`); dialogue code in `Loot/LootPet` |
 | `modules/mod_arpg/src/Loot/Salvage.{h,cpp}`, `Core/Salvage` | companion Salvage + Buy catalysts; catalyst drops/auto-use live in `Loot/Crafting`; items 7000xx in `sql/world/2026_11_26_00` |
 | `modules/mod_arpg/src/Character/AnyWeapon.{h,cpp}` | any class any weapon/shield: proficiency spells + skills at login/level-up (`Arpg.AnyWeapon.*`); `.arpg test weapons` |
 | `arpg/scripts/test-char-create.ps1` | headless create + check + erase of a new race x class pair (m6) |

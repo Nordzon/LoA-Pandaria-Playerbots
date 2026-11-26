@@ -274,6 +274,9 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   x2 Unique chance). Companion dialogue: Salvage (affixed greens/blues in the bags, confirm; 1 essence per affix, Uniques kept
   unless `Arpg.Salvage.IncludeUniques`) and Buy catalysts (10/30/90 essences). All numbers in `Arpg.Catalyst.*` / `Arpg.Salvage.*`.
 
+- *Mount shop (owner 2026-11-26, change `m2b-mount-shop`):* the companion's dialogue sells the 64 reputation mounts for gold
+  (`Arpg.MountShop.Price` 5000, per-row override in `arpg_mount_shop`), no reputation needed. First of the planned gold sinks.
+
 ### 4.9 Character creation (m6)
 - Any race with any class (e.g. Undead Monk): server SQL (playercreateinfo, spells, skills) + client `CharBaseInfo` patch.
 - *Implemented 2026-11-23:* `sql/tools/gen_any_race_class.py` adds the 43 missing pairs (165 total): start at the race's own start
