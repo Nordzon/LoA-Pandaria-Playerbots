@@ -131,8 +131,8 @@ namespace Arpg
         s.superuniqueScale = std::max(0.0f, file.GetFloat("Arpg.Superunique.Scale", 1.4f));
         s.superuniquePatrolRadius = std::max(0.0f, file.GetFloat("Arpg.Superunique.PatrolRadius", 15.0f));
         s.superuniqueAnnounce = file.GetBool("Arpg.Superunique.Announce", true);
-        s.championEntryOffset = uint32_t(std::max(0, file.GetInt("Arpg.Champion.EntryOffset", 5000000)));
-        s.superuniqueEntryOffset = uint32_t(std::max(0, file.GetInt("Arpg.Superunique.EntryOffset", 6000000)));
+        s.championEntryOffset = uint32_t(std::max(0, file.GetInt("Arpg.Champion.EntryOffset", 400000)));
+        s.superuniqueEntryOffset = uint32_t(std::max(0, file.GetInt("Arpg.Superunique.EntryOffset", 700000)));
         s.championEnabled = file.GetBool("Arpg.Champion.Enabled", true);
         s.championChancePct = std::max(0.0f, file.GetFloat("Arpg.Champion.Chance", 2.0f));
         s.championScale = std::max(0.0f, file.GetFloat("Arpg.Champion.Scale", 1.25f));

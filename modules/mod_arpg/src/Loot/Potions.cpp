@@ -154,7 +154,7 @@ namespace
             uint32 source = 0;
             if (Arpg::Loot::IsBossEntry(base))
                 source = 4;
-            else if (s.superuniqueEntryOffset && entry >= s.superuniqueEntryOffset && entry < s.superuniqueEntryOffset + 1000000)
+            else if (s.superuniqueEntryOffset && entry >= s.superuniqueEntryOffset && entry < s.superuniqueEntryOffset + 300000)
                 source = 3;
             else if (Arpg::Monsters::WasChampionKill(killed))
                 source = 2;

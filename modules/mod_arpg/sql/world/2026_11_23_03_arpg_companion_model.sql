@@ -12,8 +12,8 @@ REPLACE INTO `arpg_companion_model` VALUES
 (9, 15992, 'Peddlefeet');
 
 -- The companion's shop: water, bread, flour, spices, parchment and vellum (selling and repair work without a list too).
-DELETE FROM `npc_vendor` WHERE `entry` = 7000001;
+DELETE FROM `npc_vendor` WHERE `entry` = 1000001;
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `type`) VALUES
-(7000001, 1, 159, 0, 0, 0, 1), (7000001, 2, 1179, 0, 0, 0, 1), (7000001, 3, 8766, 0, 0, 0, 1), (7000001, 4, 58274, 0, 0, 0, 1),
-(7000001, 5, 4540, 0, 0, 0, 1), (7000001, 6, 4541, 0, 0, 0, 1), (7000001, 7, 30817, 0, 0, 0, 1), (7000001, 8, 2678, 0, 0, 0, 1),
-(7000001, 9, 39354, 0, 0, 0, 1), (7000001, 10, 38682, 0, 0, 0, 1);
+(1000001, 1, 159, 0, 0, 0, 1), (1000001, 2, 1179, 0, 0, 0, 1), (1000001, 3, 8766, 0, 0, 0, 1), (1000001, 4, 58274, 0, 0, 0, 1),
+(1000001, 5, 4540, 0, 0, 0, 1), (1000001, 6, 4541, 0, 0, 0, 1), (1000001, 7, 30817, 0, 0, 0, 1), (1000001, 8, 2678, 0, 0, 0, 1),
+(1000001, 9, 39354, 0, 0, 0, 1), (1000001, 10, 38682, 0, 0, 0, 1);

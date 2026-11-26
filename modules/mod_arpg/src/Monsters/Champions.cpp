@@ -506,9 +506,9 @@ namespace Arpg::Monsters
     uint32 BaseEntry(uint32 entry)
     {
         Arpg::Settings const& s = sArpgConfig.Get();
-        if (s.superuniqueEntryOffset && entry >= s.superuniqueEntryOffset && entry < s.superuniqueEntryOffset + 1000000)
+        if (s.superuniqueEntryOffset && entry >= s.superuniqueEntryOffset && entry < s.superuniqueEntryOffset + 300000)
             return entry - s.superuniqueEntryOffset;
-        if (s.championEntryOffset && entry >= s.championEntryOffset && entry < s.championEntryOffset + 1000000)
+        if (s.championEntryOffset && entry >= s.championEntryOffset && entry < s.championEntryOffset + 300000)
             return entry - s.championEntryOffset;
         return entry;
     }

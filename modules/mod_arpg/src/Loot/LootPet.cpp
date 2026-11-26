@@ -32,7 +32,7 @@
 
 namespace
 {
-    uint32 const PetEntry = 7000001;
+    uint32 const PetEntry = 1000001;   // below 1,048,576: a MoP creature GUID carries only 20 bits of the entry
 
     struct PetState
     {

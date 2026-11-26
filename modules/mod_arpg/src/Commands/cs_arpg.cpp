@@ -202,6 +202,7 @@ public:
             { "professions", &HandleTestProfessions, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "weapons",  &HandleTestWeapons,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "visual",   &HandleTestVisual,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "entries",  &HandleTestEntries,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "count",    &HandleTestCount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "salvage",  &HandleTestSalvage,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "mount",    &HandleTestMount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -719,6 +720,21 @@ public:
             return Fail(handler, "character not online");
         uint32 itemId = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
         handler->PSendSysMessage("ok item=%u count=%u", itemId, p->GetItemCount(itemId, true));
+        return true;
+    }
+
+    // .arpg test entries   the highest creature template entry the server loaded: a MoP creature GUID carries only 20 bits of
+    // the entry, so anything above 1,048,575 reaches the client cut and shows as nothing (2026-11-26 invisible companion).
+    static bool HandleTestEntries(ChatHandler* handler, char const* /*args*/)
+    {
+        uint32 maxEntry = 0, over = 0;
+        for (auto const& [entry, tmpl] : *sObjectMgr->GetCreatureTemplates())
+        {
+            maxEntry = std::max(maxEntry, entry);
+            if (entry > 0xFFFFF)
+                ++over;
+        }
+        handler->PSendSysMessage("ok creature max_entry=%u over_20bit=%u", maxEntry, over);
         return true;
     }
 

@@ -156,7 +156,7 @@ namespace
                 return;
             uint32 entry = killed->GetEntry();
             float chance = 0.0f;
-            if (s.superuniqueEntryOffset && entry >= s.superuniqueEntryOffset && entry < s.superuniqueEntryOffset + 1000000)
+            if (s.superuniqueEntryOffset && entry >= s.superuniqueEntryOffset && entry < s.superuniqueEntryOffset + 300000)
                 chance = s.catalystSuperuniqueChancePct;
             else if (Arpg::Monsters::WasChampionKill(killed))
                 chance = s.catalystChampionChancePct;

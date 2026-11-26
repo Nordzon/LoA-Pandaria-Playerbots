@@ -31,8 +31,8 @@ namespace Arpg
         int lootZoneCeilingMargin = 15;  // Arpg.Loot.ZoneCeilingMargin (loot level <= zone max + this)
         int lootSubstituteGap = 5;       // Arpg.Loot.SubstituteGap (swap drops more than this below the loot level)
         uint32_t sellCopperPerAffixLevel = 200; // Arpg.Loot.SellCopperPerAffixLevel (vendor value per affix per item level)
-        uint32_t championEntryOffset = 5000000;    // Arpg.Champion.EntryOffset (tag copies "Champion <name>", gen_monster_tags.py)
-        uint32_t superuniqueEntryOffset = 6000000; // Arpg.Superunique.EntryOffset (tag copies "Unique <name>")
+        uint32_t championEntryOffset = 400000;     // Arpg.Champion.EntryOffset (tag copies "Champion <name>", gen_monster_tags.py)
+        uint32_t superuniqueEntryOffset = 700000;  // Arpg.Superunique.EntryOffset (tag copies "Unique <name>")
         bool championEnabled = true;     // Arpg.Champion.Enabled
         float championChancePct = 2.0f;  // Arpg.Champion.Chance (% of open-world creatures, rolled once per life on first sight)
         float championScale = 1.25f;     // Arpg.Champion.Scale (model size multiplier)

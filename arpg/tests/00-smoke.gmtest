@@ -11,3 +11,7 @@
 # which brings the conf value back for play.
 > .arpg config set Arpg.Champion.Chance 0
 ? ok
+
+# Every creature entry fits the 20 bits a MoP creature GUID has for it (else the client shows nothing; 2026-11-26).
+> .arpg test entries
+? over_20bit=0\b
