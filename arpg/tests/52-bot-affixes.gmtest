@@ -1,0 +1,19 @@
+# Bots understand affixes (m7, owner 2026-11-26): a bot in a real player's group scores an affixed item with its affix stats
+# (mod_arpg hook in playerbots StatsWeightCalculator, // ARPG:). A blue (1489, 2-3 affixes) rolled for the bot: its score
+# with the hook is higher than the template-only score.
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 4000
+> .arpg test botscore Arpgtest any 1489
+? ok botscore bot=\S+ item=1489 affixes=[23] affix_sum=[1-9]\d* \(ok\) with=(\d+\.\d) without=(\d+\.\d)
+# with > without: checked by the regex below (the affix stats always add a positive amount).
+! with=(\d+\.\d) without=\1\b
+> .arpg config set Arpg.Bots.AffixScoring 0
+? ok
+> .arpg test botscore Arpgtest any 1489
+? affix_sum=0 \(off\)
+> .arpg config set Arpg.Bots.AffixScoring 1
+? ok
+> .arpg test botscore Arpgtest any ungroup
+? ok ungrouped

@@ -18,6 +18,7 @@
 #include "Character/AnyWeapon.h"
 #include "Loot/Crafting.h"
 #include "Loot/MountShop.h"
+#include "Bots/BotItemScore.h"
 
 #include "Chat.h"
 #include "Player.h"
@@ -77,6 +78,7 @@ void AddSC_mod_arpg()
     Arpg::Loot::InstallLootPet();
     Arpg::Character::InstallAnyWeapon();
     Arpg::Loot::InstallCatalystDrops();
+    Arpg::Bots::InstallBotItemScore();
     Arpg::Loot::InstallLootPlanner();   // last kill script: plans corpse loot after the others added items and pity
     AddSC_arpg_commandscript();
 }

@@ -29,6 +29,10 @@
 #include "Character/AnyWeapon.h"
 #include "Loot/Salvage.h"
 #include "Loot/MountShop.h"
+#include "Bots/BotItemScore.h"
+#include "Group.h"
+#include "GroupMgr.h"
+#include "StatsWeightCalculator.h"
 #include <map>
 
 #include "CellImpl.h"
@@ -199,6 +203,7 @@ public:
             { "count",    &HandleTestCount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "salvage",  &HandleTestSalvage,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "mount",    &HandleTestMount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "botscore", &HandleTestBotScore, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "money",    &HandleTestMoney,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "events",   &HandleTestEvents,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "pack",     &HandleTestPack,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -497,6 +502,78 @@ public:
             first = false;
         }
         return line;
+    }
+
+    // .arpg test botscore <char> <bot> <itemId> [ungroup]   (m7) puts the bot in the character's group, gives the bot the item
+    // rolled with affixes at the character's level, and reports the bot's own item score (playerbots StatsWeightCalculator)
+    // with and without mod_arpg's affix hook. "ungroup" takes the bot out of the group again.
+    static bool HandleTestBotScore(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        char const* usage = "usage: .arpg test botscore <char> <bot>|any <itemId>|ungroup";
+        if (t.size() != 3 || !IsNameLike(t[0]) || !IsNameLike(t[1]))
+            return Fail(handler, usage);
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        Player* bot = nullptr;
+        if (t[1] == "any")   // the first online random bot that isn't grouped with someone else
+        {
+            // Bot sessions live with playerbots, not in the world's session list: look through every online player.
+            for (auto const& [guid, b] : ObjectAccessor::GetPlayers())
+                if (b && b != p && !Arpg::Scaling::IsRealPlayer(b) && b->IsInWorld() && b->IsAlive() &&
+                    (!b->GetGroup() || (p && b->GetGroup() == p->GetGroup())))
+                {
+                    bot = b;
+                    break;
+                }
+        }
+        else
+            bot = ObjectAccessor::FindPlayerByName(NormalizeName(t[1]));
+        if (p && p->IsInWorld() && t[2] == "ungroup")
+            bot = p;   // not used
+        if (!p || !p->IsInWorld() || !bot || !bot->IsInWorld())
+            return Fail(handler, "character or bot not online");
+        if (t[2] == "ungroup")   // disbands the character's group (the test bot leaves it)
+        {
+            if (Group* g = p->GetGroup())
+                g->Disband();
+            handler->SendSysMessage("ok ungrouped");
+            return true;
+        }
+        if (bot->GetGroup() != p->GetGroup() || !p->GetGroup())
+        {
+            if (bot->GetGroup())
+                bot->GetGroup()->RemoveMember(bot->GetGUID());
+            Group* g = p->GetGroup();
+            if (!g)
+            {
+                g = new Group();
+                g->Create(p);
+                sGroupMgr->AddGroup(g);
+            }
+            g->AddMember(bot);
+        }
+        uint32 itemId = uint32(std::strtoul(t[2].c_str(), nullptr, 10));
+        ItemPosCountVec dest;
+        if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1) != EQUIP_ERR_OK)
+            return Fail(handler, "bot's bags full");
+        Item* item = bot->StoreNewItem(dest, itemId, true);
+        if (!item)
+            return Fail(handler, "could not create item");
+        std::string why;
+        int n = Arpg::Loot::RollForItem(p, item, ItemPickupSourceType::CreatureLoot, why);
+        int32 rp = item->GetItemRandomPropertyId();
+        StatsWeightCalculator calc(bot);
+        float with = calc.CalculateItem(itemId, rp);
+        auto hook = StatsWeightCalculator::ExtraItemStats;
+        StatsWeightCalculator::ExtraItemStats = nullptr;
+        StatsWeightCalculator plain(bot);
+        float without = plain.CalculateItem(itemId, rp);
+        StatsWeightCalculator::ExtraItemStats = hook;
+        std::string input;
+        int sum = Arpg::Bots::AffixScoreInput(bot, itemId, rp, input);
+        handler->PSendSysMessage("ok botscore bot=%s item=%u affixes=%d affix_sum=%d (%s) with=%.1f without=%.1f",
+            bot->GetName().c_str(), itemId, n, sum, input.c_str(), with, without);
+        return true;
     }
 
     // .arpg test mount <char> list|buy <spellId>   the companion's mount shop over SOAP

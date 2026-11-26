@@ -13,8 +13,8 @@
 > .botscenario Arpgtest lfgstate
 ? lfgstate player=[1-5]\b
 # Bots check the queue every 30 s and need a healer + 3 damage from the bots within +-3 levels: up to ~3 minutes.
-~ 160000
+# Polled every 2 s: the headless client never accepts the proposal, so it expires after ~40 s and drops the queue.
 > .botscenario Arpgtest lfgstate
-* lfgstate player=[35]\b
+*200 lfgstate player=[35]\b
 > .botscenario Arpgtest lfgleave
 ? lfgleave

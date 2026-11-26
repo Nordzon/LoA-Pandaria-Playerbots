@@ -10,6 +10,7 @@
       ! regex                     last reply must NOT match
       ~ 500                       wait 500 ms (respawns, ticks)
       * regex                     like ?, but re-sends the last command every 2 s until it matches (max 20 s; timer events)
+      *180 regex                  the same with its own time limit in seconds
   A file passes if every ? and ! holds. Exit code = number of failed files.
 
 .EXAMPLE
@@ -35,13 +36,16 @@ foreach ($file in Get-ChildItem $Dir -Filter '*.gmtest' | Where-Object { $_.Name
         try { $last = (& $gm $arg 2>&1 | Out-String) } catch { $last = "EXCEPTION: $($_.Exception.Message)"; $fails += "line ${n}: $last" }
       }
       '*' {
-        # Like '?', but re-runs the last command every 2 s until it matches (up to 20 s): for events that come on a timer.
-        $deadline = (Get-Date).AddSeconds(20)
+        # Like '?', but re-runs the last command every 2 s until it matches (up to 20 s, or "*<seconds> regex"): for events
+        # that come on a timer.
+        $secs = 20
+        if ($arg -match '^(\d+)\s+(.+)$') { $secs = [int]$Matches[1]; $arg = $Matches[2] }
+        $deadline = (Get-Date).AddSeconds($secs)
         while ($last -notmatch $arg -and (Get-Date) -lt $deadline) {
           Start-Sleep -Seconds 2
           try { $last = (& $gm $lastCmd 2>&1 | Out-String) } catch { $last = "EXCEPTION: $($_.Exception.Message)" }
         }
-        if ($last -notmatch $arg) { $fails += "line ${n}: expected (within 20 s) /$arg/ in: $($last.Trim())" }
+        if ($last -notmatch $arg) { $fails += "line ${n}: expected (within $secs s) /$arg/ in: $($last.Trim())" }
       }
       '?' { if ($last -notmatch $arg) { $fails += "line ${n}: expected /$arg/ in: $($last.Trim())" } }
       '!' { if ($last -match $arg) { $fails += "line ${n}: did not expect /$arg/ in: $($last.Trim())" } }

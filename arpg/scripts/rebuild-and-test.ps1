@@ -67,7 +67,7 @@ $mysql = 'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe'
 $guid = (& $mysql "--defaults-extra-file=$(Join-Path $Scripts 'mysql.local.cnf')" -N -e "SELECT guid FROM characters.characters WHERE name = 'Arpgtest'" 2>$null | Out-String).Trim()
 if (-not $guid) { Done 3 'FAIL test character Arpgtest missing (run overnight.ps1 gmtests stage once)' }
 $env:MOP_NAV_DATA = $Data
-$hold = Start-Process -FilePath 'py' -ArgumentList "headless.py --cmd play --char $guid --hold 600" -WorkingDirectory $Headless `
+$hold = Start-Process -FilePath 'py' -ArgumentList "headless.py --cmd play --char $guid --hold 1200" -WorkingDirectory $Headless `
           -NoNewWindow -PassThru -RedirectStandardOutput (Join-Path $Work 'rebuild-hold.out') -RedirectStandardError (Join-Path $Work 'rebuild-hold.err')
 # Wait for the real login (with 300 bots loading it can take a while); a fixed sleep let tests run before Arpgtest was online.
 $deadline = (Get-Date).AddSeconds(120)

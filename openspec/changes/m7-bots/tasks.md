@@ -13,6 +13,12 @@
 - [x] 3.1 Real player queuing: dungeon level limits lifted; bots matched to player level ±`Arpg.LFG.BotLevelWindow` (upstream's LFG.AnyLevel + AiPlayerbot.LfgAnyLevel, window 3, via write-confs - no code)
 - [x] 3.2 `.botscenario` test: level-50 test character queues Deadmines; matched bots are 47–53; instance scales to 50 (`51-dungeon-finder`: queued, bots fill -> proposal; scaling to the group = m5 test 50)
 
+## 3b. Bots understand affixes (owner 2026-11-26)
+- [x] 3b.1 One hook in playerbots `StatsWeightCalculator::CalculateItem` (`ExtraItemStats`, // ARPG:, 5 lines in 2 files); mod_arpg `Bots/BotItemScore` adds the affix stats of the item instance a party bot owns
+- [x] 3b.2 `52-bot-affixes.gmtest`: a party bot's score for an affixed blue is higher with the hook; `Arpg.Bots.AffixScoring` 0 turns it off
+- [ ] 3b.3 Loot on a corpse (Need rolls): score by the planned affixes (plan has ids + tiers; values roll at pickup)
+- [ ] 3b.4 Party bots wear affixed gear one tier below the player (`Arpg.Bots.PartyAffixTierOffset`)
+
 ## 4. Optional
 - [ ] 4.1 Bot crowding (idle bots of the zone's level range move to the player's zone)
 

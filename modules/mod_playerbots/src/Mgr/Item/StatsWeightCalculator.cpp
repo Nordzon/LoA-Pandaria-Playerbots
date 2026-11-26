@@ -167,6 +167,9 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyId
     if (randomPropertyIds != 0)
         CalculateRandomProperty(randomPropertyIds, itemId);
 
+    if (ExtraItemStats)   // ARPG: the item instance's affixes (mod_arpg Bots/BotItemScore)
+        ExtraItemStats(player_, itemId, randomPropertyIds, *collector_);
+
     if (enable_overflow_penalty_)
         ApplyOverflowPenalty(player_);
 

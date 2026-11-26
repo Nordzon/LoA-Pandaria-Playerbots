@@ -78,6 +78,7 @@ namespace Arpg
         int paragonMoveSpeedCap = 1000;        // Arpg.Paragon.MoveSpeedCap (+10%)
         int paragonFindPerPoint = 500;         // Arpg.Paragon.FindPerPoint (magic/gold find, hundredths of %)
         int paragonMagicFindCap = 10000;       // Arpg.Paragon.MagicFindCap (+100%)
+        bool botAffixScoring = true;        // Arpg.Bots.AffixScoring (party bots count affixes when choosing gear)
         bool mountShopEnabled = true;       // Arpg.MountShop.Enabled (companion dialogue)
         uint32_t mountShopPriceGold = 5000; // Arpg.MountShop.Price (gold; a row's price_gold overrides)
         int salvageEssencePerAffix = 1;     // Arpg.Salvage.EssencePerAffix

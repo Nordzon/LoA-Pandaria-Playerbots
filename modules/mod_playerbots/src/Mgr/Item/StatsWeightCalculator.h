@@ -43,6 +43,8 @@ public:
     void SetItemSetBonus(bool apply) { enable_item_set_bonus_ = apply; }
     void SetPvpSpec(bool isPvp) { pvpSpec_ = isPvp; }
     void SetExcludeResilience(bool exclude) { exclude_resilience_ = exclude; }
+    // ARPG: stats an item instance has beyond its template (mod_arpg affixes), added before weighting; null = none.
+    inline static void (*ExtraItemStats)(Player* bot, uint32 itemId, int32 randomPropertyId, StatsCollector& collector) = nullptr;
 
     private:
     void GenerateWeights(Player* player);

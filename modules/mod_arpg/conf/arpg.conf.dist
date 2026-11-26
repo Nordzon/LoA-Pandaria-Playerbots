@@ -91,6 +91,10 @@ Arpg.Catalyst.EssenceCostLesser = 10
 Arpg.Catalyst.EssenceCostGreater = 30
 Arpg.Catalyst.EssenceCostGrand = 90
 
+# --- Bots (m7) --------------------------------------------------------------------------------
+#    AffixScoring 1 = bots in your group count an item's affixes (with their spec's stat weights) when choosing gear.
+Arpg.Bots.AffixScoring = 1
+
 # --- Mount shop (companion dialogue; owner 2026-11-26: a gold sink) ----------------------------
 #    Reputation mounts (arpg_mount_shop, 64 rows) for gold, no reputation needed. Price in gold; a row's price_gold overrides.
 Arpg.MountShop.Enabled = 1
