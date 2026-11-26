@@ -4,7 +4,8 @@ For each missing (race, class) pair it adds, from the world DB as it is now:
   playercreateinfo_action  the class's action bar from a reference race that has the class
   playercreateinfo_item    the class's start items from the reference race
   player_levelstats        reference race's class stats + (this race's warrior stats - reference race's warrior stats) per level
-  skills / spells by mask  rows that name the class AND a race mask get this race's bit (class skills, weapon skills)
+  skills / spells by mask  rows that name the class AND a race mask get this race's bit (class skills, weapon skills);
+                           never the race-specific intro spells in playercreateinfo_cast_spell
 Also writes arpg/client-patch/charbaseinfo_rows.csv (race,class) for the client patch (CharBaseInfo.dbc: which class buttons
 the character creation screen offers). Re-run after a DB update; the SQL is idempotent.
 Usage: py -I gen_any_race_class.py
@@ -33,7 +34,11 @@ def q(sql):
 # The stock pairs come from the client's own CharBaseInfo.dbc (server copy, never patched): the generated SQL then covers
 # every new pair even when run against a DB where some were added already.
 import struct
-_dbc = open(r'D:\WoWMoPProject\ServerData\data\dbc\CharBaseInfo.dbc', 'rb').read()
+# build-client-patch.py replaces the server copy with the patched one (all pairs) and keeps Blizzard's as .blizzard.
+_dbc_path = r'D:\WoWMoPProject\ServerData\data\dbc\CharBaseInfo.dbc'
+if os.path.exists(_dbc_path + '.blizzard'):
+    _dbc_path += '.blizzard'
+_dbc = open(_dbc_path, 'rb').read()
 _n, _f, _sz = struct.unpack('<3I', _dbc[4:16])
 existing = {(_dbc[20 + i * _sz + 4], _dbc[20 + i * _sz + 5]) for i in range(_n)}
 missing = [(r, c) for r in RACES for c in CLASSES if (r, c) not in existing]
@@ -86,8 +91,10 @@ for cls in CLASSES:
     for r in races:
         bits |= 1 << (r - 1)
     cbit = 1 << (cls - 1)
+    # Not playercreateinfo_cast_spell: it only holds race-specific intro spells (Undead "Rigor Mortis", Pandaren starting
+    # quests, hunter pets) - spreading those to other races left a new Pandaren lying rooted on the ground (fixed by
+    # 2026_11_26_02_arpg_fix_cast_spell.sql).
     for table, rm, cm in (('playercreateinfo_skills', 'raceMask', 'classMask'),
-                          ('playercreateinfo_cast_spell', 'raceMask', 'classMask'),
                           ('playercreateinfo_spell_custom', 'racemask', 'classmask')):
         sql.append('UPDATE `%s` SET `%s` = `%s` | %d WHERE `%s` & %d AND `%s` <> 0;' % (table, rm, rm, bits, cm, cbit, rm))
 open(OUT, 'w', encoding='utf-8', newline='\n').write('\n'.join(sql) + '\n')
