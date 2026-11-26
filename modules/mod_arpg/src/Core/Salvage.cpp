@@ -6,9 +6,11 @@ namespace Arpg::Core
     {
         if (item.equipped || item.protectedByFilter)
             return false;
-        if (item.affixCount <= 0 && !item.unique)
+        if (item.unique)
+            return rules.includeUniques;
+        if (item.affixCount <= 0)
             return false;
-        return item.quality <= rules.maxQuality || item.unique;
+        return item.quality <= rules.maxQuality;
     }
 
     int EssencesFor(SalvageItem const& item, SalvageRules const& rules)

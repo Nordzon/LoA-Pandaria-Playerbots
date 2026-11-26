@@ -86,6 +86,19 @@ Arpg.AnyWeapon.DualWield = 0
 #    this % chance. The next craft that rolls affixes uses up the lowest fitting one from the bags: +1 tier, x2 Unique chance.
 Arpg.Catalyst.ChampionChance = 25
 Arpg.Catalyst.SuperuniqueChance = 100
+#    Price at the companion ("Buy catalysts"), in Salvaged Essence.
+Arpg.Catalyst.EssenceCostLesser = 10
+Arpg.Catalyst.EssenceCostGreater = 30
+Arpg.Catalyst.EssenceCostGrand = 90
+
+# --- Salvage (companion dialogue) -------------------------------------------------------------
+#    Takes affixed items from the bags (never equipped gear or the bank) up to MaxQuality (3 = blue); Uniques only with
+#    IncludeUniques = 1. Essences per item = affixes x EssencePerAffix (+ UniqueBonus, + AscendedBonus for T6+ affixes).
+Arpg.Salvage.EssencePerAffix = 1
+Arpg.Salvage.UniqueBonus = 5
+Arpg.Salvage.AscendedBonus = 3
+Arpg.Salvage.MaxQuality = 3
+Arpg.Salvage.IncludeUniques = 0
 
 # --- Loot companion (SPEC 4.7, change m2b) -------------------------------------------------
 #    A non-combat follower (.arpg lootpet on <char>) that, out of combat (WaitForCombatEnd), walks to each of the

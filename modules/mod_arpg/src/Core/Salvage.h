@@ -10,6 +10,7 @@ namespace Arpg::Core
         int uniqueBonus = 5;         // Arpg.Salvage.UniqueBonus (a Unique's power counts extra)
         int ascendedBonus = 3;       // Arpg.Salvage.AscendedBonus (per item with any Ascended affix, T6+)
         int maxQuality = 3;          // Arpg.Salvage.MaxQuality (3 = up to blue; epics are kept)
+        bool includeUniques = false; // Arpg.Salvage.IncludeUniques (Uniques are kept unless this is on)
     };
 
     struct SalvageItem

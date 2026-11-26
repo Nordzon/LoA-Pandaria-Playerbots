@@ -78,6 +78,14 @@ namespace Arpg
         int paragonMoveSpeedCap = 1000;        // Arpg.Paragon.MoveSpeedCap (+10%)
         int paragonFindPerPoint = 500;         // Arpg.Paragon.FindPerPoint (magic/gold find, hundredths of %)
         int paragonMagicFindCap = 10000;       // Arpg.Paragon.MagicFindCap (+100%)
+        int salvageEssencePerAffix = 1;     // Arpg.Salvage.EssencePerAffix
+        int salvageUniqueBonus = 5;         // Arpg.Salvage.UniqueBonus
+        int salvageAscendedBonus = 3;       // Arpg.Salvage.AscendedBonus
+        int salvageMaxQuality = 3;          // Arpg.Salvage.MaxQuality (3 = blue)
+        bool salvageIncludeUniques = false; // Arpg.Salvage.IncludeUniques
+        int catalystCostLesser = 10;        // Arpg.Catalyst.EssenceCostLesser (essences per catalyst at the companion)
+        int catalystCostGreater = 30;       // Arpg.Catalyst.EssenceCostGreater
+        int catalystCostGrand = 90;         // Arpg.Catalyst.EssenceCostGrand
         float catalystChampionChancePct = 25.0f;     // Arpg.Catalyst.ChampionChance (% per Champion leader kill)
         float catalystSuperuniqueChancePct = 100.0f; // Arpg.Catalyst.SuperuniqueChance
         float potionDropMult = 1.0f;     // Arpg.Potion.DropMult (x arpg_potion_drop.chance_pct; tests set 100 to force)

@@ -29,7 +29,9 @@ TEST(salvage_skips_equipped_protected_plain_and_epic)
 TEST(salvage_unique_and_ascended_bonus)
 {
     SalvageRules r;
-    SalvageItem u; u.quality = 4; u.affixCount = 3; u.unique = true;    // Uniques salvage whatever their quality
+    SalvageItem u; u.quality = 4; u.affixCount = 3; u.unique = true;
+    CHECK(!CanSalvage(u, r));                                             // kept by default
+    r.includeUniques = true;                                              // then any quality
     CHECK(CanSalvage(u, r));
     CHECK_EQ(EssencesFor(u, r), 3 + 5);
     SalvageItem a; a.quality = 3; a.affixCount = 2; a.ascended = true;

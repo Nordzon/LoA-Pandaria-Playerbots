@@ -53,7 +53,12 @@ window. Answer: ok / which one didn't open.
 Click the **L** button to summon the companion, right-click it. A dialogue offers Sell and repair, Bank, Mailbox (and later the
 mount shop). Answer for each: opens / doesn't: Sell+repair, Bank, Mailbox, Reforge, Transmog, Void Storage.
 
-## 6. Earlier items still unconfirmed
+## 6. Custom items, salvage, catalysts
+`.additem 700001` should show "Lesser Catalyst" (green name, essence icon, tooltip text). Get two affixed greens (kill things, or
+`.arpg test give <you> 2317` twice), right-click the companion: "Salvage 2 affixed item(s) for N essence(s)" asks to confirm and
+turns them into Salvaged Essence; "Buy catalysts" lists the three with prices. Answer: names/icons ok, dialogue ok / what's off.
+
+## 7. Earlier items still unconfirmed
 Do these in Elwynn Forest (`.tele goldshire`): Superuniques only live in Elwynn, Dun Morogh and Westfall.
 
 **Champion tag.** `.arpg champion make <you> 6` spawns a Kobold Vermin next to you as a Champion pack (leader + minions; any

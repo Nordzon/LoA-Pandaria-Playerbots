@@ -10,9 +10,9 @@
 
 ## 3. Salvage
 - [x] 3.1 `Core/Salvage`: essences for an item (affix count, Unique, Ascended) + unit test
-- [ ] 3.2 Companion dialogue: Salvage (preview + confirm), Buy catalysts (essence cost per band)
-- [ ] 3.3 `.arpg test salvage <char>` + GM test
+- [x] 3.2 Companion dialogue: Salvage (preview + confirm), Buy catalysts (essence cost per band)
+- [x] 3.3 `.arpg test salvage <char>` + GM test
 
 ## 4. Owner + docs
 - [ ] 4.1 Owner: the items show name/icon/tooltip in the real client; salvage + buy through the companion dialogue
-- [ ] 4.2 SPEC 4.8, CODEMAP, PROGRESS, OWNER-CHECKS
+- [x] 4.2 SPEC 4.8, CODEMAP, PROGRESS, OWNER-CHECKS

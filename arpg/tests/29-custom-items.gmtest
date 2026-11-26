@@ -17,5 +17,38 @@
 ? item=700010
 > .arpg test count Arpgtest 700010
 ? ok item=700010 count=2\b
+
+# --- Salvage (companion dialogue; same code over SOAP): two affixed greens -> essences by affix count; the bags keep
+# everything else (the essences and catalysts above are not affixed).
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg test give Arpgtest 2317
+? quality=2 affixes=([12])\b
+> .arpg test give Arpgtest 2317
+? quality=2 affixes=([12])\b
+> .arpg test give Arpgtest 700001
+? item=700001
+> .arpg test salvage Arpgtest preview
+? ok salvage preview items=2 essences=[2-4]\b
+> .arpg test salvage Arpgtest do
+? ok salvaged items=2 essences=[2-4]\b
+> .arpg test salvage Arpgtest preview
+? items=0 essences=0\b
+> .arpg test count Arpgtest 2317
+? count=0\b
+> .arpg test count Arpgtest 700001
+? count=1\b
+
+# --- Buy catalysts with essences: too few -> refused; price lowered for the test -> one Lesser Catalyst.
+> .arpg test salvage Arpgtest buy 3
+? not enough essences: need 90
+> .arpg config set Arpg.Catalyst.EssenceCostLesser 2
+? ok
+> .arpg test salvage Arpgtest buy 1
+? ok bought catalyst item=700001 for essences=2\b
+> .arpg test count Arpgtest 700001
+? count=2\b
+> .arpg config set Arpg.Catalyst.EssenceCostLesser 10
+? ok
 > .arpg test clearbags Arpgtest
 ? ok

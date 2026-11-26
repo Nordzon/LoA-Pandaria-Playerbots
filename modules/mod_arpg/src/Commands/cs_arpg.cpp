@@ -27,6 +27,7 @@
 #include "ObjectMgr.h"
 #include "TemporarySummon.h"
 #include "Character/AnyWeapon.h"
+#include "Loot/Salvage.h"
 #include <map>
 
 #include "CellImpl.h"
@@ -195,6 +196,7 @@ public:
             { "weapons",  &HandleTestWeapons,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "visual",   &HandleTestVisual,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "count",    &HandleTestCount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "salvage",  &HandleTestSalvage,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "events",   &HandleTestEvents,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "pack",     &HandleTestPack,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "give",     &HandleTestGive,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -491,6 +493,35 @@ public:
             first = false;
         }
         return line;
+    }
+
+    // .arpg test salvage <char> preview|do|buy <band>   the companion's Salvage / Buy catalysts, by name over SOAP
+    static bool HandleTestSalvage(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        char const* usage = "usage: .arpg test salvage <char> preview|do|buy <band>";
+        if (t.size() < 2 || !IsNameLike(t[0]))
+            return Fail(handler, usage);
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        std::string out;
+        if (t[1] == "preview" && t.size() == 2)
+        {
+            Arpg::Loot::SalvagePreview sp = Arpg::Loot::PreviewSalvage(p);
+            out = "salvage preview items=" + std::to_string(sp.items) + " essences=" + std::to_string(sp.essences);
+        }
+        else if (t[1] == "do" && t.size() == 2)
+            Arpg::Loot::DoSalvage(p, out);
+        else if (t[1] == "buy" && t.size() == 3)
+        {
+            if (!Arpg::Loot::BuyCatalyst(p, std::atoi(t[2].c_str()), out))
+                return Fail(handler, out);
+        }
+        else
+            return Fail(handler, usage);
+        handler->PSendSysMessage("ok %s", out.c_str());
+        return true;
     }
 
     // .arpg test count <char> <itemId>   how many of that item the character carries (bags + bank)

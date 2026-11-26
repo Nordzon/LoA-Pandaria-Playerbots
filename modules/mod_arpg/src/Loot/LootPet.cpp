@@ -19,7 +19,9 @@
 #include "Loot/AffixRoller.h"
 #include "Loot/AffixEffects.h"
 #include "Core/AffixEffects.h"
+#include "Chat.h"
 #include "ScriptedGossip.h"
+#include "Loot/Salvage.h"
 #include "WorldSession.h"
 
 #include <cstdio>
@@ -286,7 +288,8 @@ namespace
     }
 
     // Right-click on the companion: its owner gets a menu of the enabled roles; each opens the game's own window.
-    enum CompanionAction : uint32 { ACT_VENDOR = 1, ACT_BANK = 2, ACT_MAIL = 3, ACT_LOOKS = 4, ACT_MODEL_BASE = 100 };
+    enum CompanionAction : uint32 { ACT_VENDOR = 1, ACT_BANK = 2, ACT_MAIL = 3, ACT_LOOKS = 4, ACT_SALVAGE = 5, ACT_CATALYSTS = 6,
+        ACT_BUY_BASE = 50, ACT_MODEL_BASE = 100 };
 
     class ArpgCompanionCreatureScript : public CreatureScript
     {
@@ -309,6 +312,14 @@ namespace
                 AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "Bank", GOSSIP_SENDER_MAIN, ACT_BANK);
             if (f & UNIT_NPC_FLAG_MAILBOX)
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Mailbox", GOSSIP_SENDER_MAIN, ACT_MAIL);
+            Arpg::Loot::SalvagePreview sp = Arpg::Loot::PreviewSalvage(player);
+            if (sp.items > 0)
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Salvage " + std::to_string(sp.items) + " affixed item(s) for " +
+                    std::to_string(sp.essences) + " essence(s)", GOSSIP_SENDER_MAIN, ACT_SALVAGE,
+                    "Salvage " + std::to_string(sp.items) + " affixed green/blue item(s) from your bags? Equipped gear, the bank and "
+                    "Uniques are kept.", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Buy catalysts (" + std::to_string(player->GetItemCount(700010)) +
+                " essences)", GOSSIP_SENDER_MAIN, ACT_CATALYSTS);
             AddGossipItemFor(player, GOSSIP_ICON_TABARD, "Change appearance", GOSSIP_SENDER_MAIN, ACT_LOOKS);
             SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             return true;
@@ -317,6 +328,16 @@ namespace
         bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
         {
             ClearGossipMenuFor(player);
+            if (action == ACT_CATALYSTS)
+            {
+                static char const* const names[] = { "", "Lesser Catalyst (tiers 1-2)", "Greater Catalyst (tiers 3-4)",
+                    "Grand Catalyst (tier 5+)" };
+                for (int band = 1; band <= 3; ++band)
+                    AddGossipItemFor(player, GOSSIP_ICON_VENDOR, std::string(names[band]) + " - " +
+                        std::to_string(Arpg::Loot::CatalystEssenceCost(band)) + " essences", GOSSIP_SENDER_MAIN, ACT_BUY_BASE + band);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                return true;
+            }
             if (action == ACT_LOOKS)
             {
                 std::vector<std::pair<uint32, std::string>> list;
@@ -331,6 +352,16 @@ namespace
                 return true;
             }
             CloseGossipMenuFor(player);
+            if (action == ACT_SALVAGE || (action > ACT_BUY_BASE && action <= ACT_BUY_BASE + 3))
+            {
+                std::string out;
+                if (action == ACT_SALVAGE)
+                    Arpg::Loot::DoSalvage(player, out);
+                else
+                    Arpg::Loot::BuyCatalyst(player, int(action - ACT_BUY_BASE), out);
+                ChatHandler(player->GetSession()).SendSysMessage(out.c_str());
+                return true;
+            }
             if (action > ACT_MODEL_BASE)
             {
                 std::string out;
