@@ -133,6 +133,8 @@ if ($LASTEXITCODE -ne 0) {
 
 # 8. Build + tests
 Step "Building ($BuildConfig)"
+# The running servers lock worldserver.exe / authserver.exe: stop them first (the restart below starts them again).
+& powershell -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'restart-world.ps1') -Stop
 cmake --build build --config $BuildConfig -- /m:2 /p:CL_MPCount=6 /nodeReuse:false   # capped: uncapped runs out of memory
 if ($LASTEXITCODE -ne 0) { Fail "build failed. Fix it, or roll back: git reset --hard $tag" }
 

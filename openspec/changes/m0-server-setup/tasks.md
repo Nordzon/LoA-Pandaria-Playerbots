@@ -31,7 +31,7 @@ Bots: off during build/smoke; turned **on (300)** for play once mmaps exist (own
 - [x] 4.2 Create `arpg\scripts\soap.local.ps1`; `gm.ps1 ".server info"` works (ARPGADMIN; smoke 2026-11-22)
 - [x] 4.3 Write `restart-world.ps1` (stops/starts worldserver, waits for SOAP; checks the DLLs from 3.4) — written 2026-11-21; first real use in overnight smoke stage
 - [x] 4.4 `run-gmtests.ps1 -Filter smoke` — first block passes (the `.arpg version` block passes after m1)
-- [ ] 4.5 First full `update-upstream.ps1` run end to end (backup, tag, merge, build, tests)
+- [x] 4.5 First full `update-upstream.ps1` run end to end (backup, tag, merge, build, tests) - 2026-11-26, after two script fixes
 
 ## 5. Docs
 - [x] 5.1 Verify CODEMAP **?** paths against this fork (2026-11-23: all four exist; rows now name the real functions)
