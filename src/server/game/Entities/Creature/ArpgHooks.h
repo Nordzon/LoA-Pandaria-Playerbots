@@ -56,6 +56,10 @@ namespace ArpgHooks
     // mod_arpg may lower it (dungeon level selector, m5).
     using InstanceLevelFn = void (*)(Map* map, uint8& level);
     TC_GAME_API extern InstanceLevelFn InstanceLevel;
+    // AuctionHouseBotSeller::AddNewAuctions, after the seller created and priced a new listing: mod_arpg may roll affixes
+    // on it and raise its prices (living auction house, m7).
+    using AuctionBotItemFn = void (*)(Item* item, uint32& buyout, uint32& bid);
+    TC_GAME_API extern AuctionBotItemFn AuctionBotItem;
 }
 
 #endif

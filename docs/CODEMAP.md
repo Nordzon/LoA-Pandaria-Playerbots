@@ -16,6 +16,7 @@ What's where, and what we've touched. All paths below were checked against this 
 | `modules/mod_arpg/src/Loot/LootFilter.{h,cpp}` + `Core/LootFilter` | m2b loot filter: ordered rules per character (`character_arpg_lootfilter`), applied in `PlanLoot` (sell = gold now, leave = out of the loot), `.arpg filter …` |
 | `modules/mod_arpg/src/Dungeons/InstanceScaling.{h,cpp}` + `Core/InstanceScale` | m5: party-size table x raid tier x solo role replaces AutoBalance's curve, solo tank/healer damage dealt, dungeon level selector (`character_arpg_dungeon_level`), `.arpg dungeon info|level` |
 | `modules/mod_arpg/sql/tools/gen_any_race_class.py` | generates `2026_11_23_04_arpg_any_race_class.sql` (any race x any class) + `arpg/client-patch/charbaseinfo_rows.csv` for the client CharBaseInfo |
+| `modules/mod_arpg/src/Loot/AuctionRolls.{h,cpp}` | living AH: affixes on a share of AuctionHouseBot gear listings (`RollForAuction`, playerless roll in AffixRoller); `Arpg.AH.*`; `.arpg test ah` |
 | `modules/mod_arpg/src/Bots/BotItemScore.{h,cpp}` | party bots count affixes when scoring gear (playerbots `StatsWeightCalculator::ExtraItemStats`); `.arpg test botscore` |
 | `modules/mod_arpg/src/Loot/MountShop.{h,cpp}` | companion "Mounts for gold" (`arpg_mount_shop`, `Arpg.MountShop.*`); dialogue code in `Loot/LootPet` |
 | `modules/mod_arpg/src/Loot/Salvage.{h,cpp}`, `Core/Salvage` | companion Salvage + Buy catalysts; catalyst drops/auto-use live in `Loot/Crafting`; items 7000xx in `sql/world/2026_11_26_00` |
@@ -68,7 +69,8 @@ Every edit outside `modules/mod_arpg/`. Keep this list short; each entry is a me
 | File | Why | Marker | Change |
 | --- | --- | --- | --- |
 | `modules/mod_playerbots/src/Mgr/Item/StatsWeightCalculator.{h,cpp}` | Bots score affixes: `inline static ExtraItemStats` hook pointer (h) + one call after `CalculateRandomProperty` in `CalculateItem` (cpp); set by mod_arpg `Bots/BotItemScore` | `ARPG:` | m7 |
-| `src/server/game/Entities/Creature/ArpgHooks.h` (new) | Function-pointer hook declarations (CreatureLevel m1, ItemPickup m2, ItemBonuses m2, LootMoney m2, LootFilled m2, ItemSellPrice m2), null unless mod_arpg sets them | `ARPG:` | m1, m2 |
+| `src/server/game/Entities/Creature/ArpgHooks.h` (new) | Function-pointer hook declarations (CreatureLevel m1, ItemPickup m2, ItemBonuses m2, LootMoney m2, LootFilled m2, ItemSellPrice m2, InstanceScale/InstanceLevel m5, AuctionBotItem m7), null unless mod_arpg sets them | `ARPG:` | m1, m2, m5, m7 |
+| `src/server/game/AuctionHouseBot/AuctionHouseBotSeller.cpp` | Living AH: `ArpgHooks::AuctionBotItem(item, buyout, bid)` after `SetPricesOfItem` (+ include) | `ARPG:` | m7 |
 | `src/server/game/Entities/Creature/Creature.cpp` | include + hook definition (top); `SelectLevel` calls `ArpgHooks::CreatureLevel` after AutoBalance | `// ARPG:` | m1 |
 | `src/server/game/Scripting/ScriptMgr.cpp` | include + `ArpgHooks::ItemPickup` definition (top); `OnItemPickup` calls it first (new item for a player: loot, quest, craft…) | `// ARPG:` | m2 |
 | `src/server/game/Entities/Player/Player.cpp` | include + `ArpgHooks::ItemBonuses` definition (top); `_ApplyItemBonuses` calls it (not for the level-scale-only pass) | `// ARPG:` | m2 |

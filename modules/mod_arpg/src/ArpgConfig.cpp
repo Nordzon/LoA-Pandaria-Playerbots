@@ -21,7 +21,7 @@ namespace
         "Arpg.Companion.Reforge", "Arpg.Companion.Transmog", "Arpg.Companion.VoidStorage", "Arpg.Companion.InCombat",
         "Arpg.LootPet.Enabled", "Arpg.LootPet.WaitForCombatEnd", "Arpg.LootPet.ReachTimeoutMs",
         "Arpg.AnyWeapon.Enabled", "Arpg.AnyWeapon.Bots", "Arpg.AnyWeapon.DualWield",
-        "Arpg.MountShop.Enabled", "Arpg.MountShop.Price", "Arpg.Bots.AffixScoring", "Arpg.Bots.PartyGear", "Arpg.Bots.PartyAffixTierOffset",
+        "Arpg.MountShop.Enabled", "Arpg.MountShop.Price", "Arpg.Bots.AffixScoring", "Arpg.Bots.PartyGear", "Arpg.Bots.PartyAffixTierOffset", "Arpg.AH.AffixShare", "Arpg.AH.TierOffset", "Arpg.AH.AffixMarkup",
         "Arpg.Catalyst.ChampionChance", "Arpg.Catalyst.SuperuniqueChance", "Arpg.Catalyst.EssenceCostLesser",
         "Arpg.Catalyst.EssenceCostGreater", "Arpg.Catalyst.EssenceCostGrand", "Arpg.Salvage.EssencePerAffix",
         "Arpg.Salvage.UniqueBonus", "Arpg.Salvage.AscendedBonus", "Arpg.Salvage.MaxQuality", "Arpg.Salvage.IncludeUniques",
@@ -66,6 +66,9 @@ namespace Arpg
         s.sellCopperPerAffixLevel = uint32_t(std::max(0, file.GetInt("Arpg.Loot.SellCopperPerAffixLevel", 200)));
         s.godRollPityEvery = std::max(1, file.GetInt("Arpg.Loot.GodRollPityEvery", 3));
         s.craftMaxSkill = std::max(1, file.GetInt("Arpg.Craft.MaxSkill", 600));
+        s.ahAffixSharePct = std::max(0.0f, std::min(100.0f, file.GetFloat("Arpg.AH.AffixShare", 30.0f)));
+        s.ahTierOffset = std::max(-4, std::min(2, file.GetInt("Arpg.AH.TierOffset", -1)));
+        s.ahAffixMarkup = std::max(1.0f, file.GetFloat("Arpg.AH.AffixMarkup", 4.0f));
         s.botPartyGear = file.GetBool("Arpg.Bots.PartyGear", true);
         s.botPartyTierOffset = std::max(-4, std::min(2, file.GetInt("Arpg.Bots.PartyAffixTierOffset", -1)));
         s.botAffixScoring = file.GetBool("Arpg.Bots.AffixScoring", true);

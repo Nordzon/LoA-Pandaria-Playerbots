@@ -533,11 +533,12 @@ namespace Arpg::Loot
         return plan.nameAffixId ? -int32(s.displaySuffixBase + plan.nameAffixId) : 0;
     }
 
-    int ApplyRoll(Player* player, Item* item, RollPlan const& plan, std::string& why)
+    // The roll's values for `lootLevel`; `player` may be null (auction listings: no owner, no events, no Unique).
+    int ApplyRollAt(Player* player, Item* item, RollPlan const& plan, int lootLevel, std::string& why)
     {
         Arpg::Settings s = sArpgConfig.Get();
         ItemTemplate const* proto = item ? item->GetTemplate() : nullptr;
-        if (!player || !proto) { why = "no player/item"; return 0; }
+        if (!proto) { why = "no item"; return 0; }
         std::vector<Core::RolledAffix> const& rolled = plan.rolled;
         std::map<uint32, AffixInfo> byId;
         std::map<std::pair<uint32, int>, Core::TierRange> ranges;
@@ -549,7 +550,6 @@ namespace Arpg::Loot
             ranges = g_ranges;
             tiers = g_tiers;
         }
-        int const lootLevel = LootLevelFor(player);
         uint32 budget = BudgetB(proto, uint8(lootLevel)).budget;
         uint32 itemGuid = item->GetGUID().GetCounter();
         std::string summary;
@@ -628,25 +628,73 @@ namespace Arpg::Loot
         }
         if (s.displayEnabled && plan.nameAffixId && s.displaySuffixBase)
             item->SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, -int32(s.displaySuffixBase + plan.nameAffixId));   // field only
-        if (plan.makeUnique)
+        if (plan.makeUnique && player)
         {
             std::string msg;
             int tier = std::max(1, Core::MaxTierForLevel(tiers, lootLevel));
             if (MakeUnique(player, item, plan.makeUnique, tier, msg))
                 summary += " | " + msg;
         }
-        if (item->IsInWorld())   // in the bags; a mailed item (overflow) is saved by the mail
+        if (player && item->IsInWorld())   // in the bags; a mailed item (overflow) is saved by the mail
             item->SetState(ITEM_CHANGED, player);
         {
             std::lock_guard<std::mutex> l(g_lock);
-            g_lastItem[player->GetGUID().GetCounter()] = itemGuid;
+            if (player)
+                g_lastItem[player->GetGUID().GetCounter()] = itemGuid;
             g_itemStats[itemGuid] = statLines;   // new items are in bags, never equipped yet: no stats to re-apply
             g_itemEffects[itemGuid] = effectLines;
         }
-        Arpg::TestEvents::Record(player->GetGUID().GetCounter(), "affix item=" + std::to_string(proto->ItemId) + " guid=" +
-            std::to_string(itemGuid) + " q=" + std::to_string(proto->Quality) + " n=" + std::to_string(rolled.size()) +
-            (plan.championLoot ? " champion" : "") + (plan.planned ? " planned" : "") + " " + summary);
+        if (player)
+            Arpg::TestEvents::Record(player->GetGUID().GetCounter(), "affix item=" + std::to_string(proto->ItemId) + " guid=" +
+                std::to_string(itemGuid) + " q=" + std::to_string(proto->Quality) + " n=" + std::to_string(rolled.size()) +
+                (plan.championLoot ? " champion" : "") + (plan.planned ? " planned" : "") + " " + summary);
+        else
+            why = summary;
         return int(rolled.size());
+    }
+
+    int ApplyRoll(Player* player, Item* item, RollPlan const& plan, std::string& why)
+    {
+        if (!player) { why = "no player"; return 0; }
+        return ApplyRollAt(player, item, plan, LootLevelFor(player), why);
+    }
+
+    int RollForAuction(Item* item, int level, int tierOffset, std::string& why)
+    {
+        ItemTemplate const* proto = item ? item->GetTemplate() : nullptr;
+        if (!proto) { why = "no item"; return 0; }
+        if (proto->Quality < ITEM_QUALITY_UNCOMMON || proto->Quality > ITEM_QUALITY_EPIC) { why = "quality"; return 0; }
+        if (proto->RandomProperty || proto->RandomSuffix) { why = "has Blizzard random stats"; return 0; }
+        uint32 slot = SlotGroup(proto);
+        if (!slot) { why = "slot has no affixes"; return 0; }
+        std::vector<Core::AffixDef> pool;
+        std::vector<Core::TierRule> tiers;
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            uint8 mat = Material(proto);
+            for (AffixInfo const& a : g_affixes)
+                if (!a.materialMask || !mat || (a.materialMask & mat))
+                    pool.push_back(a.def);
+            tiers = g_tiers;
+        }
+        RollPlan plan;
+        plan.itemId = proto->ItemId;
+        Core::RollRequest req;
+        req.quality = int(proto->Quality);
+        req.slotBit = slot;
+        req.playerLevel = std::max(1, level);
+        req.smartLootPct = 0;           // no buyer to favour
+        req.tierBonus = tierOffset;
+        plan.rolled = Core::RollAffixes(pool, tiers, req, [](uint32_t n) { return n ? urand(0, n - 1) : 0u; });
+        if (plan.rolled.empty()) { why = "nothing rolled"; return 0; }
+        int nameTier = 0;
+        for (Core::RolledAffix const& a : plan.rolled)
+            if (a.tier > nameTier)
+            {
+                nameTier = a.tier;
+                plan.nameAffixId = a.affixId;
+            }
+        return ApplyRollAt(nullptr, item, plan, req.playerLevel, why);
     }
 
     int RollForItem(Player* player, Item* item, ItemPickupSourceType source, std::string& why, uint32 sourceId, int maxCount)

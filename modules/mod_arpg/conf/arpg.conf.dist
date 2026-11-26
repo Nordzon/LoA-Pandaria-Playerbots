@@ -99,6 +99,13 @@ Arpg.Bots.AffixScoring = 1
 Arpg.Bots.PartyGear = 1
 Arpg.Bots.PartyAffixTierOffset = -1
 
+# --- Living auction house (m7) -----------------------------------------------------------------
+#    The core's AuctionHouseBot seller (on via write-confs) lists materials and gear; AffixShare % of its green-epic gear
+#    (without stock random stats) rolls affixes at the item's level tier + TierOffset, buyout = sell formula x AffixMarkup.
+Arpg.AH.AffixShare = 30
+Arpg.AH.TierOffset = -1
+Arpg.AH.AffixMarkup = 4
+
 # --- Mount shop (companion dialogue; owner 2026-11-26: a gold sink) ----------------------------
 #    Reputation mounts (arpg_mount_shop, 64 rows) for gold, no reputation needed. Price in gold; a row's price_gold overrides.
 Arpg.MountShop.Enabled = 1

@@ -16,6 +16,7 @@
 */
 
 #include "AuctionHouseBotSeller.h"
+#include "ArpgHooks.h"   // ARPG: mod_arpg hook points
 #include "AuctionHouseMgr.h"
 #include "Containers.h"
 #include "DatabaseEnv.h"
@@ -920,6 +921,8 @@ void AuctionBotSeller::AddNewAuctions(SellerConfiguration& config)
 
         // Price of items are set here
         SetPricesOfItem(prototype, config, buyoutPrice, bidPrice, stackCount);
+        if (ArpgHooks::AuctionBotItem) // ARPG: some gear listings carry affixes (mod_arpg living auction house)
+            ArpgHooks::AuctionBotItem(item, buyoutPrice, bidPrice);
 
         // Deposit time
         uint32 etime = urand(1, 3);

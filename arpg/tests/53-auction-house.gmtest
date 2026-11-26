@@ -1,0 +1,13 @@
+# Living auction house (m7): the AuctionHouseBot seller lists materials and gear (write-confs); Arpg.AH.AffixShare % of its
+# green-epic gear listings roll affixes at the item's required-level tier + Arpg.AH.TierOffset (-1), buyout = sell formula x
+# Arpg.AH.AffixMarkup (4), never below the seller's own price. `.arpg test ah` runs the hook on one listing (share forced).
+
+# A level-18ish green (2317): 1-2 affixes; the buyout rises above the stand-in price.
+> .arpg test ah 2317
+? ok ah item=2317 level=\d+ affixes=[12] base=(\d+) buyout=\d+ bid=\d+
+# A blue (1489): 2-3 affixes.
+> .arpg test ah 1489
+? affixes=[23]\b
+# Materials and stock random-stat items are left plain.
+> .arpg test ah 2589
+? affixes=0 .*\(not gear\)

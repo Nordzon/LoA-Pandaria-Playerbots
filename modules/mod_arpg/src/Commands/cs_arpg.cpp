@@ -30,6 +30,7 @@
 #include "Loot/Salvage.h"
 #include "Loot/MountShop.h"
 #include "Bots/BotItemScore.h"
+#include "Loot/AuctionRolls.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "StatsWeightCalculator.h"
@@ -204,6 +205,7 @@ public:
             { "salvage",  &HandleTestSalvage,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "mount",    &HandleTestMount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "botscore", &HandleTestBotScore, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "ah",       &HandleTestAh,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "money",    &HandleTestMoney,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "events",   &HandleTestEvents,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "pack",     &HandleTestPack,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -502,6 +504,32 @@ public:
             first = false;
         }
         return line;
+    }
+
+    // .arpg test ah <itemId>   (m7 living auction house) what the hook does to one new AuctionHouseBot listing of that item,
+    // with the share forced: an ownerless item rolled at its required level, buyout before/after. The item is thrown away.
+    static bool HandleTestAh(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 1)
+            return Fail(handler, "usage: .arpg test ah <itemId>");
+        uint32 itemId = uint32(std::strtoul(t[0].c_str(), nullptr, 10));
+        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+        if (!proto)
+            return Fail(handler, "unknown item " + t[0]);
+        Item* item = Item::CreateItem(itemId, 1);
+        if (!item)
+            return Fail(handler, "could not create item");
+        uint32 base = std::max<uint32>(1, proto->SellPrice * 4);   // a stand-in for the seller's own price
+        uint32 buyout = base, bid = base * 3 / 4;
+        std::string why;
+        int n = Arpg::Loot::RollAuctionListing(item, buyout, bid, true, why);
+        uint32 guid = item->GetGUID().GetCounter();
+        CharacterDatabase.DirectPExecute("DELETE FROM item_instance_arpg_affix WHERE item_guid = %u", guid);
+        delete item;
+        handler->PSendSysMessage("ok ah item=%u level=%u affixes=%d base=%u buyout=%u bid=%u (%s)", itemId,
+            uint32(proto->RequiredLevel), n, base, buyout, bid, why.c_str());
+        return true;
     }
 
     // .arpg test botscore <char> <bot> <itemId> [ungroup]   (m7) puts the bot in the character's group, gives the bot the item

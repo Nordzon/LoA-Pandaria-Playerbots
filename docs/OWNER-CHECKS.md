@@ -4,9 +4,16 @@ Things only a person in the real client can confirm. Work top-down when you have
 each line (a number or "ok" / "no: what happened" is enough). Client: `Wow-64-all.exe`. Type `/reload` once after login so
 the addon picks up new files. GM commands go in the chat box; replace `<you>` with your character's name.
 
+**Handy commands** (no target needed unless noted):
+- Level: `.character level <you> 90` (any level 1-90; relog not needed). One level up: `.levelup` (yourself) or `.levelup <you> 5`.
+- Leave a stuck start zone: `.tele goldshire` (Elwynn), `.tele orgrimmar`, `.tele stormwind`, `.tele ValeofEternalBlossoms`.
+- Gold: `.modify money 60000000` with yourself targeted (= 6000 g).
+- A new Pandaren lying on the ground and unable to move (fixed on the server 2026-11-26; characters made before it):
+  `.unaura 73523` with no target (removes "Rigor Mortis"). Skipping the intro is fine after that.
+
 ## 1. Pick two visuals (loot beam, Champion glow)
-`.arpg test visual <you> <spellId>` puts that spell's visual on the creature nearest to you (stand next to any mob) for 60 s;
-`.arpg test visual <you> clear` removes it. Try each and note the ones you like.
+`.arpg test visual Nordon 117230` puts that spell's visual on the creature nearest to you (stand next to any mob) for 60 s;
+`.arpg test visual Nordon clear` removes it. Try each and note the ones you like.
 
 **Loot beam** (shows a corpse with something worth picking up; should read from a distance, not blind you):
 
@@ -22,6 +29,8 @@ the addon picks up new files. GM commands go in the chat box; replace `<you>` wi
 | 58042 | Treasure Sparkle |
 | 85560 | Loot Sparkles |
 
+### Selected for loot: | 120720 | Light Beam: Feralas Blue |
+
 **Champion glow** (marks a Champion pack leader; visible in a fight, not too loud):
 
 | Spell | Name in the game data |
@@ -35,28 +44,40 @@ the addon picks up new files. GM commands go in the chat box; replace `<you>` wi
 | 117230 | Empowered |
 | 145050 | Empowered |
 
+### Selected for champions/superuniques: | 117230 | Empowered |
+
 Answer: "beam = <id>, glow = <id>" (or "none of them, show me more").
 
 ## 2. Character creation: any race, any class
 Log out to the character list -> Create. Every race should offer all 11 classes. Make e.g. an Undead Monk or a Tauren Rogue,
 enter the world, cast a class spell, then delete it if you like. Answer: ok / which pair failed.
 
+> Result: Works, BUT the characters spawn without their starter gear. Monks should always start in Pandaria as well. Some of my characters are spawning in a "sleeping" position and they can't get up at all - NE Monk, UD Rogue. Logout and Login seems to fix
+
 ## 3. Any weapon (a caster with a shield)
 On (or create) a mage or priest: `.additem 1201` (Dull Heater Shield) and `.additem 2489` (Two-Handed Sword). In the bags
 neither should be red; both should equip. Answer: ok / which one refused (and the error text).
+
+> Result: Working
 
 ## 4. Professions panel
 Click the **T** button by the minimap (or `/prof`). Every profession you know is listed; clicking a crafting one opens its
 window. Answer: ok / which one didn't open.
 
+> Result: 
+
 ## 5. Loot companion windows
 Click the **L** button to summon the companion, right-click it. A dialogue offers Sell and repair, Bank, Mailbox (and later the
 mount shop). Answer for each: opens / doesn't: Sell+repair, Bank, Mailbox, Reforge, Transmog, Void Storage.
 
+> Result: 
+
 ## 6. Custom items, salvage, catalysts
 `.additem 700001` should show "Lesser Catalyst" (green name, essence icon, tooltip text). Get two affixed greens (kill things, or
-`.arpg test give <you> 2317` twice), right-click the companion: "Salvage 2 affixed item(s) for N essence(s)" asks to confirm and
+`.arpg test give Nordon 2317` twice), right-click the companion: "Salvage 2 affixed item(s) for N essence(s)" asks to confirm and
 turns them into Salvaged Essence; "Buy catalysts" lists the three with prices. Answer: names/icons ok, dialogue ok / what's off.
+
+> Result: Catalyst looking good.
 
 ## 7. Mount shop
 Give yourself gold (`.modify money 60000000` = 6000 g with yourself targeted), right-click the companion -> "Mounts for gold".

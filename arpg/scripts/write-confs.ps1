@@ -89,6 +89,17 @@ $overrides = @{
       'LFG.AnyLevel.Enable'    = '1'
       'LFG.AnyLevel.Random'    = '1'                # random 5-man queues too (pick from the entry's whole expansion group)
       'LFG.AnyLevel.Scenarios' = '1'
+      # m7 living auction house (owner 2026-11-26: materials first): the core's seller, weighted to materials; mod_arpg
+      # rolls affixes on Arpg.AH.AffixShare % of its gear listings (ArpgHooks::AuctionBotItem).
+      'AuctionHouseBot.Seller.Enabled'    = '1'
+      'AuctionHouseBot.Class.TradeGood'   = '12'
+      'AuctionHouseBot.Class.Consumable'  = '8'
+      'AuctionHouseBot.Class.Gem'         = '6'
+      'AuctionHouseBot.Class.Recipe'      = '6'
+      'AuctionHouseBot.Class.Glyph'       = '5'
+      'AuctionHouseBot.Class.Weapon'      = '3'
+      'AuctionHouseBot.Class.Armor'       = '3'
+      'AuctionHouseBot.Class.Container'   = '2'
     }
   }
   'playerbots.conf' = @{

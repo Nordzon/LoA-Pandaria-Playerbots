@@ -68,6 +68,8 @@ namespace Arpg::Loot
     bool PlanRoll(Player* player, ItemTemplate const* proto, ItemPickupSourceType source, uint32 sourceId, int maxCount,
                   bool championLoot, RollPlan& plan, std::string& why);
     int ApplyRoll(Player* player, Item* item, RollPlan const& plan, std::string& why);
+    // Living auction house (m7): rolls affixes on an ownerless item for `level` (+ tierOffset tiers). `why` = summary or reason.
+    int RollForAuction(Item* item, int level, int tierOffset, std::string& why);
     // Plans every rollable item of a loot (corpse, chest) and sets each item's suffix id so the loot window shows its name.
     void PlanLoot(Player* owner, ::Loot& loot, ItemPickupSourceType source, uint32 sourceId, bool championLoot);
     bool TakePlan(uint32 itemId, int32 rp, RollPlan& out);
