@@ -12,8 +12,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 - **Active (20:45): change `m6-any-weapon-skills`** (owner: no class ability needs a specific weapon or 1H/2H; shields stay).
   Done: `Core/WeaponReq` + 6 unit tests, `Character/AnyWeaponSkills` (35 class spells widened, Mutilate/Lava Lash/Wild Strike
   main hand), `.arpg test spellreq`, GM test `56-weapon-skills`, client patch builder (same 35/3). ALL OK 30 GM files 20:48,
-  live on the server; committed + pushed. **Next:** install the client patch when the owner's client is closed (`build-client-patch.py
-  --install`); owner check OWNER-CHECKS A; then archive. Open question: Hunter shots without a ranged weapon (suggest keep).
+  live on the server; committed + pushed; client patch installed 21:12. **Next:** owner check OWNER-CHECKS A; then archive. Open question: Hunter shots without a ranged weapon (suggest keep).
 - **Earlier (19:22):** m8 4.1-4.5 done and live: personal loot, highest-level scaling, `Arpg.Paragon.WorldTierMode`
   (highest; switch with `.arpg config set`), per-player shares, round robin for 2+ real players, `$FriendsBotCount`; tests 54 + 55
   with a second real test character (Arpgtesttwo, account ARPGTEST2, parked at `park-stormwind`). ALL OK 28 GM files. Committed +
@@ -32,7 +31,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | 2 | m2b-loot-pet-filter | done except owner check (companion windows) |
 | 6 | m6-blank-bases | done except owner check |
 | 7 | m7-living-ah | done except owner check (auction house) |
-| 6 | m6-any-weapon-skills | **active**: built, ALL OK, live; client patch install + owner check A |
+| 6 | m6-any-weapon-skills | **active**: built, ALL OK, live, client patch installed; owner check A |
 | 8 | m8-friends | **active**: sign-up, network, kit, backups done; multiplayer rules wait for owner |
 | – | multiplayer with friends (client updater, Tailscale, group rules) | idea |
 | – | loot pet gathers herbs/ore | idea |
