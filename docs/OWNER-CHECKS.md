@@ -21,13 +21,13 @@ start **`Wow-64-all.exe`** (or the desktop shortcut / `start-stack.ps1`). The po
 2. Character creation: unusual pairs (e.g. Goblin Monk, Pandaren Warlock) can be picked again.
 3. `.additem 118 5`, hover: "Use: Restores 10% of your maximum health. Shares a 10 sec cooldown with other potions."
 
-> Result:
+> Result: All of this is working
 
 ## 1. Loot names on the corpse (fixed overnight)
 Companion off (click **L**). Kill things near your level: affixed greens/blues show their full name in the loot window
 ("... of the Bear") before you take them, and the bag item is the same.
 
-> Result: I don't have a character strong enough to kill the super uniques as the fresh level 20 is naked. Check chat feedback re: loot
+> Result: This is not working still, see screenshots in chat message
 
 ## 2. Loot beam and Champion glow (new - your picks)
 1. `.tele goldshire`, `.arpg champion make Lokund 299`: the pack leader has the "Empowered" glow (117230).
@@ -61,7 +61,7 @@ A new Goblin Monk (or another unusual pair) starts dressed in its class's starti
 What should they be for: (a) a drop that always rolls the most affixes for its quality, (b) the crafting wheel's target items
 (craft a blank of your armour type, it rolls), (c) sold by the companion for essences, or (d) all of these?
 
-> Answer:
+> Answer: Go for all of these
 
 ## Later: auction house
 `.tele stormwind`, Trade District auctioneer: mostly materials, some gear, about a third of the green-epic gear with affixes.

@@ -49,6 +49,11 @@ Every `.arpg` debug command takes an explicit character name or GUID (works over
 - Values follow the **player's** level at drop time, not the item's.
 - **Typed blank bases** (owner decision 2026-11-22, BALANCE §8c, with the Item-sparse patch in m6): affixed drops become stat-less copies
   that keep only the armour type's main stat + Stamina; all other power comes from up to 5 affix lines (Uniques: 4 + power line).
+  **Use (owner 2026-11-27, "all of these", change m6-blank-bases):** `Arpg.Blank.DropChance` (10%) of gear drops come as their
+  blank, crafted gear comes out as its blank (crafting-wheel roll), the companion sells blanks for essences; a dropped or bought
+  blank rolls the most affixes for its quality. 1,495 blanks (slot x type x quality x 10-level bracket x main stat).
+- **Corpse loot preview** (owner 2026-11-27): affix values are fixed when corpse loot is planned; the loot window tooltip shows
+  the lines (ArpgUI, `.lootinfo data`), identical to the picked-up item.
 - **Level-appropriate loot with a zone ceiling** (owner 2026-11-22, to build in m2): when a drop's required level is more than
   `Arpg.Loot.SubstituteGap` (5) below the loot level, it is swapped - before affixes roll - for an item of the same slot,
   quality and armour type whose required level is closest to the loot level. **Loot level = min(player level, zone max level

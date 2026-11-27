@@ -264,6 +264,11 @@ copies of every droppable green/blue/epic base (~24,000 candidates already index
 blank copy in the same `LootFilled` hook, and switch the affix value table to the blank scale. Until then, today's "template +
 affixes" stays. **Owner decides:** (a) or (b), and the x2.5 / guaranteed stamina numbers.
 
+**Built (2026-11-27, change m6-blank-bases; owner: "all of these"):** option (b) as a *share* of drops, not all of them:
+`Arpg.Blank.DropChance` 10% of gear drops, crafted gear, and the companion shop (essences 5 / 15 / 45 by quality). A dropped or
+bought blank rolls the most affixes for its quality (green 2, blue 3, epic 5) - that is what makes it worth having over the
+original with its template secondaries. Raise DropChance towards 100 to move fully to typed bases once it feels right.
+
 ## 9. Superuniques
 `Arpg.Superunique.RespawnDelay` stays **300 s** (a different Superunique of the zone appears 5 minutes after a kill). With bad-luck
 protection on Uniques, farming one zone for a specific Unique takes about 30 minutes on average. Good chase, no slog.

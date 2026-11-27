@@ -4,6 +4,11 @@ The single source of truth for where work stands. Every session starts by readin
 updating **Now** and adding a **Log** line. If this file and memory disagree, this file wins.
 
 ## Now
+- **NOW (2026-11-27 08:10, owner in the morning round):** (1) corpse loot preview (m2 4.11: fixed rolls at planning,
+  `.lootinfo data` -> ArpgUI `LootTooltip.lua`; test 30 `lootpreview` PASSED in the 07:41 run); (2) **m6-blank-bases** coded
+  (owner: "all of these"): 1,495 blanks (`gen_blank_bases.py`, sql 2026_11_27_03 applied), `Loot/Blanks`, `Core/Blanks` (87 unit
+  tests), craft hook `ArpgHooks::CraftedItem` in `Spell::DoCreateItem`, companion "Blank bases" menu, test 36. **Done 08:15** (ALL OK, 27 files, committed + pushed). **Next:** owner checks: loot tooltip preview, a blank's tooltip, companion "Blank bases". Open question for the
+  owner: Unique pity per Superunique (461 counters) vs one shared counter.
 - **Active changes:** `m2-affix-loot` (roll, save, calibration to real blues, stats on equip: done; next 4.6 MPQ spike,
   4.5 sell, 4.4 pity, 4.3 effect affixes), `m3-champions-superuniques` (Core bands + SQL pulled forward).
   Done but not archived: `m0-server-setup` (except owner's real-client login + first upstream sync), `m1-world-scaling`,
@@ -44,7 +49,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 - **QUEUE (work top-down, one change each):** (1) ~~m6-any-weapon~~ done (owner check pending); (2) ~~upstream sync~~ done 2026-11-26;
   (3) ~~visual picker + OWNER-CHECKS~~ done; (4) ~~m6-custom-items + catalysts/salvage~~ done (owner check 4.1); (5) ~~companion mount shop~~ done; (6) m7: ~~500 bots, Dungeon Finder, affix-aware party bots v1~~ done + party bots' affixed gear + living AH + crowding done (corpse-loot scoring later);
   affix-aware party bots, living AH, crowding; (7) typed blank bases.
-- **Blockers:** none for the queue below. Owner checks pending (bundled in `docs/OWNER-CHECKS.md` once written): creation screen any race/class, `/prof` panel, any weapon on a caster, companion windows (reforge/transmog/void open?), visual candidates for the loot beam + Champion glow. Client: `Wow-64-all.exe`. OPEN QUESTION (typed blank bases, queue item 7): what are they for - (a) a drop that always rolls the max affixes for its quality, (b) the crafting wheel's target items (craft a blank chest of your armour type, it rolls), (c) sold by the companion for essences, or (d) all of these? Item layout is clear (ids 710000+, one per slot x armour type x quality, existing models); waiting for the use before building.
+- **Blockers:** none for the queue below. Owner checks pending (bundled in `docs/OWNER-CHECKS.md` once written): creation screen any race/class, `/prof` panel, any weapon on a caster, companion windows (reforge/transmog/void open?), visual candidates for the loot beam + Champion glow. Client: `Wow-64-all.exe`. Typed blank bases: owner answered 2026-11-27 "all of these" -> change m6-blank-bases.
 - **Bots:** on for play (500 since 2026-11-26; 300 before) via start-stack / final stage; off for ARPG feature tests. Bot rules in m7.
 
 ## Roadmap (one change folder each; propose the backlog ones from the spec Doc when their turn comes)
@@ -85,6 +90,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-27 08:15 corpse loot preview (m2 4.11) + m6-blank-bases (1,495 blanks; drops 10%, crafted, companion shop; max affixes; craft hook in Spell::DoCreateItem). Full run ALL OK (27 files), 87 unit tests. Owner checks next.
 - 2026-11-27 07:40 owner morning checks: beam/glow/mount vendor/potion text/starter gear ok. "Plain blues" = stock Wow-64.exe (use Wow-64-all.exe). Potion "Use:" text moved from the patch Spell.dbc to ArpgUI Potions.lua (generated PotionData.lua); `--spell` keeps the old way. Open: blank-bases answer, Unique pity per Superunique (ask owner).
 - 2026-11-27 02:43 all work without owner input done; server healthy (500 bots); check-in cron stopped. Next: owner's OWNER-CHECKS round + blank-bases answer; recreate the check-in job when work runs again.
 - 2026-11-27 02:10 m7 3b.3: party bots score corpse loot by its plan (PlannedStatLines: plan affixes at mid range, read-only); `.arpg test planscore`; test 52. Full run ALL OK (26 files).
