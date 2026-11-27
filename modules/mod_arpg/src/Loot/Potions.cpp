@@ -1,4 +1,5 @@
 #include "Loot/Potions.h"
+#include "Loot/PersonalLoot.h"
 
 #include "ArpgConfig.h"
 #include "Core/Potions.h"
@@ -170,13 +171,19 @@ namespace
                 d = it->second;
                 potions = g_potions;
             }
-            if (float(rand_chance()) >= d.chancePct * s.potionDropMult)
-                return;
-            uint32 total = d.wHeal + d.wMana + d.wRejuv;
-            Arpg::Core::PotionKind kind = Arpg::Core::PickPotionKind(d.wHeal, d.wMana, d.wRejuv, total ? urand(0, total - 1) : 0);
-            uint32 item = Arpg::Core::PotionForTier(potions, kind, d.tier);
-            if (!item)
-                item = Arpg::Core::PotionForTier(potions, Arpg::Core::PotionKind::Healing, d.tier);
+            // One independent roll per player: the killer's potion goes into the corpse, friends' (m8) into their own loot.
+            auto roll = [&]() -> uint32
+            {
+                if (float(rand_chance()) >= d.chancePct * s.potionDropMult)
+                    return 0;
+                uint32 total = d.wHeal + d.wMana + d.wRejuv;
+                Arpg::Core::PotionKind kind = Arpg::Core::PickPotionKind(d.wHeal, d.wMana, d.wRejuv, total ? urand(0, total - 1) : 0);
+                uint32 found = Arpg::Core::PotionForTier(potions, kind, d.tier);
+                return found ? found : Arpg::Core::PotionForTier(potions, Arpg::Core::PotionKind::Healing, d.tier);
+            };
+            for (Player* m : Arpg::Loot::PersonalRecipients(killer, killed))
+                Arpg::Loot::AddPersonalItem(m, killed, roll());
+            uint32 item = roll();
             if (!item)
                 return;
             Arpg::Monsters::AddLootItem(killed->loot, item);

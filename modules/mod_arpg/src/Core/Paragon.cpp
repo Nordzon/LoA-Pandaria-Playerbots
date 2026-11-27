@@ -55,4 +55,43 @@ namespace Arpg::Core
             pct = std::min(pct, capPct);
         return 1.0f + pct / 100.0f;
     }
+
+    WorldTierMode WorldTierModeFromName(std::string const& name)
+    {
+        if (name == "average")
+            return WorldTierMode::Average;
+        if (name == "lowest")
+            return WorldTierMode::Lowest;
+        return WorldTierMode::Highest;
+    }
+
+    char const* WorldTierModeName(WorldTierMode mode)
+    {
+        switch (mode)
+        {
+            case WorldTierMode::Average: return "average";
+            case WorldTierMode::Lowest:  return "lowest";
+            default:                     return "highest";
+        }
+    }
+
+    int GroupParagonLevel(std::vector<int> const& levels, WorldTierMode mode)
+    {
+        if (levels.empty())
+            return 0;
+        switch (mode)
+        {
+            case WorldTierMode::Lowest:
+                return std::max(0, *std::min_element(levels.begin(), levels.end()));
+            case WorldTierMode::Average:
+            {
+                long long sum = 0;
+                for (int l : levels)
+                    sum += std::max(0, l);
+                return int(sum / (long long)levels.size());
+            }
+            default:
+                return std::max(0, *std::max_element(levels.begin(), levels.end()));
+        }
+    }
 }

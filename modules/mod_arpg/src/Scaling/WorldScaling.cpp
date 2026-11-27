@@ -22,6 +22,8 @@
 #include <list>
 #include <mutex>
 #include <unordered_map>
+#include <vector>
+#include <algorithm>
 
 namespace
 {
@@ -190,6 +192,14 @@ namespace
         Trinity::AnyUnitInObjectRangeCheck check(player, s.scaleRadius);
         Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(player, units, check);
         Cell::VisitAllObjects(player, searcher, s.scaleRadius);
+        // m8 (owner 2026-11-27): with several real players, a monster follows the highest level among those near it, and
+        // its world tier follows Arpg.Paragon.WorldTierMode over their Paragon levels. Real players of this map, once per tick.
+        std::vector<Player*> real;
+        Map::PlayerList const& mapPlayers = map->GetPlayers();
+        for (Map::PlayerList::const_iterator itr = mapPlayers.begin(); itr != mapPlayers.end(); ++itr)
+            if (Player* rp = itr->GetSource())
+                if (rp != player && rp->IsInWorld() && Arpg::Scaling::IsRealPlayer(rp) && rp->IsWithinDist(player, s.scaleRadius * 2.0f))
+                    real.push_back(rp);
 
         for (Unit* u : units)
         {
@@ -213,14 +223,23 @@ namespace
                     continue;   // it became a Champion (pinned)
             }
             uint8 original = known ? e.original : c->GetLevel();
+            int playerLevel = int(player->GetLevel());
+            std::vector<int> paragons{ Arpg::Paragon::ParagonLevel(player) };
+            for (Player* rp : real)
+                if (c->IsWithinDist(rp, s.scaleRadius))
+                {
+                    playerLevel = std::max(playerLevel, int(rp->GetLevel()));
+                    paragons.push_back(Arpg::Paragon::ParagonLevel(rp));
+                }
             // Zone cap (task 4.9): scale to at most the zone's max level + Arpg.Scale.ZoneCapAbove (Vale: no cap).
-            int effective = Arpg::Core::LootLevel(int(player->GetLevel()), Arpg::Loot::ZoneLevelsFor(c->GetZoneId(), c->GetAreaId()),
+            int effective = Arpg::Core::LootLevel(playerLevel, Arpg::Loot::ZoneLevelsFor(c->GetZoneId(), c->GetAreaId()),
                 s.scaleZoneCapAbove, false);
             uint8 target = Arpg::Core::ScaledLevel(s.scale, original, effective);
             // World tier (m4, SPEC 4.1 "Paragon grind"): in uncapped zones (the Vale) monsters grow with the player's Paragon.
             float tier = 1.0f;
             if (s.uncappedZones.count(c->GetZoneId()))
-                tier = Arpg::Core::WorldTierMultiplier(Arpg::Paragon::ParagonLevel(player), s.paragonWorldTierPct, s.paragonWorldTierCapPct);
+                tier = Arpg::Core::WorldTierMultiplier(Arpg::Core::GroupParagonLevel(paragons, s.paragonWorldTierMode),
+                    s.paragonWorldTierPct, s.paragonWorldTierCapPct);
             if (target == 0 && tier > 1.0f)
                 target = original;   // no level change, but the tier still applies
             if (target == 0)
@@ -282,6 +301,12 @@ namespace Arpg::Scaling
         new ArpgScalingPlayerScript();
     }
 
+    float TierOf(Creature* creature)
+    {
+        ScaledEntry e;
+        return creature && FindEntry(creature, e) ? std::max(1.0f, e.tier) : 1.0f;
+    }
+
     bool IsRealPlayer(Player* player)
     {
         WorldSession* session = player ? player->GetSession() : nullptr;
@@ -300,6 +325,31 @@ namespace Arpg::Scaling
         {
             Creature* c = u->ToCreature();
             if (!c || !IsCandidateType(c) || !player->IsValidAttackTarget(c))
+                continue;
+            float d = player->GetDistance(c);
+            if (d < bestDist)
+            {
+                best = c;
+                bestDist = d;
+            }
+        }
+        return best;
+    }
+
+    Creature* FindNearestScaled(Player* player, float radius, bool uncappedOnly)
+    {
+        Arpg::Settings const s = sArpgConfig.Get();
+        std::list<Unit*> units;
+        Trinity::AnyUnitInObjectRangeCheck check(player, radius);
+        Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(player, units, check);
+        Cell::VisitAllObjects(player, searcher, radius);
+        Creature* best = nullptr;
+        float bestDist = radius + 1.0f;
+        for (Unit* u : units)
+        {
+            Creature* c = u->ToCreature();
+            ScaledEntry e;
+            if (!c || !c->IsAlive() || c->IsInCombat() || (uncappedOnly && !s.uncappedZones.count(c->GetZoneId())) || !FindEntry(c, e) || e.pinned)
                 continue;
             float d = player->GetDistance(c);
             if (d < bestDist)

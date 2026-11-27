@@ -1,4 +1,5 @@
 #include "Loot/Crafting.h"
+#include "Loot/PersonalLoot.h"
 
 #include "ArpgConfig.h"
 #include "Core/Salvage.h"
@@ -170,9 +171,15 @@ namespace
                 chance = s.catalystSuperuniqueChancePct;
             else if (Arpg::Monsters::WasChampionKill(killed))
                 chance = s.catalystChampionChancePct;
-            if (chance <= 0.0f || float(rand_chance()) >= chance)
+            if (chance <= 0.0f)
                 return;
             int tier = Arpg::Loot::MaxAffixTierAtLevel(int(killed->GetLevel()));
+            // m8: friends nearby roll their own catalyst (personal loot).
+            for (Player* m : Arpg::Loot::PersonalRecipients(killer, killed))
+                if (float(rand_chance()) < chance)
+                    Arpg::Loot::AddPersonalItem(m, killed, Arpg::Loot::CatalystItemForBand(Arpg::Core::CatalystBandForTier(tier)));
+            if (float(rand_chance()) >= chance)
+                return;
             uint32 item = Arpg::Loot::CatalystItemForBand(Arpg::Core::CatalystBandForTier(tier));
             if (!item)
                 return;

@@ -327,7 +327,12 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
 - **Client kit** (`make-client-kit.ps1`): patch MPQ + ArpgUI + installer (realmlist); mates bring their own 5.4.8 client.
 - **Backups:** auth + characters before every rebuild (`backup-db.ps1`, last 30); rebuild-and-test won't restart while a real
   player is online. Guide: `docs/FRIENDS.md`.
-- Multiplayer rules (scaling with several players, loot, companions, spawns, bot load): owner decisions pending.
+- **Rules with several real players** (owner 2026-11-27, "as recommended"): a monster scales to the highest level among the real
+  players near it; the Vale world tier follows `Arpg.Paragon.WorldTierMode` (highest, change any time: average | lowest).
+  **Personal loot** (`Arpg.Party.PersonalLoot`): the killer keeps the corpse (round robin; groups with 2+ real players switch to
+  it), every other real player of the group within `PersonalLootRange` (100 yd) gets their own roll of the loot table + their own
+  Champion/Superunique/boss extras and Unique counters, straight into the bags (mailed when full). One companion per player.
+  Bots with friends: `$FriendsBotCount` (300) in network.local.ps1.
 
 ## 5. Client patch pipeline (m2 spike, m6 full)
 - Git tracks only sources: `arpg/client-patch/dbc/*.csv` (rows we add/override, reserved high ID range), `icons/`, `arpg/addons/ArpgUI/`.

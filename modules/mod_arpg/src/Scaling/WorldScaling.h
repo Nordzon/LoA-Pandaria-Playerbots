@@ -19,9 +19,14 @@ namespace Arpg::Scaling
 
     // Nearest creature to the player that is a scaling candidate by type (alive, not a pet/summon/critter), or null.
     Creature* FindNearestCandidate(Player* player, float radius);
+    // Tests: the nearest creature that is scaled right now (skips fights, which keep their state); uncappedOnly = only in
+    // zones with a world tier (Arpg.Scale.UncappedZones - the Vale test spot stands at the Vale's edge).
+    Creature* FindNearestScaled(Player* player, float radius, bool uncappedOnly);
 
     // One line for .arpg scale probe: entry, levels, "scaled=<level>|none", health and multipliers.
     std::string Describe(Creature* creature);
+    // The world tier multiplier applied to this creature (1 = none / not scaled).
+    float TierOf(Creature* creature);
 
     // Number of creatures currently scaled (all maps).
     size_t ScaledCount();

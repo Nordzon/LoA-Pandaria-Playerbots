@@ -1,0 +1,119 @@
+# Several real players (m8-friends tasks 4.1-4.3, owner 2026-11-27 "as recommended"). Needs Arpgtest AND Arpgtesttwo online
+# (rebuild-and-test holds both; account ARPGTEST2). Zone cap lifted as in 10-world-scaling.
+
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg config set Arpg.Scale.ZoneCapAbove 100
+? ok
+> .arpg test party Arpgtest leave
+? ok
+> .arpg test party Arpgtesttwo leave
+? ok
+> .arpg test setup Arpgtest 30 elwynn-northshire
+? ok .*\(online\)
+> .arpg test setup Arpgtesttwo 60 elwynn-northshire
+? ok .*\(online\)
+~ 8000
+
+# 4.1 World scaling: a monster near both follows the HIGHEST level (60); with the mate gone it follows Arpgtest (30).
+> .arpg scale probe Arpgtest 178359
+* scaled=60\b
+> .arpg test setup Arpgtesttwo 60 westfall-sentinelhill
+? ok .*\(online\)
+~ 6000
+> .arpg scale probe Arpgtest 178359
+* scaled=30\b
+
+# 4.2 Personal loot: grouped, the loot method becomes round robin (1) - nobody rolls on a mate's corpse.
+> .arpg test setup Arpgtesttwo 60 elwynn-northshire
+? ok .*\(online\)
+~ 6000
+> .arpg test clearbags Arpgtesttwo
+? ok
+> .arpg test party Arpgtest Arpgtesttwo
+? ok party members=2 real=2 loot_method=1\b
+
+# Arpgtest kills a Champion: the corpse is Arpgtest's; Arpgtesttwo gets their own floor + loot roll in the bags, with affixes.
+> .arpg test events Arpgtesttwo clear
+? ok
+> .arpg champion make Arpgtest 49871
+? ok Arpgtest champion entry=49871
+> .arpg champion kill Arpgtest
+? ok .* killed champion
+> .arpg test events Arpgtesttwo
+? champion share entry=\d+ floor_green=[1-9]\d*
+? personal loot from=\d+ items=[1-9]\d* mailed=0
+? affix item=\d+ guid=\d+
+> .arpg champion loot Arpgtest
+? ok
+
+# 4.3 Superuniques: everyone gets their own share on their OWN (shared-for-all-Superuniques) counter: full pity -> a Unique.
+> .arpg config set Arpg.Superunique.RespawnDelay 5
+? ok
+> .arpg test setup Arpgtest 20 elwynn-wilds
+? ok .*\(online\)
+> .arpg test setup Arpgtesttwo 60 elwynn-wilds
+? ok .*\(online\)
+~ 6000
+> .arpg superunique next Arpgtest
+? ok
+~ 2500
+> .arpg superunique spawn Arpgtest 1
+? ok Arpgtest superunique id=1
+> .arpg pity set Arpgtesttwo unique superunique 18
+? ok unique_misses boss=1 = 18
+> .arpg test events Arpgtesttwo clear
+? ok
+> .arpg superunique kill Arpgtest
+? ok Arpgtest killed superunique
+> .arpg test events Arpgtesttwo
+? superunique share id=1 entry=99 .* unique won misses=0 unique_base=[1-9]
+? personal loot from=\d+ items=[2-9]\d* mailed=0
+? affix item=\d+ .*unique=
+> .arpg pity set Arpgtesttwo unique superunique 0
+? ok
+> .arpg pity set Arpgtest unique superunique 0
+? ok
+> .arpg config set Arpg.Superunique.RespawnDelay 300
+? ok
+
+# Vale world tier with mixed Paragon (owner: "highest for now", easy to change): Paragon 40 and 0, 2% per level.
+# highest -> 40 -> 180%; average -> 20 -> 140%; lowest -> 0 -> no tier (level 90 monsters then aren't scaled at all).
+# "tiered" probes the nearest scaled monster inside a world-tier zone (the spot itself stands just outside the Vale's zone;
+# monsters in a fight - bots hunt here - keep their old state).
+> .arpg test setup Arpgtest 90 vale-krikthik
+? ok .*\(online\)
+> .arpg test setup Arpgtesttwo 90 vale-krikthik
+? ok .*\(online\)
+~ 15000
+> .arpg paragon set Arpgtest 40 0
+? ok paragon level=40
+> .arpg paragon set Arpgtesttwo 0 0
+? ok paragon level=0
+> .arpg scale probe Arpgtest tiered
+* tier_pct=180\b
+> .arpg config set Arpg.Paragon.WorldTierMode average
+? ok
+> .arpg scale probe Arpgtest tiered
+* tier_pct=140\b
+> .arpg config set Arpg.Paragon.WorldTierMode lowest
+? ok
+> .arpg scale probe Arpgtest tiered
+* tier_pct=100\b|scaled=none\b
+> .arpg config set Arpg.Paragon.WorldTierMode highest
+? ok
+> .arpg paragon set Arpgtest 0 0
+? ok
+
+# Clean up: ungroup, back to the usual spots and settings.
+> .arpg test party Arpgtest leave
+? ok party left
+> .arpg config set Arpg.Scale.ZoneCapAbove 15
+? ok
+> .arpg test clearbags Arpgtesttwo
+? ok
+> .arpg test setup Arpgtesttwo 20 park-stormwind
+? ok .*\(online\)
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 8000

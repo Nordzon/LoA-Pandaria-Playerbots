@@ -3,6 +3,8 @@
 #define ARPG_CORE_PARAGON_H
 
 #include <cstdint>
+#include <string>
+#include <vector>
 
 namespace Arpg::Core
 {
@@ -33,6 +35,13 @@ namespace Arpg::Core
     // World tier (Vale, uncapped zones): monster health/damage and Paragon XP multiplier,
     // 1 + pctPerLevel × level / 100, at most 1 + capPct / 100.
     float WorldTierMultiplier(int paragonLevel, float pctPerLevel, float capPct);
+
+    // Several real players near one monster (m8, owner 2026-11-27): whose Paragon sets the world tier.
+    // Arpg.Paragon.WorldTierMode: "highest" (default), "average" (rounded down), "lowest".
+    enum class WorldTierMode { Highest, Average, Lowest };
+    WorldTierMode WorldTierModeFromName(std::string const& name);   // unknown -> Highest
+    char const* WorldTierModeName(WorldTierMode mode);
+    int GroupParagonLevel(std::vector<int> const& levels, WorldTierMode mode);   // empty -> 0
 }
 
 #endif

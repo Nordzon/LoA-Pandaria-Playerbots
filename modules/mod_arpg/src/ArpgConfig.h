@@ -5,6 +5,7 @@
 #include "Core/ConfigFile.h"
 #include "Core/LevelCurve.h"
 #include "Core/Scaling.h"
+#include "Core/Paragon.h"
 
 #include <mutex>
 #include <set>
@@ -75,6 +76,9 @@ namespace Arpg
         float paragonQuestXpPct = 100.0f; // Arpg.Paragon.QuestXpPct (share of a quest's XP at the max level)
         float paragonWorldTierPct = 2.0f;     // Arpg.Paragon.WorldTierPct (uncapped zones: monster health/damage and Paragon XP % per Paragon level)
         float paragonWorldTierCapPct = 100.0f; // Arpg.Paragon.WorldTierCapPct
+        Arpg::Core::WorldTierMode paragonWorldTierMode = Arpg::Core::WorldTierMode::Highest; // Arpg.Paragon.WorldTierMode (m8)
+        bool personalLoot = true;              // Arpg.Party.PersonalLoot (m8): other real players in the group get their own loot
+        float personalLootRange = 100.0f;      // Arpg.Party.PersonalLootRange (yards from the corpse)
         float paragonStatPctPerPoint = 0.5f;   // Arpg.Paragon.StatPctPerPoint (Core: main stat / stamina %)
         int paragonRatingPerPoint = 240;       // Arpg.Paragon.RatingPerPoint (Offense crit/haste/mastery, Defense dodge/parry)
         float paragonArmorPctPerPoint = 0.4f;  // Arpg.Paragon.ArmorPctPerPoint (Defense)

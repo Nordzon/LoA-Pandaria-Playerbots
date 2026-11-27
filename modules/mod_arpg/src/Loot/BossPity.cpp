@@ -1,4 +1,5 @@
 #include "Loot/BossPity.h"
+#include "Loot/PersonalLoot.h"
 
 #include "ArpgConfig.h"
 #include "Core/Pity.h"
@@ -36,6 +37,14 @@ namespace
         {
             if (!killer || !killed || !Arpg::Scaling::IsRealPlayer(killer) || !Arpg::Loot::IsBossEntry(killed->GetEntry()))
                 return;
+            Count(killer, killed);
+            for (Player* m : Arpg::Loot::PersonalRecipients(killer, killed))   // m8: friends' own boss pity
+                Count(m, killed);
+        }
+
+        // God-roll counter and the boss's Unique ladder for one player.
+        static void Count(Player* killer, Creature* killed)
+        {
             int kills = Arpg::Loot::GodRollKills(killer) + 1;
             Store(killer->GetGUID().GetCounter(), kills);
             Arpg::TestEvents::Record(killer->GetGUID().GetCounter(), "boss kill entry=" + std::to_string(killed->GetEntry()) +

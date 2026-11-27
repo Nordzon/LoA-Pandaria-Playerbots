@@ -91,6 +91,14 @@ Arpg.Catalyst.EssenceCostLesser = 10
 Arpg.Catalyst.EssenceCostGreater = 30
 Arpg.Catalyst.EssenceCostGrand = 90
 
+# --- Playing with friends (m8, owner 2026-11-27) -------------------------------------------
+#    PersonalLoot: when a group with several real players kills a monster, the killer gets the corpse as usual and every
+#    other real player in the group within PersonalLootRange yards gets their OWN roll of its loot (own level, affixes,
+#    blank chance, Champion/Superunique extras and Unique counter) straight into the bags (mailed when full).
+#    World scaling with several real players: a monster scales to the highest level among the real players near it.
+Arpg.Party.PersonalLoot = 1
+Arpg.Party.PersonalLootRange = 100
+
 # --- Bots (m7) --------------------------------------------------------------------------------
 #    AffixScoring 1 = bots in your group count an item's affixes (with their spec's stat weights) when choosing gear.
 Arpg.Bots.AffixScoring = 1
@@ -176,6 +184,9 @@ Arpg.Paragon.QuestXpPct = 100
 #    +WorldTierPct % health and damage per Paragon level (at most +WorldTierCapPct %), and Paragon XP there gets the same %.
 Arpg.Paragon.WorldTierPct = 2
 Arpg.Paragon.WorldTierCapPct = 100
+#    WorldTierMode: with several real players near a monster, whose Paragon sets the tier: highest | average | lowest
+#    (owner 2026-11-27: highest for now; change any time with .arpg config set Arpg.Paragon.WorldTierMode average).
+Arpg.Paragon.WorldTierMode = highest
 #    Points (owner: Diablo 3 rotation Core -> Offense -> Defense -> Utility, pick the stat inside the tab, free respec):
 #    Core: strength, agility, intellect or stamina +StatPctPerPoint % (any of them - no main-stat guess); Offense: crit / haste / mastery +RatingPerPoint rating; Defense: armour
 #    +ArmorPctPerPoint %, dodge / parry +RatingPerPoint rating; Utility: move speed +MoveSpeedPerPoint (hundredths of %, up to

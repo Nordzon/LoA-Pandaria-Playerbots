@@ -1,4 +1,5 @@
 #include "Monsters/Champions.h"
+#include "Loot/PersonalLoot.h"
 
 #include "ArpgConfig.h"
 #include "Core/LootSubstitution.h"
@@ -373,6 +374,16 @@ namespace
             Arpg::TestEvents::Record(killer->GetGUID().GetCounter(), "champion killed entry=" + std::to_string(Arpg::Monsters::BaseEntry(killed->GetEntry())) +
                 " orb_health=" + std::to_string(heal) + " orb_power=" + std::to_string(power) + " floor_green=" + std::to_string(green) +
                 " floor_blue=" + std::to_string(blue));
+            // m8: every other real player of the group nearby gets their own loot floor (personal loot).
+            for (Player* m : Arpg::Loot::PersonalRecipients(killer, killed))
+            {
+                uint32 g = FloorItem(m, ITEM_QUALITY_UNCOMMON);
+                uint32 b = float(rand_chance()) < s.championLootBlueChancePct ? FloorItem(m, ITEM_QUALITY_RARE) : 0;
+                Arpg::Loot::AddPersonalItem(m, killed, g);
+                Arpg::Loot::AddPersonalItem(m, killed, b);
+                Arpg::TestEvents::Record(m->GetGUID().GetCounter(), "champion share entry=" + std::to_string(Arpg::Monsters::BaseEntry(killed->GetEntry())) +
+                    " floor_green=" + std::to_string(g) + " floor_blue=" + std::to_string(b));
+            }
         }
     };
 }

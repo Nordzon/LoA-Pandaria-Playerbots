@@ -224,6 +224,7 @@ public:
             { "sell",     &HandleTestSell,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "relog",    &HandleTestRelog,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "bot",      &HandleTestBot,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "party",    &HandleTestParty,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "events",   &HandleTestEvents,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "pack",     &HandleTestPack,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "give",     &HandleTestGive,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -923,6 +924,57 @@ public:
             return true;
         }
         return Fail(handler, usage);
+    }
+
+    // .arpg test party <char> <other>|status|leave   (m8) groups two characters (both real test characters, the first leads),
+    // shows the group (members, real players, loot method: 1 = round robin), or disbands it.
+    static bool HandleTestParty(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2 || !IsNameLike(t[0]) || !IsNameLike(t[1]))
+            return Fail(handler, "usage: .arpg test party <char> <other>|status|leave");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        if (t[1] == "leave")
+        {
+            if (Group* g = p->GetGroup())
+                g->Disband();
+            handler->SendSysMessage("ok party left");
+            return true;
+        }
+        if (t[1] != "status")
+        {
+            Player* o = ObjectAccessor::FindPlayerByName(NormalizeName(t[1]));
+            if (!o || !o->IsInWorld() || o == p)
+                return Fail(handler, "other character not online");
+            if (o->GetGroup() && o->GetGroup() != p->GetGroup())
+                o->GetGroup()->RemoveMember(o->GetGUID());
+            Group* g = p->GetGroup();
+            if (!g)
+            {
+                g = new Group();
+                g->Create(p);
+                sGroupMgr->AddGroup(g);
+            }
+            if (o->GetGroup() != g)
+                g->AddMember(o);
+        }
+        Group* g = p->GetGroup();
+        if (!g)
+        {
+            handler->SendSysMessage("ok party none");
+            return true;
+        }
+        int members = 0, real = 0;
+        for (GroupReference* ref = g->GetFirstMember(); ref; ref = ref->next())
+            if (Player* m = ref->GetSource())
+            {
+                ++members;
+                real += Arpg::Scaling::IsRealPlayer(m) ? 1 : 0;
+            }
+        handler->PSendSysMessage("ok party members=%d real=%d loot_method=%u", members, real, uint32(g->GetLootMethod()));
+        return true;
     }
 
     // .arpg test salvage <char> preview|do|buy <band>   the companion's Salvage / Buy catalysts, by name over SOAP
@@ -2622,7 +2674,15 @@ public:
             auto it = standIns.find(spawnId);
             if (it != standIns.end())
                 d = ObjectAccessor::GetCreature(*p, it->second);
-            if (v && v->ToPlayer())   // "bot" mode: a real random bot is the opponent
+            Player* tb = TestBotOf(p);
+            if (tb && c->GetThreatManager().IsThreatenedBy(tb))   // "bot" mode: the grouped random bot is on its threat list
+            {
+                handler->PSendSysMessage("ok combat status spawn=%u incombat=%u victim_player=%s real=%d level=%u alive=%u hp=%u", spawnId,
+                    c->IsInCombat() ? 1u : 0u, tb->GetName().c_str(), Arpg::Scaling::IsRealPlayer(tb) ? 1 : 0, c->GetLevel(),
+                    c->IsAlive() ? 1u : 0u, c->GetHealth());
+                return true;
+            }
+            if (v && v->ToPlayer())
             {
                 handler->PSendSysMessage("ok combat status spawn=%u incombat=%u victim_player=%s real=%d level=%u alive=%u hp=%u", spawnId,
                     c->IsInCombat() ? 1u : 0u, v->GetName().c_str(), Arpg::Scaling::IsRealPlayer(v->ToPlayer()) ? 1 : 0, c->GetLevel(),
@@ -2710,7 +2770,7 @@ public:
     {
         std::vector<std::string> t = Tokens(args);
         if (t.size() != 2 || !IsNameLike(t[0]))
-            return Fail(handler, "usage: .arpg scale probe <char> nearest|<spawnId>");
+            return Fail(handler, "usage: .arpg scale probe <char> nearest|scaled|tiered|<spawnId>");
         Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
         if (!p || !p->IsInWorld())
             return Fail(handler, "character not online");
@@ -2719,6 +2779,8 @@ public:
         Creature* c = nullptr;
         if (t[1] == "nearest")
             c = Arpg::Scaling::FindNearestCandidate(p, radius);
+        else if (t[1] == "scaled" || t[1] == "tiered")
+            c = Arpg::Scaling::FindNearestScaled(p, radius, t[1] == "tiered");
         else
         {
             uint32 spawnId = uint32(std::strtoul(t[1].c_str(), nullptr, 10));

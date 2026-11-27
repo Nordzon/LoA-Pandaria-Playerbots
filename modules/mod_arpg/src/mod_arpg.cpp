@@ -1,6 +1,7 @@
 // mod_arpg entry point: Pandaria ARPG layer (see docs/SPEC.md). Called by the generated modules/ModulesLoader.cpp.
 #include "ArpgConfig.h"
 #include "Scaling/WorldScaling.h"
+#include "Loot/PersonalLoot.h"
 #include "Loot/NativeEnchants.h"
 #include "Loot/AffixRoller.h"
 #include "Loot/AffixStats.h"
@@ -86,6 +87,7 @@ void AddSC_mod_arpg()
     Arpg::Bots::InstallBotItemScore();
     Arpg::Loot::InstallAuctionRolls();
     Arpg::Loot::InstallLootBeam();
-    Arpg::Loot::InstallLootPlanner();   // last kill script: plans corpse loot after the others added items and pity
+    Arpg::Loot::InstallLootPlanner();   // plans corpse loot after the others added items and pity
+    Arpg::Loot::InstallPersonalLoot();  // last kill script (m8): friends' own loot, after every extra was queued
     AddSC_arpg_commandscript();
 }

@@ -2,3 +2,4 @@
 # Read by write-confs.ps1 (BindIP) and set-realm-address.ps1 (RealmAddress). Without this file everything stays on 127.0.0.1.
 $BindIP       = '0.0.0.0'          # authserver + worldserver listen on all interfaces (the firewall limits it to Tailscale)
 $RealmAddress = '100.64.0.1'       # this PC's Tailscale address (tailscale ip -4), sent to mates' clients by the authserver
+$FriendsBotCount = 300             # random bots while this file exists (owner 2026-11-27: 300 until we know the load); 0 = keep 500

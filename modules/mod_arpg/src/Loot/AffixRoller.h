@@ -73,6 +73,8 @@ namespace Arpg::Loot
     // Plans every rollable item of a loot (corpse, chest) and sets each item's suffix id so the loot window shows its name.
     void PlanLoot(Player* owner, ::Loot& loot, ItemPickupSourceType source, uint32 sourceId, bool championLoot);
     bool TakePlan(uint32 itemId, int32 rp, RollPlan& out);
+    // What a pickup does: the item's loot plan (by its suffix id) if there is one, else a fresh roll for this source.
+    void ApplyPickupRoll(Player* player, Item* item, ItemPickupSourceType source, uint32 sourceId);
     // The affix lines a planned loot item will get when `player` picks it up (exact values: the plan fixes its rolls), for the
     // loot window: "s:<display stat>:<value>;e:<effect>:<tenths, 0 = flag>;u:<unique id>:0". Empty = no plan. Nothing is taken.
     std::string PlanPreview(Player* player, uint32 itemId, int32 rp);

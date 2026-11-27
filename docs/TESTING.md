@@ -28,7 +28,7 @@ SOAP lets scripts send GM commands to the running worldserver. Enable it in `wor
 for things that happen on a timer, such as the scaling tick).
 
 SOAP has no selected target, so our debug commands always take a player name or GUID. The test
-character `Arpgtest` is created and moved by `.arpg test setup`, so tests don't depend on where you logged off.
+character `Arpgtest` is created and moved by `.arpg test setup`, so tests don't depend on where you logged off. A second real test character, `Arpgtesttwo` (account ARPGTEST2, password in `headless.local.json` account2/password2), is held online too for the multiplayer tests (55-friends, m8).
 
 ## 3. Bot scenarios
 LoA-Pandaria-Playerbots ships `.botscenario` GM commands to place, group, queue and probe bots in

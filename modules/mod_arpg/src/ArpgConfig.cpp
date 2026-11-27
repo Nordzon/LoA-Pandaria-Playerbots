@@ -28,7 +28,7 @@ namespace
         "Arpg.Dungeon.Enabled", "Arpg.Dungeon.SoloNonTankDamage", "Arpg.Dungeon.SoloTankDamageDealt",
         "Arpg.Dungeon.SoloHealerDamageDealt", "Arpg.Dungeon.RaidTierStep",
         "Arpg.Paragon.Enabled", "Arpg.Paragon.XpBase", "Arpg.Paragon.XpGrowth", "Arpg.Paragon.QuestXpPct",
-        "Arpg.Paragon.WorldTierPct", "Arpg.Paragon.WorldTierCapPct", "Arpg.Paragon.StatPctPerPoint", "Arpg.Paragon.RatingPerPoint", "Arpg.Paragon.ArmorPctPerPoint",
+        "Arpg.Paragon.WorldTierPct", "Arpg.Paragon.WorldTierCapPct", "Arpg.Paragon.WorldTierMode", "Arpg.Superunique.SharedBadLuck", "Arpg.Party.PersonalLoot", "Arpg.Party.PersonalLootRange", "Arpg.Paragon.StatPctPerPoint", "Arpg.Paragon.RatingPerPoint", "Arpg.Paragon.ArmorPctPerPoint",
         "Arpg.Paragon.MoveSpeedPerPoint", "Arpg.Paragon.MoveSpeedCap", "Arpg.Paragon.FindPerPoint", "Arpg.Paragon.MagicFindCap",
         "Arpg.Superunique.Enabled", "Arpg.Superunique.PerZone", "Arpg.Superunique.RespawnDelay", "Arpg.Superunique.UniqueChance",
         "Arpg.Superunique.UniqueBadLuckStep", "Arpg.Superunique.Scale", "Arpg.Champion.EntryOffset", "Arpg.Superunique.EntryOffset",
@@ -122,6 +122,9 @@ namespace Arpg
         s.paragonQuestXpPct = std::max(0.0f, file.GetFloat("Arpg.Paragon.QuestXpPct", 100.0f));
         s.paragonWorldTierPct = std::max(0.0f, file.GetFloat("Arpg.Paragon.WorldTierPct", 2.0f));
         s.paragonWorldTierCapPct = std::max(0.0f, file.GetFloat("Arpg.Paragon.WorldTierCapPct", 100.0f));
+        s.paragonWorldTierMode = Arpg::Core::WorldTierModeFromName(file.GetString("Arpg.Paragon.WorldTierMode", "highest"));
+        s.personalLoot = file.GetBool("Arpg.Party.PersonalLoot", true);
+        s.personalLootRange = std::max(0.0f, file.GetFloat("Arpg.Party.PersonalLootRange", 100.0f));
         s.paragonStatPctPerPoint = std::max(0.0f, file.GetFloat("Arpg.Paragon.StatPctPerPoint", 0.5f));
         s.paragonRatingPerPoint = std::max(0, file.GetInt("Arpg.Paragon.RatingPerPoint", 240));
         s.paragonArmorPctPerPoint = std::max(0.0f, file.GetFloat("Arpg.Paragon.ArmorPctPerPoint", 0.4f));

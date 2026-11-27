@@ -51,18 +51,12 @@ The sign-up page, the network settings and the client kit are built and tested. 
 
 > Result:
 
-## 6. Questions: rules with several real players (no testing)
-Recommendations first; answer "as recommended" or change any.
-1. **World scaling:** a monster scales to the **highest-level** real player near it (rec.), or to the one who attacks it first?
-2. **Loot:** **personal loot** (rec.: each player gets their own corpse loot and affix rolls, no rolling against mates), or
-   shared group loot with Need/Greed?
-3. **Companion:** one per player (rec.), each looting only its owner's loot?
-4. **Champions/Superuniques:** shared spawns in the world (rec.); everyone who helped kill one gets their own drop and their own
-   Unique bad-luck counter (counters are already per character).
-5. **Bots:** keep 500, or drop to 300 while mates are online (rec.: 300 until we see the PC's load with 2-3 players)?
-6. **Vale world tier (Paragon):** follows the **highest Paragon** of the players there (rec.), or the average?
-
-> Answers:
+## 6. ~~Rules with several real players~~ - answered "as recommended", Vale tier "highest for now"
+Built (live after the next restart): highest level scales a monster; personal loot (your own corpse, mates get their own roll
+in their bags; groups with 2+ real players switch to round robin); one companion each; own Champion/Superunique drops and Unique
+counters; 300 bots in friends mode. **Paragon tier switch, no rebuild needed:**
+`.arpg config set Arpg.Paragon.WorldTierMode average` (or `lowest` / `highest`); to keep it after restarts, set the same line in
+`arpg.conf` next to the server (build/bin/RelWithDebInfo).
 
 ## Later: auction house
 `.tele stormwind`, Trade District auctioneer: mostly materials, some gear, about a third of the green-epic gear with affixes.

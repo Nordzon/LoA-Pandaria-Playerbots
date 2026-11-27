@@ -40,7 +40,7 @@ if (-not $TestsOnly) {
 if (Get-Process MSBuild -ErrorAction SilentlyContinue) { Done 10 'FAIL another build is running (MSBuild); try later' }
 # Never kick a playing person by accident (owner 2026-11-27): a real account other than the test account online -> stop here.
 $mysqlExe = 'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe'
-$online = (& $mysqlExe "--defaults-extra-file=$(Join-Path $Scripts 'mysql.local.cnf')" -N -e "SELECT GROUP_CONCAT(c.name) FROM characters.characters c JOIN auth.account a ON a.id = c.account WHERE c.online = 1 AND a.username NOT LIKE 'RNDBOT%' AND a.username <> 'ARPGTEST'" 2>$null | Out-String).Trim()
+$online = (& $mysqlExe "--defaults-extra-file=$(Join-Path $Scripts 'mysql.local.cnf')" -N -e "SELECT GROUP_CONCAT(c.name) FROM characters.characters c JOIN auth.account a ON a.id = c.account WHERE c.online = 1 AND a.username NOT LIKE 'RNDBOT%' AND a.username NOT IN ('ARPGTEST', 'ARPGTEST2')" 2>$null | Out-String).Trim()
 if ($online -and $online -ne 'NULL' -and -not $Force) { Done 11 "FAIL players online ($online): log them out first or pass -Force" }
 # Backup of accounts + characters before anything is stopped or changed (owner 2026-11-27).
 & powershell -ExecutionPolicy Bypass -File (Join-Path $Scripts 'backup-db.ps1') -Reason rebuild *>> $Log
@@ -93,11 +93,32 @@ if (-not (Select-String -Path (Join-Path $Work 'rebuild-hold.out') -Pattern 'LOG
 Start-Sleep 3
 Say 'Arpgtest online'
 
+# m8: a second real test character (Arpgtesttwo, account ARPGTEST2 from headless.local.json account2/password2) for the
+# multiplayer tests (55-friends). Optional: without it only that file fails.
+$hold2 = $null
+$hcfg = Get-Content (Join-Path $Headless 'headless.local.json') -Raw | ConvertFrom-Json
+$guid2 = (& $mysql "--defaults-extra-file=$(Join-Path $Scripts 'mysql.local.cnf')" -N -e "SELECT guid FROM characters.characters WHERE name = 'Arpgtesttwo'" 2>$null | Out-String).Trim()
+if ($hcfg.account2 -and $guid2) {
+  $env:MOP_ACCOUNT = $hcfg.account2; $env:MOP_PASSWORD = $hcfg.password2
+  $hold2 = Start-Process -FilePath 'py' -ArgumentList "headless.py --cmd play --char $guid2 --hold 1200" -WorkingDirectory $Headless `
+            -NoNewWindow -PassThru -RedirectStandardOutput (Join-Path $Work 'rebuild-hold2.out') -RedirectStandardError (Join-Path $Work 'rebuild-hold2.err')
+  Remove-Item Env:MOP_ACCOUNT, Env:MOP_PASSWORD -ErrorAction SilentlyContinue
+  $deadline = (Get-Date).AddSeconds(120)
+  while ((Get-Date) -lt $deadline -and -not $hold2.HasExited -and -not (Select-String -Path (Join-Path $Work 'rebuild-hold2.out') -Pattern 'LOGIN-OK' -Quiet -ErrorAction SilentlyContinue)) { Start-Sleep 2 }
+  if (Select-String -Path (Join-Path $Work 'rebuild-hold2.out') -Pattern 'LOGIN-OK' -Quiet -ErrorAction SilentlyContinue) {
+    # Parked away from every test spot: next to Arpgtest it would scale monsters first (its events, not Arpgtest's).
+    & (Join-Path $Scripts 'gm.ps1') '.arpg test setup Arpgtesttwo 20 park-stormwind' *>> $Log
+    Say 'Arpgtesttwo online (parked in Stormwind)'
+  }
+  else { Say 'WARN Arpgtesttwo could not log in (55-friends will fail; see rebuild-hold2.out/.err)' }
+}
+
 $args2 = @('-ExecutionPolicy', 'Bypass', '-File', (Join-Path $Scripts 'run-gmtests.ps1'))
 if ($Filter) { $args2 += @('-Filter', $Filter) }
 & powershell @args2 *> (Join-Path $Work 'rebuild-gmtests.log')
 $failed = $LASTEXITCODE
 if (-not $hold.HasExited) { $hold.Kill() }
+if ($hold2 -and -not $hold2.HasExited) { $hold2.Kill() }
 $summary = (Select-String -Path (Join-Path $Work 'rebuild-gmtests.log') -Pattern '^(PASS|FAIL)\s' | ForEach-Object { $_.Line.Trim() }) -join '; '
 if ($failed -ne 0 -or -not $unitOk) { Done 4 "FAIL gmtests ($failed file(s)) unit=$unitOk : $summary" }
 Done 0 "ALL OK: $summary (world left running, bots on)"

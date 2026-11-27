@@ -9,9 +9,11 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
   17:23) + rebuild-and-test refuses to restart with real players online (`-Force`); sign-up page `arpg/signup/signup.py` +
   `start-signup.ps1` + `test-signup.ps1` (ALL OK, 12 checks incl. headless login); `write-confs -BindIP` / `network.local.ps1`,
   `set-realm-address.ps1`, `make-client-kit.ps1` (tested on a fake client); guide `docs/FRIENDS.md`.
-- **Where we stopped:** m8 tasks 1-3.3 done. **Next:** owner's part (OWNER-CHECKS 5: Tailscale, firewall incl. the open MySQL
-  3307 rule, local settings files) then ONE restart together; owner answers OWNER-CHECKS 6 (multiplayer rules) -> m8 tasks 4.x
-  (C++, needs restarts: batch them, ask first).
+- **Where we stopped (19:22):** m8 4.1-4.5 done and live: personal loot, highest-level scaling, `Arpg.Paragon.WorldTierMode`
+  (highest; switch with `.arpg config set`), per-player shares, round robin for 2+ real players, `$FriendsBotCount`; tests 54 + 55
+  with a second real test character (Arpgtesttwo, account ARPGTEST2, parked at `park-stormwind`). ALL OK 28 GM files. Committed +
+  pushed. **Next:** owner's part of the friends setup (OWNER-CHECKS 5: Tailscale, firewall incl. MySQL 3307, local settings files),
+  then one restart together; m8 4.6 = play with a mate.
 - **Earlier today:** 13 of 16 changes archived; ALL OK 28 GM files / 87 unit tests at 17:12 (commits 4a60c143, a0ed215e).
 - **Open changes (owner checks only):** `m2b-loot-pet-filter` (owner: companion Reforge/Transmog/Void windows, OWNER-CHECKS 3),
   `m6-blank-bases` (owner check OWNER-CHECKS 1), `m7-living-ah` (owner: auction house).
@@ -51,6 +53,8 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-27 19:22 m8 multiplayer rules live: ALL OK 28 GM files (new 55-friends, fixes in 30/54; probes `scaled`/`tiered`; test spot park-stormwind). Committed + pushed.
+- 2026-11-27 18:45 m8 multiplayer rules coded (personal loot, highest-level scaling, WorldTierMode, per-player extras, round robin, friends bot count), test 55 + Arpgtesttwo; compiled + unit tests OK; waiting for the owner to log out for the restart run.
 - 2026-11-27 17:40 m8-friends started (owner: mates sign up + play): backups before rebuilds + no-restart-with-players guard, sign-up page (test-signup ALL OK), bind/realm scripts, client kit, docs/FRIENDS.md. Found: MySQL 3307 listens on all interfaces with an allow-any firewall rule (owner to restrict). No restart done (owner playing).
 - 2026-11-27 17:12 cleanup round: 13 of 16 changes archived (specs merged; deltas written for m4/m5/m6-race-class/m7); playtests -> OWNER-CHECKS. New test tools `test sell|relog|bot`, `scale combat bot`; tests 21/22 extended, new 54-bots. Owner: bots never Need (pinned LootNeedRollLevel 1), shared Superunique Unique counter (`SharedBadLuck`). ALL OK 28 files, 87 unit tests.
 - 2026-11-27 08:15 corpse loot preview (m2 4.11) + m6-blank-bases (1,495 blanks; drops 10%, crafted, companion shop; max affixes; craft hook in Spell::DoCreateItem). Full run ALL OK (27 files), 87 unit tests. Owner checks next.

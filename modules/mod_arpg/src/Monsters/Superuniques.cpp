@@ -6,6 +6,7 @@
 #include "Core/MonsterBands.h"
 #include "Core/Pity.h"
 #include "Core/SuperuniqueRotation.h"
+#include "Loot/PersonalLoot.h"
 #include "Loot/BossPity.h"
 #include "Loot/Substitution.h"
 #include "Loot/Uniques.h"
@@ -393,54 +394,63 @@ namespace
             killer->ModifyHealth(int32(heal));
             Powers pt = killer->GetPowerType();
             killer->ModifyPower(pt, int32(Arpg::Core::OrbAmount(lv.band, uint32(std::max(0, killer->GetMaxPower(pt))))));
-            // Guaranteed blue.
-            uint32 blue = Arpg::Monsters::FloorItem(killer, ITEM_QUALITY_RARE);
-            if (blue)
-                Arpg::Monsters::AddLootItem(killed->loot, blue);
-            // Unique ladder per character: 10% + 5% per Superunique kill without one. One counter shared by all Superuniques
-            // (owner 2026-11-27, Arpg.Superunique.SharedBadLuck); 0 = one counter per Superunique (original creature).
             uint32 const baseEntry = Arpg::Monsters::BaseEntry(killed->GetEntry());
             uint32 const pityKey = s.superuniqueSharedBadLuck ? Arpg::Loot::SharedSuperuniquePityKey : baseEntry;
-            int misses = Arpg::Loot::UniqueMisses(killer, pityKey);
-            Arpg::Core::PityLadder ladder;
-            ladder.base = s.superuniqueUniqueChancePct / 100.0f;
-            ladder.step = s.superuniqueUniqueStepPct / 100.0f;
-            bool won = Arpg::Core::RollWithPity(ladder, misses, rand_norm());
-            Arpg::Loot::SetUniqueMisses(killer, pityKey, misses);
-            uint32 uniqueBase = 0;
-            if (won)
+            // One player's share: a guaranteed blue + the Unique ladder (10% + 5% per Superunique kill without one; one counter
+            // for all Superuniques, owner 2026-11-27, Arpg.Superunique.SharedBadLuck; 0 = per Superunique). The killer's share
+            // goes into the corpse; with friends (m8) every other real player of the group nearby gets their own share.
+            auto share = [&](Player* p, bool intoCorpse)
             {
-                // The Unique sits on a base of its slot added to the loot; picking it up turns it into the Unique.
-                uint32 uid = 0;
+                uint32 blue = Arpg::Monsters::FloorItem(p, ITEM_QUALITY_RARE);
+                int misses = Arpg::Loot::UniqueMisses(p, pityKey);
+                Arpg::Core::PityLadder ladder;
+                ladder.base = s.superuniqueUniqueChancePct / 100.0f;
+                ladder.step = s.superuniqueUniqueStepPct / 100.0f;
+                bool won = Arpg::Core::RollWithPity(ladder, misses, rand_norm());
+                Arpg::Loot::SetUniqueMisses(p, pityKey, misses);
+                uint32 uniqueBase = 0, uid = 0;
+                if (won)
                 {
-                    std::lock_guard<std::mutex> l(g_lock);
-                    auto d = g_defs.find(lv.id);
-                    uid = d != g_defs.end() ? d->second.uniqueId : 0;
+                    // The Unique sits on a base of its slot added to the loot; picking it up turns it into the Unique.
+                    {
+                        std::lock_guard<std::mutex> l(g_lock);
+                        auto d = g_defs.find(lv.id);
+                        uid = d != g_defs.end() ? d->second.uniqueId : 0;
+                    }
+                    if (!uid)
+                        uid = Arpg::Loot::RandomUniqueId();
+                    uint32 inv = 0, armor = 0;
+                    if (uid && Arpg::Loot::UniqueSlot(uid, inv, armor))
+                    {
+                        int lvl = Arpg::Loot::LootLevelFor(p);
+                        uniqueBase = Arpg::Loot::FindBaseItem(inv, armor, ITEM_QUALITY_RARE, lvl);
+                        // Low levels have hardly any blues: a green base of the slot, else a blue a little higher up.
+                        if (!uniqueBase)
+                            uniqueBase = Arpg::Loot::FindBaseItem(inv, armor, ITEM_QUALITY_UNCOMMON, lvl);
+                        for (int up = 1; !uniqueBase && up <= 10; ++up)
+                            uniqueBase = Arpg::Loot::FindBaseItem(inv, armor, ITEM_QUALITY_RARE, lvl + up);
+                    }
                 }
-                if (!uid)
-                    uid = Arpg::Loot::RandomUniqueId();
-                uint32 inv = 0, armor = 0;
-                if (uid && Arpg::Loot::UniqueSlot(uid, inv, armor))
-                {
-                    int lvl = Arpg::Loot::LootLevelFor(killer);
-                    uniqueBase = Arpg::Loot::FindBaseItem(inv, armor, ITEM_QUALITY_RARE, lvl);
-                    // Low levels have hardly any blues: a green base of the slot, else a blue a little higher up.
-                    if (!uniqueBase)
-                        uniqueBase = Arpg::Loot::FindBaseItem(inv, armor, ITEM_QUALITY_UNCOMMON, lvl);
-                    for (int up = 1; !uniqueBase && up <= 10; ++up)
-                        uniqueBase = Arpg::Loot::FindBaseItem(inv, armor, ITEM_QUALITY_RARE, lvl + up);
-                }
+                for (uint32 item : { blue, uniqueBase })
+                    if (item)
+                    {
+                        if (intoCorpse)
+                            Arpg::Monsters::AddLootItem(killed->loot, item);
+                        else
+                            Arpg::Loot::AddPersonalItem(p, killed, item);
+                    }
                 if (uniqueBase)
-                {
-                    Arpg::Monsters::AddLootItem(killed->loot, uniqueBase);
-                    Arpg::Loot::SetPendingUnique(killer, killed->GetEntry(), uid);   // matched against the loot's source (tag entry)
-                }
-            }
-            if (blue || uniqueBase)
-                killed->SetFlag(OBJECT_FIELD_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-            Rec(killer, "superunique killed id=" + std::to_string(lv.id) + " entry=" + std::to_string(baseEntry) + " tag=" + killed->GetName() +
-                " orb_health=" + std::to_string(heal) + " floor_blue=" + std::to_string(blue) + " unique " + (won ? "won" : "missed") +
-                " misses=" + std::to_string(misses) + " unique_base=" + std::to_string(uniqueBase));
+                    Arpg::Loot::SetPendingUnique(p, killed->GetEntry(), uid);   // matched against the loot's source (tag entry)
+                if (intoCorpse && (blue || uniqueBase))
+                    killed->SetFlag(OBJECT_FIELD_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                Rec(p, "superunique " + std::string(intoCorpse ? "killed" : "share") + " id=" + std::to_string(lv.id) + " entry=" +
+                    std::to_string(baseEntry) + " tag=" + killed->GetName() + (intoCorpse ? " orb_health=" + std::to_string(heal) : "") +
+                    " floor_blue=" + std::to_string(blue) + " unique " + (won ? "won" : "missed") + " misses=" + std::to_string(misses) +
+                    " unique_base=" + std::to_string(uniqueBase));
+            };
+            share(killer, true);
+            for (Player* m : Arpg::Loot::PersonalRecipients(killer, killed))
+                share(m, false);
         }
     };
 }

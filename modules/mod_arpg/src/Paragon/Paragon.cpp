@@ -191,15 +191,20 @@ namespace
 
 
         // Kill XP at the max level (the core would drop it): it becomes Paragon XP.
-        void OnGiveXP(Player* player, uint32& amount, Unit* /*victim*/) override
+        void OnGiveXP(Player* player, uint32& amount, Unit* victim) override
         {
             Arpg::Settings const& s = sArpgConfig.Get();
             if (!s.paragonEnabled || !amount || !AtMaxLevel(player) || !Arpg::Scaling::IsRealPlayer(player))
                 return;
             uint64 xp = amount;
             if (s.uncappedZones.count(player->GetZoneId()))   // world tier: harder monsters, more Paragon XP
-                xp = uint64(double(xp) * Arpg::Core::WorldTierMultiplier(Arpg::Paragon::ParagonLevel(player), s.paragonWorldTierPct,
-                    s.paragonWorldTierCapPct) + 0.5);
+            {
+                // m8: the tier the monster really had (with friends it may follow another player's Paragon), else our own.
+                float tier = victim && victim->ToCreature() ? Arpg::Scaling::TierOf(victim->ToCreature()) : 1.0f;
+                if (tier <= 1.0f)
+                    tier = Arpg::Core::WorldTierMultiplier(Arpg::Paragon::ParagonLevel(player), s.paragonWorldTierPct, s.paragonWorldTierCapPct);
+                xp = uint64(double(xp) * tier + 0.5);
+            }
             Arpg::Paragon::AddXp(player, xp, "kill");
         }
 

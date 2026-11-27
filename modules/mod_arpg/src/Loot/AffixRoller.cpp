@@ -179,6 +179,14 @@ namespace
 
     void PickupHook(Player* player, Item* item, ItemPickupSourceType source, uint32 sourceId)
     {
+        Arpg::Loot::ApplyPickupRoll(player, item, source, sourceId);
+    }
+}
+
+namespace Arpg::Loot
+{
+    void ApplyPickupRoll(Player* player, Item* item, ItemPickupSourceType source, uint32 sourceId)
+    {
         std::string why;
         // Rolled when the loot was made (the loot window showed its name): apply exactly that plan.
         int32 rp = item ? item->GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) : 0;

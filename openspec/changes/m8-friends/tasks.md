@@ -15,12 +15,16 @@
 - [x] 3.3 `make-client-kit.ps1` (patch MPQ, ArpgUI, realmlist, README) -> zip - kit built + installed into a fake client (realmlist, MPQ, 8 addon files)
 - [ ] 3.4 Owner: install Tailscale, firewall rule; a mate signs up and logs in
 
-## 4. Multiplayer rules (owner decisions first, then one task each)
-- [ ] 4.1 World scaling with several real players near a creature
-- [ ] 4.2 Loot: personal loot / plans per player, loot pet per player
-- [ ] 4.3 Champions/Superuniques per player, pity per player (already per character)
-- [ ] 4.4 Bot count and server load with friends online
-- [ ] 4.5 GM tests with two real test characters
+## 4. Multiplayer rules (owner 2026-11-27: "as recommended"; Paragon tier "highest for now, easy reconfig")
+- [x] 4.1 World scaling: highest level among the real players near a monster; Vale world tier by `Arpg.Paragon.WorldTierMode`
+  (highest|average|lowest, `Core::GroupParagonLevel` + unit test); Paragon XP uses the monster's applied tier
+- [x] 4.2 Personal loot (`Loot/PersonalLoot`, `Arpg.Party.PersonalLoot|PersonalLootRange`): killer keeps the corpse (round robin
+  owner; groups with 2+ real players switch to round robin), every other real player nearby gets their own loot-table roll +
+  extras into the bags (mail when full); companion already one per player (queues its owner's kills)
+- [x] 4.3 Champion floor, Superunique share (blue + Unique ladder on their own counter), boss pity, potions, catalysts per player
+- [x] 4.4 Bots: `$FriendsBotCount` in network.local.ps1 (300) applies while friends mode is set; explicit -BotCount wins
+- [x] 4.5 `55-friends.gmtest` with Arpgtest + Arpgtesttwo (account ARPGTEST2, held by rebuild-and-test) - needs the restart - ALL OK 19:20 (Arpgtesttwo parked at `park-stormwind` between tests)
+- [ ] 4.6 Owner: play with a mate; tune
 
 ## 5. Docs
 - [ ] 5.1 SPEC 4.11, CODEMAP, PROGRESS

@@ -58,3 +58,18 @@ TEST(paragon_bonus_caps_and_world_tier)
     CHECK(m > 1.199f && m < 1.201f);
     CHECK(WorldTierMultiplier(80, 2.0f, 100.0f) < 2.0001f);
 }
+
+TEST(paragon_group_world_tier_mode)
+{
+    // m8: several real players near a monster - whose Paragon sets the world tier (Arpg.Paragon.WorldTierMode).
+    std::vector<int> levels = { 100, 0, 41 };
+    CHECK_EQ(GroupParagonLevel(levels, WorldTierMode::Highest), 100);
+    CHECK_EQ(GroupParagonLevel(levels, WorldTierMode::Average), 47);   // 141 / 3, rounded down
+    CHECK_EQ(GroupParagonLevel(levels, WorldTierMode::Lowest), 0);
+    CHECK_EQ(GroupParagonLevel({}, WorldTierMode::Highest), 0);
+    CHECK_EQ(GroupParagonLevel({ 7 }, WorldTierMode::Average), 7);
+    CHECK(WorldTierModeFromName("average") == WorldTierMode::Average);
+    CHECK(WorldTierModeFromName("lowest") == WorldTierMode::Lowest);
+    CHECK(WorldTierModeFromName("nonsense") == WorldTierMode::Highest);
+    CHECK(std::string(WorldTierModeName(WorldTierMode::Average)) == "average");
+}

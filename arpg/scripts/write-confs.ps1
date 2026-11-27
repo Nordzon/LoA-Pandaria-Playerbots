@@ -31,11 +31,15 @@ param(
   [string]$BindIP = ''                               # m8: '' = network.local.ps1's $BindIP, else 127.0.0.1
 )
 # m8-friends: friends' access is configured once in network.local.ps1, so every rebuild keeps it.
-if (-not $BindIP) {
-  $netConf = Join-Path $PSScriptRoot 'network.local.ps1'
-  if (Test-Path $netConf) { . $netConf }
-  if (-not $BindIP) { $BindIP = '127.0.0.1' }
+# Read in its own scope: the file can't overwrite this script's parameters by accident.
+$netConf = Join-Path $PSScriptRoot 'network.local.ps1'
+if (Test-Path $netConf) {
+  $net = & { param($f) $BindIP = ''; $FriendsBotCount = 0; . $f; [pscustomobject]@{ BindIP = $BindIP; Bots = [int]$FriendsBotCount } } $netConf
+  if (-not $BindIP -and $net.BindIP) { $BindIP = $net.BindIP }
+  # Bots with friends (owner 2026-11-27: 300 until we see the PC's load with 2-3 players); an explicit -BotCount wins.
+  if ($net.Bots -gt 0 -and -not $PSBoundParameters.ContainsKey('BotCount')) { $BotCount = $net.Bots }
 }
+if (-not $BindIP) { $BindIP = '127.0.0.1' }
 if ($BindIP -notmatch '^\d{1,3}(\.\d{1,3}){3}$') { Write-Error "bad BindIP '$BindIP'"; exit 2 }
 function Num([double]$v) { $v.ToString([cultureinfo]::InvariantCulture) }
 $ErrorActionPreference = 'Stop'
