@@ -100,6 +100,11 @@ try {
     if ($LASTEXITCODE -ne 0) { Fail "Server start failed (code $LASTEXITCODE). Logs: D:\WoWMoPProject\ServerData\logs" }
   }
 
+  # 4b. sign-up page for friends (m8), only when configured
+  if (Test-Path (Join-Path $PSScriptRoot '..\signup\signup.local.json')) {
+    & powershell -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'start-signup.ps1') | Out-Host
+  }
+
   # 5. client
   if (-not $NoClient) {
     if (-not (Test-Path $ClientExe)) { Fail "Client not found: $ClientExe" }

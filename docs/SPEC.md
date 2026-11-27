@@ -319,6 +319,16 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   (3) AHBot buyer values affixes (count × tier), so a good roll sells better there than at a vendor.
 - Idea (owner to decide): crafter at max skill → +1 affix tier on crafted items (crafting already rolls affixes).
 
+### 4.11 Playing with friends (m8, owner 2026-11-27)
+- Mates connect over **Tailscale** (private network; no port forwarding). Servers bind per `network.local.ps1` (`write-confs
+  -BindIP`); the realm address is the owner's Tailscale address (`set-realm-address.ps1`), loopback for the owner's own client.
+- **Sign-up page** (`arpg/signup/signup.py`, port 8090): name + password twice -> a normal player account (never GM, never over
+  an existing account); invite code, account cap, rate limit; settings in `signup.local.json`. Test: `test-signup.ps1`.
+- **Client kit** (`make-client-kit.ps1`): patch MPQ + ArpgUI + installer (realmlist); mates bring their own 5.4.8 client.
+- **Backups:** auth + characters before every rebuild (`backup-db.ps1`, last 30); rebuild-and-test won't restart while a real
+  player is online. Guide: `docs/FRIENDS.md`.
+- Multiplayer rules (scaling with several players, loot, companions, spawns, bot load): owner decisions pending.
+
 ## 5. Client patch pipeline (m2 spike, m6 full)
 - Git tracks only sources: `arpg/client-patch/dbc/*.csv` (rows we add/override, reserved high ID range), `icons/`, `arpg/addons/ArpgUI/`.
 - Build: merge CSV rows into the extracted base DBC/DB2 → **copy the same files to the server's DBC dir** → pack MPQ

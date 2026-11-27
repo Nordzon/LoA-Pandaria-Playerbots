@@ -35,6 +35,9 @@ What's where, and what we've touched. All paths below were checked against this 
 | `arpg/unittests/` | Unit tests (ctest `-R arpg`): tiny header-only harness, compiles `mod_arpg/src/Core/*.cpp` only. Outside the module because upstream globs every module `.cpp` into the server |
 | `arpg/scripts/` | setup-tools, gm (SOAP), run-gmtests, restart-world, update-upstream, write-confs (server confs from .conf.dist + overrides; DB login from mysql.local.cnf), new-account (game account via SQL), overnight (unattended m0 pipeline; state in ServerData/pipeline), start-stack (desktop one-click: close apps, MySQL, servers, client; -Stop), rebuild-and-test (dev loop: stop, build, ctest, SQL, start, hold Arpgtest, all gmtests; log ServerData/pipeline/rebuild.log), apply-sql |
 | `arpg/tests/*.gmtest` | GM-command tests run over SOAP |
+| `arpg/signup/signup.py` | m8 sign-up page (stdlib HTTP, port 8090; settings `signup.local.json`); `start-signup.ps1`, `test-signup.ps1` |
+| `arpg/scripts/backup-db.ps1` | auth + characters dump to ServerData/backups (keep 30); called by rebuild-and-test (which also refuses to restart with real players online) |
+| `arpg/scripts/set-realm-address.ps1`, `network.local.ps1(.example)`, `make-client-kit.ps1` | m8 friends: realm address, bind address (read by write-confs), mates' client kit zip; guide `docs/FRIENDS.md` |
 | `arpg/client-patch/`, `arpg/addons/ArpgUI/` | Client patch sources (`build-client-patch.py` = the real patch: affix display rows → `Data\enUS\wow-update-enUS-20000.MPQ`; `build-probe-patch.py` + `TEST-SCENARIOS.md` = spike tools/test sheet; StormLib built from source in `arpg/tools/bin/StormLib`), client addon |
 | `openspec/` | `specs/<capability>/spec.md` = current behaviour (merged from archived changes); `changes/` = open work; `changes/archive/` = done (11 archived 2026-11-27) |
 

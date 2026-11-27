@@ -16,6 +16,7 @@
 param(
   [string]$Filter = '',
   [switch]$TestsOnly,          # skip stop/build/restart: servers must be running; just hold Arpgtest and run GM tests
+  [switch]$Force,              # restart even if real players are online (they get disconnected)
   [string]$Work = 'D:\WoWMoPProject\ServerData\pipeline',
   [string]$Data = 'D:\WoWMoPProject\ServerData\data'
 )
@@ -37,6 +38,14 @@ Say "==== rebuild-and-test start (filter '$Filter', tests only: $TestsOnly)"
 $unitOk = $true
 if (-not $TestsOnly) {
 if (Get-Process MSBuild -ErrorAction SilentlyContinue) { Done 10 'FAIL another build is running (MSBuild); try later' }
+# Never kick a playing person by accident (owner 2026-11-27): a real account other than the test account online -> stop here.
+$mysqlExe = 'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe'
+$online = (& $mysqlExe "--defaults-extra-file=$(Join-Path $Scripts 'mysql.local.cnf')" -N -e "SELECT GROUP_CONCAT(c.name) FROM characters.characters c JOIN auth.account a ON a.id = c.account WHERE c.online = 1 AND a.username NOT LIKE 'RNDBOT%' AND a.username <> 'ARPGTEST'" 2>$null | Out-String).Trim()
+if ($online -and $online -ne 'NULL' -and -not $Force) { Done 11 "FAIL players online ($online): log them out first or pass -Force" }
+# Backup of accounts + characters before anything is stopped or changed (owner 2026-11-27).
+& powershell -ExecutionPolicy Bypass -File (Join-Path $Scripts 'backup-db.ps1') -Reason rebuild *>> $Log
+if ($LASTEXITCODE -ne 0) { Done 12 'FAIL database backup (see rebuild.log); nothing was stopped' }
+Say 'databases backed up'
 
 & powershell -ExecutionPolicy Bypass -File (Join-Path $Scripts 'restart-world.ps1') -Stop *>> $Log
 Say 'servers stopped'

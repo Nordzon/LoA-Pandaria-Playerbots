@@ -42,6 +42,28 @@ Right-click the companion -> Reforge, Transmogrify, Void Storage: does each open
 2. ~~Unique bad-luck counter~~ - answered "one shared counter" (built; `Arpg.Superunique.SharedBadLuck` 1).
 > Answers: 1. Bots never need is perfect. 2. One shared counter.
 
+## 5. Friends: your part (when you want to invite mates; guide: `docs/FRIENDS.md`)
+The sign-up page, the network settings and the client kit are built and tested. What only you can do (system changes):
+1. Install Tailscale, note your 100.x address, share your PC with your mates.
+2. As administrator: the firewall rule for 3724/8085/8090 from Tailscale, and **limit the existing "Port 3307" rule** (MySQL is
+   reachable from your network today - see FRIENDS.md step 2).
+3. Fill in `network.local.ps1` and `signup.local.json` (copy the .example files), then tell me: I'll do the one restart with you.
+
+> Result:
+
+## 6. Questions: rules with several real players (no testing)
+Recommendations first; answer "as recommended" or change any.
+1. **World scaling:** a monster scales to the **highest-level** real player near it (rec.), or to the one who attacks it first?
+2. **Loot:** **personal loot** (rec.: each player gets their own corpse loot and affix rolls, no rolling against mates), or
+   shared group loot with Need/Greed?
+3. **Companion:** one per player (rec.), each looting only its owner's loot?
+4. **Champions/Superuniques:** shared spawns in the world (rec.); everyone who helped kill one gets their own drop and their own
+   Unique bad-luck counter (counters are already per character).
+5. **Bots:** keep 500, or drop to 300 while mates are online (rec.: 300 until we see the PC's load with 2-3 players)?
+6. **Vale world tier (Paragon):** follows the **highest Paragon** of the players there (rec.), or the average?
+
+> Answers:
+
 ## Later: auction house
 `.tele stormwind`, Trade District auctioneer: mostly materials, some gear, about a third of the green-epic gear with affixes.
 

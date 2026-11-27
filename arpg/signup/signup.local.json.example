@@ -1,0 +1,9 @@
+{
+  "bind": "127.0.0.1",
+  "port": 8090,
+  "invite_code": "pick-a-code-and-tell-your-mates",
+  "max_accounts": 20,
+  "rate_max": 5,
+  "realm_address": "your-pc.tailnet-name.ts.net",
+  "title": "Pandaria ARPG"
+}

@@ -27,8 +27,16 @@ param(
   [double]$DropEpic = 1.5,                           # Rate.Drop.Item.Epic
   [double]$DropMoney = 1.5,                          # Rate.Drop.Money
   [int]$SkillGain = 2,                               # SkillGain.Gathering / .Crafting: points per skill-up
-  [double]$GatherXpRate = 3.0                        # Rate.XP.Gather (overrides XpRate for gathering)
+  [double]$GatherXpRate = 3.0,                       # Rate.XP.Gather (overrides XpRate for gathering)
+  [string]$BindIP = ''                               # m8: '' = network.local.ps1's $BindIP, else 127.0.0.1
 )
+# m8-friends: friends' access is configured once in network.local.ps1, so every rebuild keeps it.
+if (-not $BindIP) {
+  $netConf = Join-Path $PSScriptRoot 'network.local.ps1'
+  if (Test-Path $netConf) { . $netConf }
+  if (-not $BindIP) { $BindIP = '127.0.0.1' }
+}
+if ($BindIP -notmatch '^\d{1,3}(\.\d{1,3}){3}$') { Write-Error "bad BindIP '$BindIP'"; exit 2 }
 function Num([double]$v) { $v.ToString([cultureinfo]::InvariantCulture) }
 $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
@@ -53,7 +61,7 @@ $overrides = @{
     set  = [ordered]@{
       'LoginDatabaseInfo' = (DbInfo 'auth')
       'LogsDir'           = "`"$LogsDir`""
-      'BindIP'            = '"127.0.0.1"'
+      'BindIP'            = "`"$BindIP`""
     }
   }
   'worldserver.conf' = @{
@@ -65,7 +73,7 @@ $overrides = @{
       'PlayerbotsDatabaseInfo' = (DbInfo 'playerbots')
       'DataDir'                = "`"$DataDir`""
       'LogsDir'                = "`"$LogsDir`""
-      'BindIP'                 = '"127.0.0.1"'
+      'BindIP'                 = "`"$BindIP`""
       'SOAP.Enabled'           = '1'
       'SOAP.IP'                = '"127.0.0.1"'
       'SOAP.Port'              = '7878'

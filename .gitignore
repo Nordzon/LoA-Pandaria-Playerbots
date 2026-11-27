@@ -30,3 +30,5 @@ arpg/backups/
 arpg/tools/bin/
 arpg/client-patch/build/
 arpg/scripts/stack.local.ps1
+arpg/signup/signup.local.json
+arpg/scripts/network.local.ps1

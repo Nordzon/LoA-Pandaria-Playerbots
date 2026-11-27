@@ -4,18 +4,18 @@ The single source of truth for where work stands. Every session starts by readin
 updating **Now** and adding a **Log** line. If this file and memory disagree, this file wins.
 
 ## Now
-- **NOW (2026-11-27 16:10, owner present):** cleanup + headless round. Done: 11 of 16 changes archived
-  (`openspec/changes/archive/2026-11-27-*`, specs merged into `openspec/specs/`); deltas written for m4, m5, m6-any-race-class,
-  m7-bots; owner playtests moved to `docs/OWNER-CHECKS.md` "Playtests". New test tools `.arpg test sell|relog|bot`,
-  `scale combat ... bot`; tests 21 (real sale), 22 (relog), new 54-bots (bot fight keeps level, party of 2 in the Deadmines,
-  bot items unaffixed). Owner answers: bots never Need (= playerbots `LootNeedRollLevel` 1, pinned in write-confs); one shared
-  Superunique Unique counter (`Arpg.Superunique.SharedBadLuck` 1, test 31). "Creation works once" = stock exe, not a bug.
-- **Where we stopped (17:12):** ALL OK (28 GM files, 87 unit tests), committed + pushed; `m2-affix-loot` and `m7-bots` archived
-  too (13 of 16). Test fixes on the way: 30 (brittle "not yet exploded" check dropped), 51 (queue wait 300 s), 54 (zone cap
-  lifted; bot brought after the mob scales; on "off" the bot goes home). **Next:** owner checks (OWNER-CHECKS 1, 3, Later).
+- **NOW (2026-11-27 17:40, owner playing as account NORDON - no restarts/kicks without asking):** change **m8-friends**
+  (mates play over Tailscale). Done without a restart: `backup-db.ps1` (auth + characters, before every rebuild; first backup
+  17:23) + rebuild-and-test refuses to restart with real players online (`-Force`); sign-up page `arpg/signup/signup.py` +
+  `start-signup.ps1` + `test-signup.ps1` (ALL OK, 12 checks incl. headless login); `write-confs -BindIP` / `network.local.ps1`,
+  `set-realm-address.ps1`, `make-client-kit.ps1` (tested on a fake client); guide `docs/FRIENDS.md`.
+- **Where we stopped:** m8 tasks 1-3.3 done. **Next:** owner's part (OWNER-CHECKS 5: Tailscale, firewall incl. the open MySQL
+  3307 rule, local settings files) then ONE restart together; owner answers OWNER-CHECKS 6 (multiplayer rules) -> m8 tasks 4.x
+  (C++, needs restarts: batch them, ask first).
+- **Earlier today:** 13 of 16 changes archived; ALL OK 28 GM files / 87 unit tests at 17:12 (commits 4a60c143, a0ed215e).
 - **Open changes (owner checks only):** `m2b-loot-pet-filter` (owner: companion Reforge/Transmog/Void windows, OWNER-CHECKS 3),
   `m6-blank-bases` (owner check OWNER-CHECKS 1), `m7-living-ah` (owner: auction house).
-- **Blockers:** none. Owner checks in `docs/OWNER-CHECKS.md`. Client: always `Wow-64-all.exe`.
+- **Blockers:** owner decisions for m8 4.x (OWNER-CHECKS 6); MySQL 3307 open to the network (owner: firewall rule). Owner checks in `docs/OWNER-CHECKS.md`. Client: always `Wow-64-all.exe`.
 - **Bots:** on for play (500 since 2026-11-26; 300 before) via start-stack and rebuild-and-test (tests 51-54 need them). Bot rules: `openspec/specs/bots` after archiving m7.
 
 ## Roadmap (one change folder each; propose the backlog ones from the spec Doc when their turn comes)
@@ -25,6 +25,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | 2 | m2b-loot-pet-filter | done except owner check (companion windows) |
 | 6 | m6-blank-bases | done except owner check |
 | 7 | m7-living-ah | done except owner check (auction house) |
+| 8 | m8-friends | **active**: sign-up, network, kit, backups done; multiplayer rules wait for owner |
 | – | multiplayer with friends (client updater, Tailscale, group rules) | idea |
 | – | loot pet gathers herbs/ore | idea |
 
@@ -50,6 +51,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-27 17:40 m8-friends started (owner: mates sign up + play): backups before rebuilds + no-restart-with-players guard, sign-up page (test-signup ALL OK), bind/realm scripts, client kit, docs/FRIENDS.md. Found: MySQL 3307 listens on all interfaces with an allow-any firewall rule (owner to restrict). No restart done (owner playing).
 - 2026-11-27 17:12 cleanup round: 13 of 16 changes archived (specs merged; deltas written for m4/m5/m6-race-class/m7); playtests -> OWNER-CHECKS. New test tools `test sell|relog|bot`, `scale combat bot`; tests 21/22 extended, new 54-bots. Owner: bots never Need (pinned LootNeedRollLevel 1), shared Superunique Unique counter (`SharedBadLuck`). ALL OK 28 files, 87 unit tests.
 - 2026-11-27 08:15 corpse loot preview (m2 4.11) + m6-blank-bases (1,495 blanks; drops 10%, crafted, companion shop; max affixes; craft hook in Spell::DoCreateItem). Full run ALL OK (27 files), 87 unit tests. Owner checks next.
 - 2026-11-27 07:40 owner morning checks: beam/glow/mount vendor/potion text/starter gear ok. "Plain blues" = stock Wow-64.exe (use Wow-64-all.exe). Potion "Use:" text moved from the patch Spell.dbc to ArpgUI Potions.lua (generated PotionData.lua); `--spell` keeps the old way. Open: blank-bases answer, Unique pity per Superunique (ask owner).
