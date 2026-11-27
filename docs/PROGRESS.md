@@ -19,8 +19,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
   Also (owner report 22:35): **main-hand unequip wiped affix lines** - upstream `Player::RemoveItem` cleared 2 PROP enchant
   slots ("held enchantments"); commented out (`// ARPG:`), + `Loot/AffixDisplayRepair` rewrites lines at login (Nordana's
   daggers 402254/403371 come back); test 22 checks lines_before = lines_after on a main-hand unequip.
-  Built after the owner's "go": **ALL OK 31 GM files 22:48**, committed + pushed. **Next:** owner relogs Nordana (daggers'
-  lines come back at login); archive m6-start-quests + m6-any-weapon-skills after OWNER-CHECKS A.
+  Built after the owner's "go": **ALL OK 31 GM files 22:48**, committed + pushed. Owner confirmed Nordana's dagger affixes are back after relog. **Next:** archive m6-start-quests + m6-any-weapon-skills after OWNER-CHECKS A.
 - **Active (20:45): change `m6-any-weapon-skills`** (owner: no class ability needs a specific weapon or 1H/2H; shields stay).
   Done: `Core/WeaponReq` + 6 unit tests, `Character/AnyWeaponSkills` (35 class spells widened, Mutilate/Lava Lash/Wild Strike
   main hand), `.arpg test spellreq`, GM test `56-weapon-skills`, client patch builder (same 35/3). ALL OK 30 GM files 20:48,
@@ -71,6 +70,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-27 — Owner: Nordana's dagger affix lines back after relog (login repair works).
 - 2026-11-27 — Fixed: Superuniques dropped from tracking when a real player was on another map; main-hand unequip wiped affix lines (upstream clearing disabled + login repair). ALL OK 31 files.
 - 2026-11-27 — m6-start-quests: new race/class pairs borrow the Warrior's starting-zone class quests (Nordana stuck in Shadowglen); upstream hook in SatisfyQuestClass.
 - 2026-11-27 — Owner: Hunter shots keep needing a bow/gun/crossbow (m6-any-weapon-skills, as built).
