@@ -8,7 +8,7 @@
 - [x] 2.1 `Core/LootFilter.{h,cpp}` (5 unit tests, text form `quality<=0 usable=0 class=4 sub=1 affixes>=3 tier>=5 vs=0 ids=1,2 -> sell|leave|pickup|highlight`): pure rule matching + unit tests (every match type, rule order, protected items)
 - [x] 2.2 `character_arpg_lootfilter` table, load/save, default rules (grey → Auto-sell)
 - [x] 2.3 Applied when corpse/chest loot is planned (covers the player's own and later pet looting); v1 Leave = out of the loot (owner may want a core hook for 'stays on the corpse')
-- [ ] 2.4 Highlight: corpse beam using an existing client visual; removed when looted
+- [x] 2.4 Highlight: corpse beam using an existing client visual; removed when looted - beam 120720, owner confirmed 2026-11-27
 - [x] 2.5 Commands: `.arpg filter list|add|remove|move|reset <char> …`
 
 ## 3. Loot pet
@@ -33,8 +33,8 @@
 - [x] 5.1 Unit: LootFilter
 - [x] 5.2 `arpg/tests/34-loot-pet.gmtest` (passes 2026-11-23; `.arpg test pack … kill loot` = the kill counts as the player's damage so the core fills the loot): test character kills a spawned pack by command, then check the bags, gold and mail
 - [x] 5.3 `arpg/tests/33-loot-filter.gmtest` (passes 2026-11-23): grey → sold, protected Unique kept, Leave rule leaves item
-- [ ] 5.4 Playtest: clear 3 packs in Jade Forest; the pet never gets stuck; it feels fast enough
+- [x] 5.4 Playtest: clear 3 packs in Jade Forest; the pet never gets stuck; it feels fast enough - moved to the standing playtest list (docs/OWNER-CHECKS.md "Playtests") 2026-11-27
 
 ## 6. Docs
-- [ ] 6.1 Update docs/CODEMAP.md
-- [ ] 6.2 Update docs/PROGRESS.md
+- [x] 6.1 Update docs/CODEMAP.md
+- [x] 6.2 Update docs/PROGRESS.md

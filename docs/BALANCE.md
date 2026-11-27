@@ -324,7 +324,7 @@ Per boss, per character, **pity counters** (`character_arpg_pity`):
   without a 5-affix item guarantees one ("god-roll pity"). Rerolling stays possible via crafting later (not in v1).
 - **Smart loot:** 70% of drops match your spec's main stat (SPEC 4.1); boss Uniques for your class are picked over others 60% of the time.
 - **Trash:** with 2x green/blue rates, a dungeon clear gives about 15-25 affixed items; most get auto-sold for gold by the loot filter.
-- Superuniques keep their 10% + 5%/miss ladder: ~5-6 kills on average, guaranteed by kill 19 (unit-tested; 5-min respawns → ~30 min typical).
+- Superuniques keep their 10% + 5%/miss ladder (one counter for all Superuniques since 2026-11-27): ~5-6 kills on average, guaranteed by kill 19 (unit-tested; 5-min respawns → ~30 min typical).
 
 Expected time to "done with a dungeon" (all its Uniques): 3-5 runs of ~15-25 minutes = roughly an evening. A raid tier: 5 runs per raid.
 

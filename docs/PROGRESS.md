@@ -4,67 +4,27 @@ The single source of truth for where work stands. Every session starts by readin
 updating **Now** and adding a **Log** line. If this file and memory disagree, this file wins.
 
 ## Now
-- **NOW (2026-11-27 08:10, owner in the morning round):** (1) corpse loot preview (m2 4.11: fixed rolls at planning,
-  `.lootinfo data` -> ArpgUI `LootTooltip.lua`; test 30 `lootpreview` PASSED in the 07:41 run); (2) **m6-blank-bases** coded
-  (owner: "all of these"): 1,495 blanks (`gen_blank_bases.py`, sql 2026_11_27_03 applied), `Loot/Blanks`, `Core/Blanks` (87 unit
-  tests), craft hook `ArpgHooks::CraftedItem` in `Spell::DoCreateItem`, companion "Blank bases" menu, test 36. **Done 08:15** (ALL OK, 27 files, committed + pushed). **Next:** owner checks: loot tooltip preview, a blank's tooltip, companion "Blank bases". Open question for the
-  owner: Unique pity per Superunique (461 counters) vs one shared counter.
-- **Active changes:** `m2-affix-loot` (roll, save, calibration to real blues, stats on equip: done; next 4.6 MPQ spike,
-  4.5 sell, 4.4 pity, 4.3 effect affixes), `m3-champions-superuniques` (Core bands + SQL pulled forward).
-  Done but not archived: `m0-server-setup` (except owner's real-client login + first upstream sync), `m1-world-scaling`,
-  `m1b-all-professions` (server side).
-- **Where we stopped (2026-11-22 20:08):** owner away (playing with his son). Owner's build queue DONE and tested: **all 16
-  GM files pass** (00-32), 65 unit tests. (1) splash/chain procs skip neutral bystanders; guard/bot Superunique kills wait
-  the respawn delay; (2) loot rolled at the kill, loot window shows the final name, pickup applies the plan; (3) Champion /
-  Superunique tags (creature copies, "Champion <name>" Rare, "Unique <name>" Rare Elite); (4) potions (m3b): % heal/resource
-  for every class, drops by monster kind, 999 stacks, level 1, 10 s shared cooldown via item script + Item-sparse hotfixes.
-- **Next step:** owner checks in game (headless can't): Champion/Unique names + silver / winged-silver portraits, loot-window
-  names before pickup, potions (999 stack shown, 10 s sweep on all potion buttons, mana potion on a rage class), Superunique
-  casts at a bot tank. m3 left: glow aura + 4.3 playtest (owner). NOW: m4 Paragon (change `m4-paragon`): Core, tables, XP at 90 -> Paragon, `.arpg paragon info|set|xp`, test 40 done; points + bonuses + ArpgUI Paragon window done (owner to try in game: `/paragon`); world tier in the Vale done (test 40). m4 left: 4.3 playtest (>= 5 levels per 2-hour session), loot tier T6-T8 gating comes with m5 raids. m3/m3b/m4 stay open until the owner's playtests. NOW m5: party table x raid tier x solo role (AutoBalance hook), solo tank/healer damage, level selector done (test 50). Ascended T6-T8 done (test 50). Raid probe done (Molten Core solo: 0.115 / 0.288, Instance.IgnoreRaid = 1 via write-confs). m5 left: 4.3 playtest (owner). NOW m2b: loot filter done (rules, commands, applied at loot planning; test 33). loot pet v1 done (test 34). companion roles v1 done (gossip menu: sell+repair, bank, mailbox; reforge/transmog/void flags set - owner to check in game if those windows open). overflow mail done. companion looks + shop done. ArpgUI loot button + filter panel done (owner to look in game). m2b left: 2.4 highlight beam (owner: visual spell id), 5.4 playtest. All 35 affix effects now roll (CC/snare reduction, cooldown rate, skill-up, pet range, Socketed added; test 23 covers CC/snare). m7 'bots understand affixes' analysed: bots score items by template (+ random property id = our display-only suffix -> nothing); needs `StatsWeightCalculator::CalculateItem(Item*)` + mod_arpg stat lines and ~6 playerbots call sites (EquipAction x3, ItemUsageValue, BotFactory) = ~8 upstream touches; low value until party bots get affixed gear -> parked for m7. NOW m6-any-race-class: done except the owner check (1.4): 43 new pairs (165 total) server side, CharBaseInfo in the client patch (installed), headless Undead Monk created + erased (`test-char-create.ps1`). Owner: on the creation screen every race should offer every class. m1b 2.1 professions panel done (ArpgUI T button / `/prof`, `.professions data`, test 15); owner: click a profession in the panel opens its window. m6/crafting 2b.3 wait for the owner's answers (Blockers); m7 'bots understand affixes' touches playerbots scoring in many callers - later Later: m6 custom items via Item-sparse hotfixes - ask owner before m6 design choices, world tier in the Vale, `.paragon` player commands. Idea to raise with owner: custom items via Item-sparse
-  hotfixes (typed blank bases, catalysts, essences) before m6. Parked: sell price.
-- **Owner decisions 2026-11-26** (all "as recommended"): custom items via Item-sparse hotfixes (ids 700000+, existing icons/models)
-  for catalysts + essences, typed blank bases after; catalyst consumed automatically by the next craft; salvage on the companion ->
-  essences -> buy catalysts; visual candidates via `.arpg test visual` packaged into one owner test list; filter "Leave" stays as is;
-  companion = gossip dialogue with the roles + a gold sink: reputation mounts for gold (start 5,000 g each, tune later); upstream
-  sync OK when the owner isn't playing; m7: 500 bots, Dungeon Finder (any dungeon any level, bots +-3), affix-aware party bots
-  (playerbots touches OK), living auction house, bot crowding; order DF -> affix bots -> AH -> crowding.
-- **Owner quality gate 2026-11-26 (OWNER-CHECKS):** loot beam = 120720 (Light Beam: Feralas Blue), Champion + Superunique
-  glow = 117230 (Empowered); any weapon OK; catalyst item OK; creation OK but (a) new race/class pairs spawn without starter
-  gear, (b) "Monks should always start in Pandaria", (c) some characters lay "sleeping" unable to stand (NE Monk, UD Rogue) -
-  made before the cast_spell fix; owner to re-check with new characters.
-- **OVERNIGHT QUEUE DONE 01:40 (owner 2026-11-27, asleep):** items 1-5 committed (a6419667..2be78430); item 7 (typed blank bases) waits for the owner's answer in OWNER-CHECKS 7. (1) finish the 00:50 run, Goblin Monk creation test,
-  commit; (2) Superuniques in every open-world zone (generated from each zone's rare creatures + their spawn points, kits
-  round-robin, tag copies regenerated); (3) Champions everywhere (tag copies for every open-world creature that can roll,
-  higher Arpg.Champion.Chance); (4) visuals: loot beam 120720 on corpses with loot worth picking up, glow 117230 on Champion
-  leaders + Superuniques; (5) potion tooltip via a client-patch Spell.dbc description override; then typed blank bases.
-  Restarts are fine (owner asleep); commit + push after each green run.
-- **Owner check 3 (2026-11-27):** companion + dialogue, salvage/catalysts, Champion/Unique tags + drops, Paragon, new-character
-  start: OK. Mounts OK (5000 g stays). FIX PILE: (1) loot window shows plain names (suffix only in bags) - suffix factor now
-  sent with planned loot; (2) mount shop as a vendor window - done (Mount Merchant list 1000002, copies 800000+id); (3) some new
-  pairs naked (Goblin Monk) - starter gear live with this restart; (4) potion "Use:" tooltip = client spell text -> needs a
-  client-patch Spell.dbc description override (open).
-- **QUEUE ADDITIONS (before typed blank bases):** (A) visuals: beam 120720 on corpses with loot worth picking up, glow 117230
-  on Champion leaders and Superuniques (m2b 2.4, m3 glow); (B) ~~starter gear~~ in the DB (generator reads CharStartOutfit.dbc; live after a restart); (C) monk start: owner 2026-11-26 chose "own racial start" (stock
-  behaviour, nothing to build) - only starter gear (B) and the sleeping bug (fixed; re-check) remain.
-- **QUEUE (work top-down, one change each):** (1) ~~m6-any-weapon~~ done (owner check pending); (2) ~~upstream sync~~ done 2026-11-26;
-  (3) ~~visual picker + OWNER-CHECKS~~ done; (4) ~~m6-custom-items + catalysts/salvage~~ done (owner check 4.1); (5) ~~companion mount shop~~ done; (6) m7: ~~500 bots, Dungeon Finder, affix-aware party bots v1~~ done + party bots' affixed gear + living AH + crowding done (corpse-loot scoring later);
-  affix-aware party bots, living AH, crowding; (7) typed blank bases.
-- **Blockers:** none for the queue below. Owner checks pending (bundled in `docs/OWNER-CHECKS.md` once written): creation screen any race/class, `/prof` panel, any weapon on a caster, companion windows (reforge/transmog/void open?), visual candidates for the loot beam + Champion glow. Client: `Wow-64-all.exe`. Typed blank bases: owner answered 2026-11-27 "all of these" -> change m6-blank-bases.
-- **Bots:** on for play (500 since 2026-11-26; 300 before) via start-stack / final stage; off for ARPG feature tests. Bot rules in m7.
+- **NOW (2026-11-27 16:10, owner present):** cleanup + headless round. Done: 11 of 16 changes archived
+  (`openspec/changes/archive/2026-11-27-*`, specs merged into `openspec/specs/`); deltas written for m4, m5, m6-any-race-class,
+  m7-bots; owner playtests moved to `docs/OWNER-CHECKS.md` "Playtests". New test tools `.arpg test sell|relog|bot`,
+  `scale combat ... bot`; tests 21 (real sale), 22 (relog), new 54-bots (bot fight keeps level, party of 2 in the Deadmines,
+  bot items unaffixed). Owner answers: bots never Need (= playerbots `LootNeedRollLevel` 1, pinned in write-confs); one shared
+  Superunique Unique counter (`Arpg.Superunique.SharedBadLuck` 1, test 31). "Creation works once" = stock exe, not a bug.
+- **Where we stopped (17:12):** ALL OK (28 GM files, 87 unit tests), committed + pushed; `m2-affix-loot` and `m7-bots` archived
+  too (13 of 16). Test fixes on the way: 30 (brittle "not yet exploded" check dropped), 51 (queue wait 300 s), 54 (zone cap
+  lifted; bot brought after the mob scales; on "off" the bot goes home). **Next:** owner checks (OWNER-CHECKS 1, 3, Later).
+- **Open changes (owner checks only):** `m2b-loot-pet-filter` (owner: companion Reforge/Transmog/Void windows, OWNER-CHECKS 3),
+  `m6-blank-bases` (owner check OWNER-CHECKS 1), `m7-living-ah` (owner: auction house).
+- **Blockers:** none. Owner checks in `docs/OWNER-CHECKS.md`. Client: always `Wow-64-all.exe`.
+- **Bots:** on for play (500 since 2026-11-26; 300 before) via start-stack and rebuild-and-test (tests 51-54 need them). Bot rules: `openspec/specs/bots` after archiving m7.
 
 ## Roadmap (one change folder each; propose the backlog ones from the spec Doc when their turn comes)
 | # | Change | Status |
 | --- | --- | --- |
-| 0 | m0-server-setup | done except owner's real-client login + first upstream sync |
-| 1 | m1-world-scaling (module skeleton, `.arpg` commands, test harness, scaling) | live + tested; archive pending |
-| 1 | m1b-all-professions | server side done |
-| 2 | m2-affix-loot (+ MPQ-loading spike) | **active**: roll/save/calibration done, stats on equip in test |
-| 2 | m2b-loot-pet-filter | proposed |
-| 3 | m3-champions-superuniques (a different Superunique respawns 5 min after a kill) | started: Core bands + SQL |
-| 4 | m4-paragon-addon | backlog |
-| 5 | m5-dungeon-scaling (party size 1–5, leader's level, difficulty knob) | backlog |
-| 6 | m6-client-patch (native affix lines + names, Uniques, charms, race/class combos) | backlog |
-| 7 | m7-bots (enable bots, verify bot rules, Dungeon Finder hook, optional crowding) | proposed |
+| 0-7 | m0, m1, m1b, m2-affix-loot, m2b-mount-shop, m3, m3b, m4, m5, m6-any-race-class, m6-any-weapon, m6-custom-items, m7-bots | archived 2026-11-27 |
+| 2 | m2b-loot-pet-filter | done except owner check (companion windows) |
+| 6 | m6-blank-bases | done except owner check |
+| 7 | m7-living-ah | done except owner check (auction house) |
 | – | multiplayer with friends (client updater, Tailscale, group rules) | idea |
 | – | loot pet gathers herbs/ore | idea |
 
@@ -90,6 +50,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-27 17:12 cleanup round: 13 of 16 changes archived (specs merged; deltas written for m4/m5/m6-race-class/m7); playtests -> OWNER-CHECKS. New test tools `test sell|relog|bot`, `scale combat bot`; tests 21/22 extended, new 54-bots. Owner: bots never Need (pinned LootNeedRollLevel 1), shared Superunique Unique counter (`SharedBadLuck`). ALL OK 28 files, 87 unit tests.
 - 2026-11-27 08:15 corpse loot preview (m2 4.11) + m6-blank-bases (1,495 blanks; drops 10%, crafted, companion shop; max affixes; craft hook in Spell::DoCreateItem). Full run ALL OK (27 files), 87 unit tests. Owner checks next.
 - 2026-11-27 07:40 owner morning checks: beam/glow/mount vendor/potion text/starter gear ok. "Plain blues" = stock Wow-64.exe (use Wow-64-all.exe). Potion "Use:" text moved from the patch Spell.dbc to ArpgUI Potions.lua (generated PotionData.lua); `--spell` keeps the old way. Open: blank-bases answer, Unique pity per Superunique (ask owner).
 - 2026-11-27 02:43 all work without owner input done; server healthy (500 bots); check-in cron stopped. Next: owner's OWNER-CHECKS round + blank-bases answer; recreate the check-in job when work runs again.

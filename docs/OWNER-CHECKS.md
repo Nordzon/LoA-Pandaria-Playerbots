@@ -32,8 +32,26 @@ Any zone has a Superunique of its own rares ("Unique <name>"); Champion packs ar
 
 > Result:
 
-## 3. Character creation works only once (your report, open - I'm looking into it)
-You made a Goblin Monk, and after that no unusual combination could be picked any more. Nothing to test yet.
+## 3. Companion windows (one check left from the companion change)
+Right-click the companion -> Reforge, Transmogrify, Void Storage: does each open its normal window?
+
+> Result:
+
+## 4. Questions for you (no testing)
+1. ~~Bots' loot rolls~~ - answered "bots never Need is perfect" (already so via playerbots `LootNeedRollLevel` 1; now pinned).
+2. ~~Unique bad-luck counter~~ - answered "one shared counter" (built; `Arpg.Superunique.SharedBadLuck` 1).
+> Answers: 1. Bots never need is perfect. 2. One shared counter.
 
 ## Later: auction house
 `.tele stormwind`, Trade District auctioneer: mostly materials, some gear, about a third of the green-epic gear with affixes.
+
+## Playtests (standing list - write notes whenever you've played; no rush)
+Moved here from the change folders so finished features can be archived. Tuning goes into `docs/BALANCE.md`.
+- World scaling: at 85 in Northshire, Westfall, Jade Forest - kill times feel right?
+- Loot: an evening of levelling - are drops exciting?
+- Champion packs: an at-level character beats a pack in 30-60 s?
+- Paragon: 5 or more levels in a 2-hour session at the start?
+- Dungeons: solo a 5-man as tank, DPS and healer.
+- Companion: clear 3 packs in Jade Forest - it never gets stuck and feels fast enough.
+
+> Notes:

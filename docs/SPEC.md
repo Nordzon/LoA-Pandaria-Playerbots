@@ -81,7 +81,7 @@ Every `.arpg` debug command takes an explicit character name or GUID (works over
   player's level and slot (blue main line = 43% of B, best secondary 34%, stamina 50%). T1 = 30–45% of that line, T5 = 85–100%
   (a T5 roll equals a full blue stat line); Ascended T6–T8 go above it. Tiers in between are linear.
 - Sell value: `template price + affixCount × playerLevel × Arpg.Loot.SellCopperPerAffixLevel` (200) → ~350–500 g/h of normal play at 90 (needs a small `// ARPG:` hook in the vendor sell handler).
-- Bots: `Arpg.Loot.AffixBotItems = 0` (bot gear vanilla). In a group, bots roll only on items the player's class can't use.
+- Bots: `Arpg.Loot.AffixBotItems = 0` (bot gear vanilla). In a group, bots never roll Need (owner 2026-11-27; `AiPlayerbot.LootNeedRollLevel` 1 turns their Need into Greed), so the player wins any Need roll.
 - **Display:** all affix effects are applied server-side at their exact value. A stat affix also shows natively when the client
   has a fixed-amount `SpellItemEnchantment` within ±5% of the roll (measured: client rows only reach ~46 main stat, so mostly low levels). Other affixes work server-side from day one; ArpgUI adds their tooltip lines (server sends
   affixes via addon messages). With the client patch (m6, or m2 if the MPQ-loading spike succeeds), the pipeline generates
@@ -180,7 +180,7 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   **Targeting (owner 2026-11-22):** abilities and caster affixes go at whoever holds the monster's aggro: the player, a bot tank
   in the player's party, a pet. The full kit is used on the tank-at-the-time, damage always as a % of *that* target's max
   health. They only act while a real player is near (~100 yd).
-  Loot: guaranteed blue + own Unique at **10%** with bad-luck protection (+5% per kill without it, reset on drop; `Arpg.Superunique.UniqueChance`, `.UniqueBadLuckStep`).
+  Loot: guaranteed blue + own Unique at **10%** with bad-luck protection (+5% per kill without it, reset on drop; `Arpg.Superunique.UniqueChance`, `.UniqueBadLuckStep`). **One counter shared by all Superuniques** (owner 2026-11-27, `.SharedBadLuck` 1): any Superunique kill without a Unique raises it, so a Unique comes within 19 Superunique kills whichever ones they are. Boss ladders stay per boss.
 
 ### 4.3b Potions (m3b, owner 2026-11-22)
 - Existing potion items (Minor .. Major Healing / Mana, Minor/Major Rejuvenation, Alchemist's Rejuvenation) heal / restore a
