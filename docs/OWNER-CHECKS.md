@@ -23,6 +23,18 @@ start **`Wow-64-all.exe`** (or the desktop shortcut / `start-stack.ps1`). The po
 
 > Result: All of this is working
 
+## 0c. New this morning (2026-11-27 08:15) - start `Wow-64-all.exe` fresh (the addon got new files)
+1. **Corpse loot preview:** companion off (L), kill something with a green/blue: hovering the item in the loot window shows its
+   affix lines; after looting, the bag item has exactly the same lines.
+2. **Blank bases - drops:** `.arpg config set Arpg.Blank.DropChance 100`, `.tele goldshire`, `.arpg champion make Lokund 299`,
+   kill the pack: the green/blue items are blanks - tooltip: main stat + Stamina, then the affix lines (green 2, blue 3), and
+   the yellow line "Blank base: always rolls the most affixes for its quality." Afterwards `.arpg config set Arpg.Blank.DropChance 10`.
+3. **Blank bases - companion:** `.additem 700010 50` (essences), right-click the companion -> "Blank bases for essences" ->
+   Chest -> Blue: 15 essences are taken and a leather Agility chest (rogue) with 3 affixes appears.
+4. Crafting (only if Lokund has a profession that makes gear): crafted gear comes out as its blank.
+
+> Result:
+
 ## 1. Loot names on the corpse (fixed overnight)
 Companion off (click **L**). Kill things near your level: affixed greens/blues show their full name in the loot window
 ("... of the Bear") before you take them, and the bag item is the same.
