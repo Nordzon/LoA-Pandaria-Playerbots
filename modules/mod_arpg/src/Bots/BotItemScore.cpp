@@ -64,11 +64,17 @@ namespace
         std::map<uint32, int32> sum;
         if (!sArpgConfig.Get().botAffixScoring) { why = "off"; return sum; }
         if (!IsPartyBot(bot)) { why = "not a party bot"; return sum; }
-        Item* it = FindInstance(bot, itemId, rp);
-        if (!it) { why = "no affixed instance owned"; return sum; }
-        for (Arpg::Loot::StatLine const& l : Arpg::Loot::ItemStatLines(it->GetGUID().GetCounter(), true))
+        if (Item* it = FindInstance(bot, itemId, rp))
+        {
+            for (Arpg::Loot::StatLine const& l : Arpg::Loot::ItemStatLines(it->GetGUID().GetCounter(), true))
+                sum[l.stat] += l.value;
+            why = "ok";
+            return sum;
+        }
+        // Loot still on a corpse (Need/Greed rolls, m7 3b.3): its plan's affixes at the middle of their ranges.
+        for (Arpg::Loot::StatLine const& l : Arpg::Loot::PlannedStatLines(itemId, rp, int(bot->GetLevel())))
             sum[l.stat] += l.value;
-        why = "ok";
+        why = sum.empty() ? "no affixed instance owned" : "planned";
         return sum;
     }
 

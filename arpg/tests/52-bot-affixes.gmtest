@@ -9,6 +9,10 @@
 ? ok botscore bot=\S+ item=1489 affixes=[23] affix_sum=[1-9]\d* \(ok\) with=\d+\.\d without=\d+\.\d gain=\d+\.\d equipped_affixed=[1-9]
 # Joining the group rolled affixes on the bot's own equipped greens/blues (Arpg.Bots.PartyGear, one tier below).
 # gain = with - without is never negative; it can be 0 when the rolled stats are ones the bot's spec does not value.
+# Loot still on a corpse (Need rolls, m7 3b.3): a planned blue - the bot sees its affixes (middle of their ranges) before
+# anyone loots it.
+> .arpg test planscore Arpgtest any 1489
+*20 ok planscore bot=\S+ item=1489 rp=-\d+ planned_sum=[1-9]\d* \(planned\)
 > .arpg config set Arpg.Bots.AffixScoring 0
 ? ok
 > .arpg test botscore Arpgtest any 1489

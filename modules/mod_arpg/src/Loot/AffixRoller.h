@@ -73,6 +73,9 @@ namespace Arpg::Loot
     // Plans every rollable item of a loot (corpse, chest) and sets each item's suffix id so the loot window shows its name.
     void PlanLoot(Player* owner, ::Loot& loot, ItemPickupSourceType source, uint32 sourceId, bool championLoot);
     bool TakePlan(uint32 itemId, int32 rp, RollPlan& out);
+    // The stat lines a planned loot item (still on a corpse) will roughly have at `level`: each flat-stat affix of the first
+    // plan for (itemId, suffix id) at the middle of its tier range. Nothing is taken; empty = no plan (bots, Need rolls).
+    std::vector<StatLine> PlannedStatLines(uint32 itemId, int32 rp, int level);
     // The final kill script that plans corpse loot; must be installed after BossPity, Champions and Superuniques.
     void InstallLootPlanner();
 

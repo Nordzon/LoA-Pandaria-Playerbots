@@ -16,7 +16,7 @@
 ## 3b. Bots understand affixes (owner 2026-11-26)
 - [x] 3b.1 One hook in playerbots `StatsWeightCalculator::CalculateItem` (`ExtraItemStats`, // ARPG:, 5 lines in 2 files); mod_arpg `Bots/BotItemScore` adds the affix stats of the item instance a party bot owns
 - [x] 3b.2 `52-bot-affixes.gmtest`: a party bot's score for an affixed blue is higher with the hook; `Arpg.Bots.AffixScoring` 0 turns it off
-- [ ] 3b.3 Loot on a corpse (Need rolls): score by the planned affixes (plan has ids + tiers; values roll at pickup)
+- [x] 3b.3 Loot on a corpse (Need rolls): score by the planned affixes (plan has ids + tiers; values roll at pickup)
 - [x] 3b.4 Party bots wear affixed gear one tier below the player (`Arpg.Bots.PartyAffixTierOffset`)
 
 ## 4. Optional

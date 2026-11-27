@@ -763,6 +763,40 @@ namespace Arpg::Loot
         }
     }
 
+    std::vector<StatLine> PlannedStatLines(uint32 itemId, int32 rp, int level)
+    {
+        std::vector<StatLine> out;
+        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+        if (!proto || !rp)
+            return out;
+        RollPlan plan;
+        std::map<uint32, AffixInfo> byId;
+        std::map<std::pair<uint32, int>, Core::TierRange> ranges;
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            auto it = g_plans.find({ itemId, rp });
+            if (it == g_plans.end() || it->second.empty())
+                return out;
+            plan = it->second.front();
+            for (AffixInfo const& a : g_affixes)
+                byId[a.def.id] = a;
+            ranges = g_ranges;
+        }
+        uint32 budget = BudgetB(proto, uint8(std::max(1, level))).budget;
+        for (Core::RolledAffix const& r : plan.rolled)
+        {
+            auto a = byId.find(r.affixId);
+            if (a == byId.end() || a->second.unit != "B")
+                continue;
+            uint32 stat = EffectStat(a->second.effect);
+            if (!stat)
+                continue;
+            Core::TierRange range = ranges[{ r.affixId, std::min(r.tier, 5) }];
+            out.push_back({ stat, int32(Core::FlatValue(budget, range, 0.5)), false });
+        }
+        return out;
+    }
+
     bool TakePlan(uint32 itemId, int32 rp, RollPlan& out)
     {
         std::lock_guard<std::mutex> l(g_lock);

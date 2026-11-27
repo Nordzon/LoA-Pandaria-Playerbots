@@ -85,6 +85,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-27 02:10 m7 3b.3: party bots score corpse loot by its plan (PlannedStatLines: plan affixes at mid range, read-only); `.arpg test planscore`; test 52. Full run ALL OK (26 files).
 - 2026-11-27 01:40 overnight queue done and pushed: world Superuniques (461/83 zones), Champions 5%, glow + loot beam (test 30), potion tooltips (client patch installed). OWNER-CHECKS rewritten for the morning. Waiting: blank-bases answer.
 - 2026-11-27 01:35 overnight: Superuniques in all open-world zones (gen_superuniques.py: 461 in 83 zones, Unique copies regenerated), Champion chance 5%; visuals: Champion + Superunique glow 117230 (Arpg.*.VisualAura), loot beam 120720 on corpses with green+ items (Loot/LootBeam, invisible marker); potion tooltips via the client patch (Spell.dbc descriptions of the 15 potion spells; built + installed, live at the next client start). Build of all of it running.
 - 2026-11-27 00:52 owner check 3 fixes building: suffix factor on planned loot (loot window names), mount vendor window (`2026_11_27_01_arpg_mount_vendor.sql`, applied), loot-filter empty-marker, low-level floor fallback, starter gear. Potion tooltip needs a client patch (open).

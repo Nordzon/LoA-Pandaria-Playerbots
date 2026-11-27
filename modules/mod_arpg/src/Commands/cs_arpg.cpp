@@ -209,6 +209,7 @@ public:
             { "salvage",  &HandleTestSalvage,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "mount",    &HandleTestMount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "botscore", &HandleTestBotScore, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "planscore", &HandleTestPlanScore, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "ah",       &HandleTestAh,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "money",    &HandleTestMoney,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "events",   &HandleTestEvents,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -545,6 +546,45 @@ public:
         delete item;
         handler->PSendSysMessage("ok ah item=%u level=%u affixes=%d base=%u buyout=%u bid=%u (%s)", itemId,
             uint32(proto->RequiredLevel), n, base, buyout, bid, why.c_str());
+        return true;
+    }
+
+    // .arpg test planscore <char> <bot>|any <itemId>   (m7 3b.3) plans the item as corpse loot for the character (a loot list of
+    // one, the same planner a kill uses), then reports the planned affix stats a party bot sees for it before anyone loots.
+    static bool HandleTestPlanScore(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 3 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test planscore <char> <bot>|any <itemId>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        Player* bot = nullptr;
+        if (t[1] == "any")
+        {
+            if (Group* g = p->GetGroup())
+                for (GroupReference* ref = g->GetFirstMember(); ref && !bot; ref = ref->next())
+                    if (Player* m = ref->GetSource())
+                        if (m != p && !Arpg::Scaling::IsRealPlayer(m))
+                            bot = m;
+        }
+        else
+            bot = ObjectAccessor::FindPlayerByName(NormalizeName(t[1]));
+        if (!bot)
+            return Fail(handler, "no party bot (group one first: .arpg test botscore <char> any <item>)");
+        uint32 itemId = uint32(std::strtoul(t[2].c_str(), nullptr, 10));
+        ::Loot loot;
+        LootItem li;
+        li.itemid = itemId;
+        li.count = 1;
+        loot.items.push_back(li);
+        loot.unlootedCount = 1;
+        Arpg::Loot::PlanLoot(p, loot, ItemPickupSourceType::CreatureLoot, 0, false);
+        int32 rp = loot.items[0].randomPropertyId;
+        std::string why;
+        int sum = Arpg::Bots::AffixScoreInput(bot, itemId, rp, why);
+        handler->PSendSysMessage("ok planscore bot=%s item=%u rp=%d planned_sum=%d (%s)", bot->GetName().c_str(), itemId, rp, sum,
+            why.c_str());
         return true;
     }
 
