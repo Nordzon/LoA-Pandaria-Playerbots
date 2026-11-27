@@ -158,6 +158,7 @@ enum CharacterCustomizeFlags
 
 ArpgHooks::ItemBonusesFn ArpgHooks::ItemBonuses = nullptr; // ARPG: set by mod_arpg
 ArpgHooks::ItemSellPriceFn ArpgHooks::ItemSellPrice = nullptr; // ARPG: set by mod_arpg
+ArpgHooks::QuestClassAllowedFn ArpgHooks::QuestClassAllowed = nullptr; // ARPG: set by mod_arpg
 
 static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 
@@ -13392,6 +13393,9 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                     // remove held enchantments, update expertise
                     if (slot == EQUIPMENT_SLOT_MAINHAND)
                     {
+                        // ARPG: not done - mod_arpg keeps affix/Unique tooltip lines in these slots, and unequipping a
+                        // main-hand weapon wiped them (owner 2026-11-27). Legacy "held enchantment" clearing.
+                        /*
                         if (pItem->GetItemSuffixFactor())
                         {
                             pItem->ClearEnchantment(PROP_ENCHANTMENT_SLOT_3);
@@ -13402,6 +13406,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                             pItem->ClearEnchantment(PROP_ENCHANTMENT_SLOT_0);
                             pItem->ClearEnchantment(PROP_ENCHANTMENT_SLOT_1);
                         }
+                        */
 
                         UpdateExpertise(BASE_ATTACK);
                     }
@@ -17170,6 +17175,8 @@ bool Player::SatisfyQuestClass(Quest const* qInfo, bool msg) const
 
     if ((reqClass & GetClassMask()) == 0)
     {
+        if (ArpgHooks::QuestClassAllowed && ArpgHooks::QuestClassAllowed(this, qInfo->GetQuestId()))   // ARPG: see ArpgHooks.h
+            return true;
         if (msg)
         {
             SendCanTakeQuestResponse(QUEST_ERR_NONE);

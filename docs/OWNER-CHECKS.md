@@ -15,6 +15,15 @@ glow (2), mount vendor window (4), potion tooltip (5), blank bases use (7: "all 
 | Gold (6000 g) | target yourself, then `.modify money 60000000` |
 | Teleport | `.tele goldshire`, `.tele stormwind`, `.tele ValeofEternalBlossoms` |
 
+## A2. New 2026-11-27 22:05 - starting quests for new race/class pairs (Nordana)
+1. Nordana: go to Ilthalaine (or Melithar Staghelm): "Simple Sigil" is offered - take it, it's done at once.
+2. Hand it in to Alyissia (the Warrior trainer in Aldrassil): "Learning New Techniques" - also done on accept; hand it in.
+3. "Priestess of the Moon" follows, and the rest of Shadowglen as usual.
+4. Any other new race/class character later (e.g. a Human Shaman in Northshire): Marshal McBride should offer "Beating Them
+   Back!" at level 1.
+
+> Result:
+
 ## A. New 2026-11-27 20:45 - class abilities with any weapon (patch installed 21:12: start `Wow-64-all.exe` fresh)
 1. A Rogue with a **two-handed sword** (`.additem 2489`): Backstab, Mutilate (with no off-hand weapon), Dispatch, poisons and
    Shiv all work; none is red on the action bar.

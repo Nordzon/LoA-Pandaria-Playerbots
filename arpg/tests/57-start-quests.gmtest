@@ -1,0 +1,32 @@
+# Starting quests for new race/class pairs (change m6-start-quests, owner 2026-11-27: Night Elf Paladin stuck after
+# "Demonic Thieves"). New pairs borrow the Warrior's class quests of their starting zone; trainer steps complete on accept.
+
+> .arpg reload
+? startquests=[1-9]\d*
+
+# Shadowglen: Night Elf (4) Paladin (2) / Shaman (7) / Warlock (9) take Simple Sigil (3116) and Learning New Techniques
+# (26945, at the Warrior trainer -> completes on accept); stock pairs (Night Elf Warrior 1, Hunter 3) get no row.
+> .arpg test questproxy 4 2 3116
+? ok race=4 class=2 quest=3116 allowed=1 autocomplete=1 enabled=1
+> .arpg test questproxy 4 9 26945
+? allowed=1 autocomplete=1
+> .arpg test questproxy 4 1 3116
+? allowed=0
+> .arpg test questproxy 4 3 26945
+? allowed=0
+
+# Northshire: Human (1) Shaman (7) / Druid (11) play the Warrior's "Beating Them Back!" (28766, kill worgs - not a trainer
+# step) normally; "Charging into Battle" (26913, Warrior trainer) completes on accept. Human Paladin is a stock pair.
+> .arpg test questproxy 1 7 28766
+? allowed=1 autocomplete=0
+> .arpg test questproxy 1 11 26913
+? allowed=1 autocomplete=1
+> .arpg test questproxy 1 2 28766
+? allowed=0
+
+# The hook leaves real players' own checks alone: Arpgtest (Human Warrior) can't take the Hunter version (class) nor the
+# Night Elf Warrior sigil (race).
+> .arpg test cantake Arpgtest 28767
+? ok Arpgtest race=1 class=1 quest=28767 class_ok=0 can_take=0
+> .arpg test cantake Arpgtest 3116
+? class_ok=1 can_take=0

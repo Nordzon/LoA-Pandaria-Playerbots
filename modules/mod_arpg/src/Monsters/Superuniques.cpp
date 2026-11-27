@@ -45,6 +45,7 @@ namespace
     {
         uint32 id = 0;
         uint64 guid = 0;
+        uint32 mapId = 0;                  // a player's tick only checks creatures on its own map
         Arpg::Core::MonsterBand band;
         std::vector<Ability> abilities;
         std::vector<uint32> lastUse;       // getMSTime per ability
@@ -121,6 +122,7 @@ namespace
         Live live;
         live.id = id;
         live.guid = c->GetGUID().GetRawValue();
+        live.mapId = map->GetId();
         live.band = band;
         int count = band.affixMin + int(Rand(uint32(std::max(0, band.affixMax - band.affixMin) + 1)));
         for (Ability const& a : kit)
@@ -221,9 +223,12 @@ namespace
                 aliveCount = int(z.alive.size());
                 due = z.respawnAt == 0 || int32(now - z.respawnAt) >= 0;
             }
+            // Only this player's map: a creature on another continent isn't found from here and must not count as gone
+            // (friends on different continents, 2026-11-27).
             for (auto& zs : g_zones)
                 for (auto& kv : zs.second.alive)
-                    check.push_back({ zs.first, kv.second.guid });
+                    if (kv.second.mapId == p->GetMapId())
+                        check.push_back({ zs.first, kv.second.guid });
         }
         // Drop what vanished (despawned, grid unloaded, killed without a player kill) and empty zones nobody visits.
         for (auto const& zc : check)

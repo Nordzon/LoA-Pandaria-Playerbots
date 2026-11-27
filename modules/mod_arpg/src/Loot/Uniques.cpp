@@ -196,13 +196,8 @@ namespace Arpg::Loot
         Arpg::Settings s = sArpgConfig.Get();
         if (s.displayEnabled)
         {
-            // Power line: id = UniqueBase + power*1000 + tier*100 + combo (trigger step x magnitude step), the order the
-            // client generator writes (arpg/client-patch/build-client-patch.py).
-            int lo = std::min(range.triggerMin, range.triggerMax);
-            int nMag = (range.magnitudeMax - range.magnitudeMin) / 5 + 1;
-            int combo = (roll.power.trigger - lo) * nMag + (roll.power.magnitude - range.magnitudeMin) / 5;
-            if (combo >= 0 && combo < 100)
-                item->SetEnchantment(PROP_ENCHANTMENT_SLOT_4, s.displayUniqueBase + power.id * 1000 + uint32(tier) * 100 + uint32(combo), 0, 0);
+            if (uint32 lineId = UniqueDisplayId(roll))
+                item->SetEnchantment(PROP_ENCHANTMENT_SLOT_4, lineId, 0, 0);
             // Name: "<base> - <Unique name>" until the Item-sparse patch gives Uniques their own names (m6).
             item->SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, -int32(s.displaySuffixBase + 1000 + uniqueId));
         }
@@ -235,6 +230,29 @@ namespace Arpg::Loot
         out.schoolMask = p->second.schoolMask;
         out.spellId = p->second.spellId;
         return true;
+    }
+
+    uint32 UniqueDisplayId(UniqueRoll const& roll)
+    {
+        Arpg::Settings const& s = sArpgConfig.Get();
+        if (!s.displayEnabled || !roll.uniqueId)
+            return 0;
+        Core::PowerTierRange range;
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            auto p = g_powers.find(roll.powerId);
+            if (p == g_powers.end() || !p->second.tiers.count(roll.tier))
+                return 0;
+            range = p->second.tiers.at(roll.tier);
+        }
+        // Power line: id = UniqueBase + power*1000 + tier*100 + combo (trigger step x magnitude step), the order the
+        // client generator writes (arpg/client-patch/build-client-patch.py).
+        int lo = std::min(range.triggerMin, range.triggerMax);
+        int nMag = (range.magnitudeMax - range.magnitudeMin) / 5 + 1;
+        int combo = (roll.power.trigger - lo) * nMag + (roll.power.magnitude - range.magnitudeMin) / 5;
+        if (combo < 0 || combo >= 100)
+            return 0;
+        return s.displayUniqueBase + roll.powerId * 1000 + uint32(roll.tier) * 100 + uint32(combo);
     }
 
     UniqueRoll UniqueOf(uint32 itemGuid)

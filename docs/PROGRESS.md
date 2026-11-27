@@ -9,6 +9,18 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
   17:23) + rebuild-and-test refuses to restart with real players online (`-Force`); sign-up page `arpg/signup/signup.py` +
   `start-signup.ps1` + `test-signup.ps1` (ALL OK, 12 checks incl. headless login); `write-confs -BindIP` / `network.local.ps1`,
   `set-realm-address.ps1`, `make-client-kit.ps1` (tested on a fake client); guide `docs/FRIENDS.md`.
+- **Active (22:05): change `m6-start-quests`** (owner: Nordana, Night Elf Paladin, no quests after "Demonic Thieves"). New
+  pairs borrow the Warrior's starting-zone class quests (`arpg_quest_proxy`, 105 rows, generator `gen_start_quests.py`), hook
+  `QuestClassAllowed` in `Player::SatisfyQuestClass`, trainer steps complete on accept; GM test `57-start-quests` PASS; live
+  since 22:08 and **verified on Nordana** (3116, 26945, 28723-28725 done). Full run 22:19: only 31-superuniques failed ->
+  **found a Superunique bug** (pre-existing): a real player on another map (Nordana, Kalimdor) made every tick drop the
+  Elwynn Superunique from tracking (lookup on the wrong map -> "gone", 300 s respawn, creature left untracked). Fixed in
+  `Monsters/Superuniques.cpp` (`Live.mapId`, tick checks its own map only) + test 31 parks Arpgtesttwo in Jade Forest.
+  Also (owner report 22:35): **main-hand unequip wiped affix lines** - upstream `Player::RemoveItem` cleared 2 PROP enchant
+  slots ("held enchantments"); commented out (`// ARPG:`), + `Loot/AffixDisplayRepair` rewrites lines at login (Nordana's
+  daggers 402254/403371 come back); test 22 checks lines_before = lines_after on a main-hand unequip.
+  Built after the owner's "go": **ALL OK 31 GM files 22:48**, committed + pushed. **Next:** owner relogs Nordana (daggers'
+  lines come back at login); archive m6-start-quests + m6-any-weapon-skills after OWNER-CHECKS A.
 - **Active (20:45): change `m6-any-weapon-skills`** (owner: no class ability needs a specific weapon or 1H/2H; shields stay).
   Done: `Core/WeaponReq` + 6 unit tests, `Character/AnyWeaponSkills` (35 class spells widened, Mutilate/Lava Lash/Wild Strike
   main hand), `.arpg test spellreq`, GM test `56-weapon-skills`, client patch builder (same 35/3). ALL OK 30 GM files 20:48,
@@ -31,6 +43,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | 2 | m2b-loot-pet-filter | done except owner check (companion windows) |
 | 6 | m6-blank-bases | done except owner check |
 | 7 | m7-living-ah | done except owner check (auction house) |
+| 6 | m6-start-quests | done, ALL OK, verified on Nordana; archive with A |
 | 6 | m6-any-weapon-skills | **active**: built, ALL OK, live, client patch installed; owner check A |
 | 8 | m8-friends | **active**: sign-up, network, kit, backups done; multiplayer rules wait for owner |
 | – | multiplayer with friends (client updater, Tailscale, group rules) | idea |
@@ -58,6 +71,8 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-27 — Fixed: Superuniques dropped from tracking when a real player was on another map; main-hand unequip wiped affix lines (upstream clearing disabled + login repair). ALL OK 31 files.
+- 2026-11-27 — m6-start-quests: new race/class pairs borrow the Warrior's starting-zone class quests (Nordana stuck in Shadowglen); upstream hook in SatisfyQuestClass.
 - 2026-11-27 — Owner: Hunter shots keep needing a bow/gun/crossbow (m6-any-weapon-skills, as built).
 - 2026-11-27 — m6-any-weapon-skills: class abilities take any melee weapon in any hand (server SpellInfo + client patch); shield/ranged kept; SPEC 4.9 updated.
 - 2026-11-27 19:22 m8 multiplayer rules live: ALL OK 28 GM files (new 55-friends, fixes in 30/54; probes `scaled`/`tiered`; test spot park-stormwind). Committed + pushed.

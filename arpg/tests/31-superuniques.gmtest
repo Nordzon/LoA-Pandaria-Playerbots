@@ -2,6 +2,10 @@
 # one alive while a real player is in it. Level 20: band 15 (+2 levels, 4x health, 1.35x damage, 3 abilities, 40% orb).
 # Rules, not rates: the respawn delay is set to 5 s, a Superunique is spawned next to the character, the Unique pity is full.
 
+# A second real player on ANOTHER map (friends on different continents, bug 2026-11-27): its ticks must not drop Elwynn's
+# Superunique from the tracking (before the fix: alive=0 within a second, 300 s respawn, the creature left untracked).
+> .arpg test setup Arpgtesttwo 20 jadeforest-dawnsblossom
+? ok .*\(online\)
 > .arpg test setup Arpgtest 20 elwynn-wilds
 ? ok .*\(online\)
 > .arpg test clearbags Arpgtest
@@ -94,3 +98,5 @@
 > .arpg test setup Arpgtest 20 elwynn-northshire
 ? ok .*\(online\)
 ~ 6000
+> .arpg test setup Arpgtesttwo 20 park-stormwind
+? ok .*\(online\)

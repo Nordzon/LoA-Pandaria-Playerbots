@@ -23,6 +23,8 @@ What's where, and what we've touched. All paths below were checked against this 
 | `modules/mod_arpg/src/Loot/Salvage.{h,cpp}`, `Core/Salvage` | companion Salvage + Buy catalysts; catalyst drops/auto-use live in `Loot/Crafting`; items 7000xx in `sql/world/2026_11_26_00` |
 | `modules/mod_arpg/src/Character/AnyWeapon.{h,cpp}` | any class any weapon/shield: proficiency spells + skills at login/level-up (`Arpg.AnyWeapon.*`); `.arpg test weapons` |
 | `modules/mod_arpg/src/Character/AnyWeaponSkills.{h,cpp}`, `Core/WeaponReq.{h,cpp}` | class spells take any melee weapon in any hand (widens loaded `SpellInfo` at startup / `.arpg reload`, keeps originals; `Arpg.AnyWeapon.Skills`, `.MainHandSpells`); `.arpg test spellreq <spell> [item]`; client side in `build-client-patch.py` (`SpellEquippedItems.dbc`, `SpellMisc.dbc`, same rule) |
+| `modules/mod_arpg/src/Character/StartQuests.{h,cpp}`, `sql/tools/gen_start_quests.py` | new race/class pairs take the Warrior's starting-zone class quests (`arpg_quest_proxy`; hook `QuestClassAllowed`), trainer steps complete on accept (`OnQuestAdded`); `.arpg test questproxy`, `.arpg test cantake` |
+| `modules/mod_arpg/src/Loot/AffixDisplayRepair.{h,cpp}` | login repair: rewrites missing affix lines (slots 8..) and the Unique power line (slot 12) from `item_instance_arpg_affix` / `_unique`; `Uniques::UniqueDisplayId` |
 | `arpg/scripts/test-char-create.ps1` | headless create + check + erase of a new race x class pair (m6) |
 | `modules/mod_arpg/sql/tools/gen_monster_tags.py` | generates the Champion/Superunique tag copies of creature templates (entry +5,000,000 / +6,000,000) |
 | `modules/mod_arpg/src/Monsters/Superuniques.{h,cpp}` | m3 Superuniques: zone pools (`arpg_superunique`, `_spawn`, `_ability`), PerZone alive while a real player is in the zone, band kind 1 via `Scaling::Pin`, kit abilities at the aggro holder (% of target max health), rotation `Core::NextSuperunique`, kill → orb/blue/Unique ladder, `.arpg superunique spawn/next/info/kill/loot/fight` |
@@ -75,7 +77,7 @@ Every edit outside `modules/mod_arpg/`. Keep this list short; each entry is a me
 | File | Why | Marker | Change |
 | --- | --- | --- | --- |
 | `modules/mod_playerbots/src/Mgr/Item/StatsWeightCalculator.{h,cpp}` | Bots score affixes: `inline static ExtraItemStats` hook pointer (h) + one call after `CalculateRandomProperty` in `CalculateItem` (cpp); set by mod_arpg `Bots/BotItemScore` | `ARPG:` | m7 |
-| `src/server/game/Entities/Creature/ArpgHooks.h` (new) | Function-pointer hook declarations (CreatureLevel m1, ItemPickup m2, ItemBonuses m2, LootMoney m2, LootFilled m2, ItemSellPrice m2, InstanceScale/InstanceLevel m5, AuctionBotItem m7, CraftedItem m6), null unless mod_arpg sets them | `ARPG:` | m1, m2, m5, m7 |
+| `src/server/game/Entities/Creature/ArpgHooks.h` (new) | Function-pointer hook declarations (CreatureLevel m1, ItemPickup m2, ItemBonuses m2, LootMoney m2, LootFilled m2, ItemSellPrice m2, InstanceScale/InstanceLevel m5, AuctionBotItem m7, CraftedItem m6, QuestClassAllowed m6), null unless mod_arpg sets them | `ARPG:` | m1, m2, m5, m7 |
 | `src/server/game/Spells/SpellEffects.cpp` | Blank bases: `ArpgHooks::CraftedItem(player, spellId, itemId)` at the top of `Spell::DoCreateItem` (+ include) | `ARPG:` | m6 |
 | `src/server/game/AuctionHouseBot/AuctionHouseBotSeller.cpp` | Living AH: `ArpgHooks::AuctionBotItem(item, buyout, bid)` after `SetPricesOfItem` (+ include) | `ARPG:` | m7 |
 | `src/server/game/Entities/Creature/Creature.cpp` | include + hook definition (top); `SelectLevel` calls `ArpgHooks::CreatureLevel` after AutoBalance | `// ARPG:` | m1 |
@@ -85,4 +87,6 @@ Every edit outside `modules/mod_arpg/`. Keep this list short; each entry is a me
 | `src/server/game/Loot/LootMgr.cpp` | include + `ArpgHooks::LootFilled` definition (top); `Loot::FillLoot` calls it after world drops, before group rights (loot substitution) | `// ARPG:` | m2 |
 | `src/server/game/Handlers/ItemHandler.cpp` | include; `HandleSellItemOpcode` asks `ArpgHooks::ItemSellPrice` for the payout | `// ARPG:` | m2 |
 | `src/server/game/Entities/Player/Player.cpp` (2nd touch) | `ArpgHooks::ItemSellPrice` definition; `AddItemToBuyBackSlot` uses it for the buyback price | `// ARPG:` | m2 |
+| `src/server/game/Entities/Player/Player.cpp` (3rd touch) | `ArpgHooks::QuestClassAllowed` definition; `SatisfyQuestClass` asks it before refusing a quest for the class | `// ARPG:` | m6 |
+| `src/server/game/Entities/Player/Player.cpp` (4th touch) | `RemoveItem`: main-hand "held enchantment" clearing commented out (it wiped affix/Unique tooltip lines in PROP slots 8-12) | `// ARPG:` | 2026-11-27 |
 | `CMakeLists.txt` (root) | `enable_testing()` + `add_subdirectory(arpg/unittests)` after modules | `# ARPG:` | m1 |

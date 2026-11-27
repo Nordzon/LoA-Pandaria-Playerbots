@@ -20,7 +20,7 @@ namespace
         "Arpg.Companion.Vendor", "Arpg.Companion.Repair", "Arpg.Companion.Bank", "Arpg.Companion.Mail",
         "Arpg.Companion.Reforge", "Arpg.Companion.Transmog", "Arpg.Companion.VoidStorage", "Arpg.Companion.InCombat",
         "Arpg.LootPet.Enabled", "Arpg.LootPet.WaitForCombatEnd", "Arpg.LootPet.ReachTimeoutMs",
-        "Arpg.AnyWeapon.Enabled", "Arpg.AnyWeapon.Bots", "Arpg.AnyWeapon.DualWield", "Arpg.AnyWeapon.Skills", "Arpg.AnyWeapon.MainHandSpells",
+        "Arpg.AnyWeapon.Enabled", "Arpg.AnyWeapon.Bots", "Arpg.AnyWeapon.DualWield", "Arpg.AnyWeapon.Skills", "Arpg.AnyWeapon.MainHandSpells", "Arpg.StartQuests.Enabled",
         "Arpg.MountShop.Enabled", "Arpg.MountShop.Price", "Arpg.Blank.Enabled", "Arpg.Blank.DropChance", "Arpg.Blank.Crafted", "Arpg.Blank.EssenceCost.Green", "Arpg.Blank.EssenceCost.Blue", "Arpg.Blank.EssenceCost.Epic", "Arpg.Bots.AffixScoring", "Arpg.Bots.PartyGear", "Arpg.Bots.PartyAffixTierOffset", "Arpg.AH.AffixShare", "Arpg.AH.TierOffset", "Arpg.AH.AffixMarkup",
         "Arpg.Catalyst.ChampionChance", "Arpg.Catalyst.SuperuniqueChance", "Arpg.Catalyst.EssenceCostLesser",
         "Arpg.Catalyst.EssenceCostGreater", "Arpg.Catalyst.EssenceCostGrand", "Arpg.Salvage.EssencePerAffix",
@@ -109,6 +109,7 @@ namespace Arpg
         s.anyWeaponBots = file.GetBool("Arpg.AnyWeapon.Bots", false);
         s.anyWeaponDualWield = file.GetBool("Arpg.AnyWeapon.DualWield", false);
         s.anyWeaponSkills = file.GetBool("Arpg.AnyWeapon.Skills", true);
+        s.startQuestsEnabled = file.GetBool("Arpg.StartQuests.Enabled", true);
         s.anyWeaponMainHandSpells.clear();
         {
             std::string list = file.GetString("Arpg.AnyWeapon.MainHandSpells", "1329 60103 100130"), cur;

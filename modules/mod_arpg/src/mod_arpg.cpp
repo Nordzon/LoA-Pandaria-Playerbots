@@ -18,6 +18,8 @@
 #include "Loot/LootPet.h"
 #include "Character/AnyWeapon.h"
 #include "Character/AnyWeaponSkills.h"
+#include "Character/StartQuests.h"
+#include "Loot/AffixDisplayRepair.h"
 #include "Loot/Crafting.h"
 #include "Loot/MountShop.h"
 #include "Bots/BotItemScore.h"
@@ -64,6 +66,7 @@ namespace
             Arpg::Loot::LoadMountShop();
             Arpg::Loot::LoadBlanks();
             Arpg::Character::ApplyAnyWeaponSkills();
+            Arpg::Character::LoadStartQuests();
         }
     };
 }
@@ -85,6 +88,8 @@ void AddSC_mod_arpg()
     Arpg::Loot::InstallLootPet();
     Arpg::Loot::InstallBlanks();
     Arpg::Character::InstallAnyWeapon();
+    Arpg::Character::InstallStartQuests();
+    Arpg::Loot::InstallAffixDisplayRepair();
     Arpg::Loot::InstallCatalystDrops();
     Arpg::Bots::InstallBotItemScore();
     Arpg::Loot::InstallAuctionRolls();

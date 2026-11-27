@@ -33,6 +33,9 @@ namespace Arpg::Loot
     // The item's Unique roll (uniqueId 0 = not a Unique). Thread-safe.
     UniqueRoll UniqueOf(uint32 itemGuid);
 
+    // The client patch row that shows this roll's power line (slot 12); 0 if the power/tier is unknown or display is off.
+    uint32 UniqueDisplayId(UniqueRoll const& roll);
+
     // An equipped Unique's power with everything the combat code needs.
     struct ActivePower
     {

@@ -26,9 +26,11 @@
 #include "Item.h"
 
 #include "ObjectMgr.h"
+#include "QuestDef.h"
 #include "TemporarySummon.h"
 #include "Character/AnyWeapon.h"
 #include "Character/AnyWeaponSkills.h"
+#include "Character/StartQuests.h"
 #include "Loot/Salvage.h"
 #include "Loot/MountShop.h"
 #include "Bots/BotItemScore.h"
@@ -212,6 +214,8 @@ public:
             { "professions", &HandleTestProfessions, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "weapons",  &HandleTestWeapons,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "spellreq", &HandleTestSpellReq, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "questproxy", &HandleTestQuestProxy, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "cantake",  &HandleTestCanTake,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "visual",   &HandleTestVisual,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "entries",  &HandleTestEntries,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "beams",    &HandleTestBeams,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -416,8 +420,9 @@ public:
         std::string mounts = Arpg::Loot::LoadMountShop();
         std::string blanks = Arpg::Loot::LoadBlanks();
         std::string wskills = Arpg::Character::ApplyAnyWeaponSkills();
-        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
-            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str(), mounts.c_str(), blanks.c_str(), wskills.c_str());
+        std::string squests = Arpg::Character::LoadStartQuests();
+        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
+            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str(), mounts.c_str(), blanks.c_str(), wskills.c_str(), squests.c_str());
         return ok;
     }
 
@@ -1266,6 +1271,38 @@ public:
         return true;
     }
 
+    // .arpg test questproxy <race> <class> <questId>   (m6-start-quests) may a new race/class pair take the quest?
+    static bool HandleTestQuestProxy(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 3)
+            return Fail(handler, "usage: .arpg test questproxy <race> <class> <questId>");
+        uint8 race = uint8(std::strtoul(t[0].c_str(), nullptr, 10));
+        uint8 cls = uint8(std::strtoul(t[1].c_str(), nullptr, 10));
+        uint32 questId = uint32(std::strtoul(t[2].c_str(), nullptr, 10));
+        handler->PSendSysMessage("ok race=%u class=%u quest=%u %s", race, cls, questId,
+            Arpg::Character::DescribeQuestProxy(race, cls, questId).c_str());
+        return true;
+    }
+
+    // .arpg test cantake <char> <questId>   class check and the full "can take" check of an online character for a quest
+    static bool HandleTestCanTake(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test cantake <char> <questId>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        Quest const* quest = sObjectMgr->GetQuestTemplate(uint32(std::strtoul(t[1].c_str(), nullptr, 10)));
+        if (!quest)
+            return Fail(handler, "unknown quest " + t[1]);
+        handler->PSendSysMessage("ok %s race=%u class=%u quest=%u class_ok=%u can_take=%u status=%u", p->GetName().c_str(),
+            p->GetRace(), p->GetClass(), quest->GetQuestId(), uint32(p->SatisfyQuestClass(quest, false)),
+            uint32(p->CanTakeQuest(quest, false)), uint32(p->GetQuestStatus(quest->GetQuestId())));
+        return true;
+    }
+
     // .arpg test professions <char>   the professions panel line of an online character
     static bool HandleTestProfessions(ChatHandler* handler, char const* args)
     {
@@ -1430,11 +1467,16 @@ public:
         StatVec expected = ItemTotals(item);
         for (int64& e : expected)
             e = -e;
+        // Tooltip lines (enchant slots 8-12) before and after: unequipping a main-hand weapon used to wipe two (2026-11-27).
+        auto lines = [](Item* it) { uint32 n = 0; for (uint32 s = PROP_ENCHANTMENT_SLOT_0; s <= PROP_ENCHANTMENT_SLOT_4; ++s)
+                                        n += it->GetEnchantmentId(EnchantmentSlot(s)) ? 1 : 0; return n; };
+        uint32 linesBefore = lines(item);
         StatVec before = Snapshot(p);
         p->RemoveItem(INVENTORY_SLOT_BAG_0, uint8(slot), true);
         p->StoreItem(dest, item, true);
         StatVec after = Snapshot(p);
-        handler->PSendSysMessage("ok unequipped guid=%u slot=%u%s", item->GetGUID().GetCounter(), slot, CompareStats(before, after, expected).c_str());
+        handler->PSendSysMessage("ok unequipped guid=%u slot=%u lines_before=%u lines_after=%u%s", item->GetGUID().GetCounter(), slot,
+            linesBefore, lines(item), CompareStats(before, after, expected).c_str());
         return true;
     }
 

@@ -63,6 +63,10 @@ namespace ArpgHooks
     // Spell::DoCreateItem, before the item is made: mod_arpg may swap a crafted piece of gear for its typed blank base.
     using CraftedItemFn = uint32 (*)(Player* player, uint32 spellId, uint32 itemId);
     TC_GAME_API extern CraftedItemFn CraftedItem;
+    // Player::SatisfyQuestClass, when the quest's class mask doesn't include the player's class: mod_arpg may still allow
+    // it (new race/class pairs borrow their starting zone's Warrior quests, m6-start-quests). Return true to allow.
+    using QuestClassAllowedFn = bool (*)(Player const* player, uint32 questId);
+    TC_GAME_API extern QuestClassAllowedFn QuestClassAllowed;
 }
 
 #endif

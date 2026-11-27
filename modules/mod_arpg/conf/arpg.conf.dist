@@ -88,6 +88,11 @@ Arpg.AnyWeapon.DualWield = 0
 Arpg.AnyWeapon.Skills = 1
 Arpg.AnyWeapon.MainHandSpells = 1329 60103 100130
 
+# --- Starting quests for new race/class pairs (change m6-start-quests) ------------------------
+#    Enabled  1 = a race/class pair Blizzard never had (Night Elf Paladin, ...) may take the Warrior's class quests of its
+#             starting zone (table arpg_quest_proxy); steps at a class trainer complete on accept
+Arpg.StartQuests.Enabled = 1
+
 # --- Catalysts (SPEC 4.8, change m6-custom-items) ---------------------------------------------
 #    A Champion leader / Superunique drops a catalyst of its tier band (Lesser T1-T2, Greater T3-T4, Grand T5+) with
 #    this % chance. The next craft that rolls affixes uses up the lowest fitting one from the bags: +1 tier, x2 Unique chance.

@@ -301,6 +301,10 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   Slam, ...), Hunter shots (a bow, gun or crossbow), armour specialisations, script damage bonuses (Ambush/Hemorrhage with a
   dagger, Heroic Strike with a one-hander). Server: `Arpg.AnyWeapon.Skills` (1, all characters incl. bots); client: same
   edits in the patch MPQ (`SpellEquippedItems.dbc`, `SpellMisc.dbc`).
+- **Starting quests for new pairs** (owner 2026-11-27, change `m6-start-quests`): starting zones gate their chain behind class
+  quests (Shadowglen: sigil -> class trainer -> "Priestess of the Moon"; Northshire splits every step by class). A new pair
+  borrows the Warrior's class quests of its starting zone (`arpg_quest_proxy`, `sql/tools/gen_start_quests.py`); steps at a
+  class trainer complete on accept. `Arpg.StartQuests.Enabled` (1). Not covered: Death Knight start, level 10+ class quests.
 
 ### 4.10 Bots (m7, last)
 - *Implemented 2026-11-26:* 500 random bots (write-confs default). Dungeon Finder any level = upstream's switches, set by

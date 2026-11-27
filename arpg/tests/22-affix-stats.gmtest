@@ -46,3 +46,15 @@
 ? match=yes
 > .arpg test clearbags Arpgtest
 ? ok
+
+# A main-hand weapon keeps its tooltip lines when unequipped (owner 2026-11-27: a Night Elf Paladin's daggers lost their
+# affix lines after a few swaps - the core cleared two of the slots holding them; disabled, and logins repair old items).
+# 4454 Talon of Vultros (blue one-hand dagger, req 11) goes into the main hand (slot 15).
+> .arpg test unequip Arpgtest 15
+? ok unequipped|slot empty
+> .arpg test equip Arpgtest 4454
+? ok equipped item=4454 .*affixes=[1-9]
+> .arpg test unequip Arpgtest 15
+? ok unequipped guid=\d+ slot=15 lines_before=([1-9]) lines_after=\1\b
+> .arpg test clearbags Arpgtest
+? ok
