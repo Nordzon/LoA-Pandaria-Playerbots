@@ -12,7 +12,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 - **Active (20:45): change `m6-any-weapon-skills`** (owner: no class ability needs a specific weapon or 1H/2H; shields stay).
   Done: `Core/WeaponReq` + 6 unit tests, `Character/AnyWeaponSkills` (35 class spells widened, Mutilate/Lava Lash/Wild Strike
   main hand), `.arpg test spellreq`, GM test `56-weapon-skills`, client patch builder (same 35/3). ALL OK 30 GM files 20:48,
-  live on the server; committed + pushed; client patch installed 21:12. **Next:** owner check OWNER-CHECKS A; then archive. Open question: Hunter shots without a ranged weapon (suggest keep).
+  live on the server; committed + pushed; client patch installed 21:12. **Next:** owner check OWNER-CHECKS A; then archive. Hunter shots keep the ranged requirement (owner 2026-11-27).
 - **Earlier (19:22):** m8 4.1-4.5 done and live: personal loot, highest-level scaling, `Arpg.Paragon.WorldTierMode`
   (highest; switch with `.arpg config set`), per-player shares, round robin for 2+ real players, `$FriendsBotCount`; tests 54 + 55
   with a second real test character (Arpgtesttwo, account ARPGTEST2, parked at `park-stormwind`). ALL OK 28 GM files. Committed +
@@ -58,6 +58,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-27 — Owner: Hunter shots keep needing a bow/gun/crossbow (m6-any-weapon-skills, as built).
 - 2026-11-27 — m6-any-weapon-skills: class abilities take any melee weapon in any hand (server SpellInfo + client patch); shield/ranged kept; SPEC 4.9 updated.
 - 2026-11-27 19:22 m8 multiplayer rules live: ALL OK 28 GM files (new 55-friends, fixes in 30/54; probes `scaled`/`tiered`; test spot park-stormwind). Committed + pushed.
 - 2026-11-27 18:45 m8 multiplayer rules coded (personal loot, highest-level scaling, WorldTierMode, per-player extras, round robin, friends bot count), test 55 + Arpgtesttwo; compiled + unit tests OK; waiting for the owner to log out for the restart run.

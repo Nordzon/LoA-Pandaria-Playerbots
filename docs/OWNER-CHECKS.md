@@ -20,8 +20,7 @@ glow (2), mount vendor window (4), potion tooltip (5), blank bases use (7: "all 
    Shiv all work; none is red on the action bar.
 2. A Shaman with a **staff** (`.additem 2132`): Lava Lash works without an off-hand weapon.
 3. Still needed: Shield Slam needs a shield; Hunter shots need a bow, gun or crossbow.
-4. Question: should Hunter shots also work without a ranged weapon (they'd hit for very little - the shot uses the ranged
-   weapon's damage)? My suggestion: keep as is.
+4. ~~Hunter shots without a ranged weapon?~~ - answered "keep the requirement".
 
 > Result:
 

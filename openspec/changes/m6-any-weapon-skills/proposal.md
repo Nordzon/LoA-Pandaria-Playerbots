@@ -10,7 +10,7 @@ Assassin's Resolve, Way of the Monk, ...).
 ## Scope
 - Server: at startup (and `.arpg reload`) every class spell (spell family of a class) whose weapon requirement includes a
   melee weapon accepts **any melee weapon in any hand** (weapon type list widened to all melee types, one-/two-hand/main/off
-  -hand limit removed). Ranged-only requirements (Hunter shots: bow/gun/crossbow) stay. Shield and armour requirements stay.
+  -hand limit removed). Ranged-only requirements (Hunter shots: bow/gun/crossbow) stay (owner confirmed 2026-11-27: "keep the requirement"). Shield and armour requirements stay.
 - Spells that need an off-hand weapon to be cast at all (`Arpg.AnyWeapon.MainHandSpells`: Mutilate, Lava Lash, Wild Strike)
   hit with the main-hand weapon instead, so a two-hander can use them. Their off-hand follow-up hits (Mutilate Off-Hand,
   ...) still happen only with an off-hand weapon.
