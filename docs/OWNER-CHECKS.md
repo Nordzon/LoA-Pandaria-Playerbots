@@ -15,8 +15,7 @@ glow (2), mount vendor window (4), potion tooltip (5), blank bases use (7: "all 
 | Gold (6000 g) | target yourself, then `.modify money 60000000` |
 | Teleport | `.tele goldshire`, `.tele stormwind`, `.tele ValeofEternalBlossoms` |
 
-## A. New 2026-11-27 20:45 - class abilities with any weapon (close the client, then I install the new patch; or run
-`py -I arpg\client-patch\build-client-patch.py --install` yourself with the client closed)
+## A. New 2026-11-27 20:45 - class abilities with any weapon (patch installed 21:12: start `Wow-64-all.exe` fresh)
 1. A Rogue with a **two-handed sword** (`.additem 2489`): Backstab, Mutilate (with no off-hand weapon), Dispatch, poisons and
    Shiv all work; none is red on the action bar.
 2. A Shaman with a **staff** (`.additem 2132`): Lava Lash works without an off-hand weapon.
