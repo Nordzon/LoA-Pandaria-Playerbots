@@ -33,6 +33,16 @@ namespace Arpg::Loot
         g_override[player->GetGUID().GetCounter()] = { skill, catalyst };
     }
 
+    bool IsCraftSpell(uint32 spellId)
+    {
+        SkillLineAbilityMapBounds b = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+        for (auto it = b.first; it != b.second; ++it)
+            if (SkillLineEntry const* line = sSkillLineStore.LookupEntry(it->second->SkillLine))
+                if (line->CategoryID == SKILL_CATEGORY_PROFESSION || line->CategoryID == SKILL_CATEGORY_SECONDARY)
+                    return true;
+        return false;
+    }
+
     CraftInfo CraftFor(Player* player, uint32 spellId)
     {
         CraftInfo c;

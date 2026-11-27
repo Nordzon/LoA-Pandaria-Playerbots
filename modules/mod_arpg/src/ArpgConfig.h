@@ -89,6 +89,13 @@ namespace Arpg
         bool botAffixScoring = true;        // Arpg.Bots.AffixScoring (party bots count affixes when choosing gear)
         bool mountShopEnabled = true;       // Arpg.MountShop.Enabled (companion dialogue)
         uint32_t mountShopPriceGold = 5000; // Arpg.MountShop.Price (gold; a row's price_gold overrides)
+        // Typed blank bases (m6-blank-bases, owner 2026-11-27 "all of these")
+        bool blankEnabled = true;           // Arpg.Blank.Enabled
+        uint32_t blankDropChance = 10;      // Arpg.Blank.DropChance (% per affix-eligible gear drop)
+        bool blankCrafted = true;           // Arpg.Blank.Crafted (crafted gear comes out as its blank)
+        uint32_t blankEssenceGreen = 5;     // Arpg.Blank.EssenceCost.Green (companion shop)
+        uint32_t blankEssenceBlue = 15;     // Arpg.Blank.EssenceCost.Blue
+        uint32_t blankEssenceEpic = 45;     // Arpg.Blank.EssenceCost.Epic
         int salvageEssencePerAffix = 1;     // Arpg.Salvage.EssencePerAffix
         int salvageUniqueBonus = 5;         // Arpg.Salvage.UniqueBonus
         int salvageAscendedBonus = 3;       // Arpg.Salvage.AscendedBonus

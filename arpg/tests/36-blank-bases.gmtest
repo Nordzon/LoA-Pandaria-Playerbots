@@ -1,0 +1,63 @@
+# Typed blank bases (m6-blank-bases, owner 2026-11-27 "all of these"). Needs Arpgtest online. Blanks are copies of real
+# gear (710000+) with only main stat + Stamina; dropped or bought blanks roll the most affixes for their quality.
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+
+# Mapping: Moss Cinch (blue leather belt) -> the blank of a blue belt of that type at loot level 20, main stat + Stamina.
+> .arpg blank for Arpgtest 6911
+? ok item=6911 blank=7\d{5} name=.* q=3 req=([1-9]|1\d|20) stat1=[345]:\d+ stat2=7:\d+ blank_check=1
+
+> .arpg test events Arpgtest clear
+? ok
+
+# (a) Drops: with DropChance 100 a Champion's gear comes as blanks; the loot window preview still matches the item.
+> .arpg config set Arpg.Blank.DropChance 100
+? ok
+> .arpg champion make Arpgtest 49871
+? ok Arpgtest champion entry=49871
+> .arpg champion kill Arpgtest
+? ok .* killed champion
+> .arpg test events Arpgtest
+? blank drop from=\d+ to=7\d{5}
+? loot plan item=7\d{5} rp=-3\d{4} n=[2-5]
+> .arpg test lootpreview Arpgtest
+? ok previewed=([1-9]\d*) match=\1\b
+! mismatch
+> .arpg test events Arpgtest
+? affix item=7\d{5} guid=\d+ q=(2 n=2|3 n=3|4 n=5)
+> .arpg champion loot Arpgtest
+? ok
+> .arpg config set Arpg.Blank.DropChance 0
+? ok
+
+# (c) The companion's shop (same code over SOAP): slot 2 = Chest, blue; price lowered to 2 essences for the test.
+> .arpg config set Arpg.Blank.EssenceCost.Blue 2
+? ok
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg blank buy Arpgtest 2 3
+? fail not enough essences: need 2, have 0
+> .arpg test give Arpgtest 700010
+? item=700010
+> .arpg test give Arpgtest 700010
+? item=700010
+> .arpg blank buy Arpgtest 2 3
+? ok bought blank item=7\d{5} for essences=2 affixes=3\b
+> .arpg test count Arpgtest 700010
+? ok item=700010 count=0\b
+
+# (b) Crafting: the recipe's two-hander comes out as its blank, rolled by the crafting wheel (not forced to the max).
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test craft Arpgtest 3293 skill 60
+? ok Arpgtest spell=3293 item=7\d{5} .*quality=2 affixes=[1-4] craft colour=orange
+> .arpg test events Arpgtest
+? blank crafted from=3488 to=7\d{5}
+
+> .arpg reload
+? ok .*blank bases=\d+

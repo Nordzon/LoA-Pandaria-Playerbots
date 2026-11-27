@@ -21,6 +21,7 @@
 #include "Bots/BotItemScore.h"
 #include "Loot/AuctionRolls.h"
 #include "Loot/LootBeam.h"
+#include "Loot/Blanks.h"
 
 #include "Chat.h"
 #include "Player.h"
@@ -59,6 +60,7 @@ namespace
             Arpg::Dungeons::LoadInstanceData();
             Arpg::Loot::LoadCompanionModels();
             Arpg::Loot::LoadMountShop();
+            Arpg::Loot::LoadBlanks();
         }
     };
 }
@@ -78,6 +80,7 @@ void AddSC_mod_arpg()
     Arpg::Paragon::InstallParagon();
     Arpg::Dungeons::InstallInstanceScaling();
     Arpg::Loot::InstallLootPet();
+    Arpg::Loot::InstallBlanks();
     Arpg::Character::InstallAnyWeapon();
     Arpg::Loot::InstallCatalystDrops();
     Arpg::Bots::InstallBotItemScore();

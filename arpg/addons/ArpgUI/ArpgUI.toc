@@ -8,3 +8,5 @@ Loot.lua
 Professions.lua
 PotionData.lua
 Potions.lua
+AffixText.lua
+LootTooltip.lua

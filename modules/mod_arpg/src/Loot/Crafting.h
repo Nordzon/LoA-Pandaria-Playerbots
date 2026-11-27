@@ -27,6 +27,8 @@ namespace Arpg::Loot
 
     // Recipe data + the crafter's skill. Consumes a pending test override for this player (one craft).
     CraftInfo CraftFor(Player* player, uint32 spellId);
+    // The spell is a profession recipe (no player state, nothing consumed).
+    bool IsCraftSpell(uint32 spellId);
 
     // Catalyst items (custom items 700001-700003, sql 2026_11_26_00) by band 1-3; 0 for other bands.
     uint32 CatalystItemForBand(int band);

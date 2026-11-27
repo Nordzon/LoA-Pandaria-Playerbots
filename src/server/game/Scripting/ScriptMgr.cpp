@@ -21,6 +21,7 @@
 ArpgHooks::InstanceScaleFn ArpgHooks::InstanceScale = nullptr; // ARPG: set by mod_arpg (dungeon/raid scaling)
 ArpgHooks::InstanceLevelFn ArpgHooks::InstanceLevel = nullptr; // ARPG: set by mod_arpg (dungeon level selector)
 ArpgHooks::AuctionBotItemFn ArpgHooks::AuctionBotItem = nullptr; // ARPG: set by mod_arpg (affixed auction listings)
+ArpgHooks::CraftedItemFn ArpgHooks::CraftedItem = nullptr; // ARPG: set by mod_arpg (crafted gear -> typed blank base)
 ArpgHooks::ItemPickupFn ArpgHooks::ItemPickup = nullptr; // ARPG: set by mod_arpg (affix roll on new items)
 #include "DatabaseEnv.h"
 #include "DBCStores.h"

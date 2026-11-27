@@ -35,6 +35,9 @@
 - [x] 4.10 Five affix lines + D2 names (probe confirmed in game 2026-11-22): random-suffix rows 30000+affixId (client
   patch + server ItemRandomSuffix.dbc), roller uses slots 8-12 and sets the suffix id from the highest-tier affix — done
   2026-11-22 (48 suffix rows, `build-client-patch.py --install --server`; test 21 checks the name)
+- [x] 4.11 Corpse loot preview (owner 2026-11-27): the loot window tooltip shows the affix lines the item gets. Corpse plans
+  fix each affix's roll (`RolledAffix::roll`); `PlanPreview` + player command `.lootinfo data` (ARPGV lines); ArpgUI
+  `LootTooltip.lua` + generated `AffixText.lua`; test 30 `.arpg test lootpreview` (preview == picked-up item)
 - [x] 4.3 Effect affixes — all 35 effects work (2026-11-23: CC/snare reduction, cooldown rate, skill-up, pet range, Socketed added; earlier: 29 of 35) (`Loot/AffixEffects`, tuning table `arpg_affix_effect`, GM test 23); not yet: CC/snare reduction, cooldown rate, skill-up, loot-pet range, Socketed (weight 0 until done). Effect display rows in the client patch (ids 101000-135999)
 - [~] 4.4 Pity on boss kill (`character_arpg_pity`), god-roll pity — boss loot at the highest tier, god-roll pity every 3rd boss kill (`Loot/BossPity`, `.arpg pity info|set`, test 25); Unique ladder per boss done 2026-11-22 (20% +20% per kill without one, `unique_misses`; the next boss item of a Unique's slot becomes it, max 4 affixes, tier from loot level; `.arpg pity set <char> unique <boss> <n>`, test 27). Superunique ladder (10% +5%) comes with m3 Superuniques
 - [x] 4.5 `// ARPG:` sell hook: affix sell value — `ArpgHooks::ItemSellPrice` in the sell payout AND the buyback price (no gold loop); template + affixes x required level x 200 copper; test 21 checks the exact value (2026-11-22)

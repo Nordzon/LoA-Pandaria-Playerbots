@@ -73,6 +73,13 @@ namespace Arpg::Loot
     // Plans every rollable item of a loot (corpse, chest) and sets each item's suffix id so the loot window shows its name.
     void PlanLoot(Player* owner, ::Loot& loot, ItemPickupSourceType source, uint32 sourceId, bool championLoot);
     bool TakePlan(uint32 itemId, int32 rp, RollPlan& out);
+    // The affix lines a planned loot item will get when `player` picks it up (exact values: the plan fixes its rolls), for the
+    // loot window: "s:<display stat>:<value>;e:<effect>:<tenths, 0 = flag>;u:<unique id>:0". Empty = no plan. Nothing is taken.
+    std::string PlanPreview(Player* player, uint32 itemId, int32 rp);
+    // ITEM_MOD id of the player's spec main stat (class fallback below level 10).
+    uint32 SpecMainStat(Player* player);
+    // The same encoding (stats first, then effects; no "u:") for the last item rolled for `player` (tests).
+    std::string LastItemPreview(Player* player);
     // The stat lines a planned loot item (still on a corpse) will roughly have at `level`: each flat-stat affix of the first
     // plan for (itemId, suffix id) at the middle of its tier range. Nothing is taken; empty = no plan (bots, Need rolls).
     std::vector<StatLine> PlannedStatLines(uint32 itemId, int32 rp, int level);

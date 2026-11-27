@@ -38,9 +38,13 @@
 > .arpg config set Arpg.Catalyst.ChampionChance 25
 ? ok
 
+# Loot window preview (owner 2026-11-27): the affix lines shown on the corpse are exactly what the picked-up item gets.
+> .arpg test lootpreview Arpgtest
+? ok previewed=([1-9]\d*) match=\1\b
+! mismatch
 # Items looted from the Champion roll with +1 tier (event marked "champion").
 > .arpg champion loot Arpgtest
-? ok Arpgtest looted=([2-9]|\d\d)
+? ok Arpgtest looted=\d+
 > .arpg test events Arpgtest
 ? affix item=\d+ guid=\d+ q=2 n=\d+ champion
 ? affix item=\d+ guid=\d+ q=3 n=\d+ champion

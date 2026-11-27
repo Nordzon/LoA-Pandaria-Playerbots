@@ -51,6 +51,7 @@
 #include "Random.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "ArpgHooks.h" // ARPG: CraftedItem
 #include "ServiceMgr.h"
 #include "SharedDefines.h"
 #include "SkillExtraItems.h"
@@ -1683,6 +1684,8 @@ void Spell::DoCreateItem(uint32 /*i*/, uint32 itemtype)
     Player* player = unitTarget->ToPlayer();
 
     uint32 newitemid = itemtype;
+    if (ArpgHooks::CraftedItem) // ARPG: crafted gear may come out as its typed blank base (mod_arpg Loot/Blanks)
+        newitemid = ArpgHooks::CraftedItem(player, m_spellInfo->Id, newitemid);
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(newitemid);
     if (!pProto)
     {

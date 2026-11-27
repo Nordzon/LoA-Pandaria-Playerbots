@@ -21,6 +21,7 @@
 #include "Core/AffixEffects.h"
 #include "Chat.h"
 #include "ScriptedGossip.h"
+#include "Loot/Blanks.h"
 #include "Loot/Salvage.h"
 #include "Loot/MountShop.h"
 #include "WorldSession.h"
@@ -290,6 +291,7 @@ namespace
 
     // Right-click on the companion: its owner gets a menu of the enabled roles; each opens the game's own window.
     enum CompanionAction : uint32 { ACT_VENDOR = 1, ACT_BANK = 2, ACT_MAIL = 3, ACT_LOOKS = 4, ACT_SALVAGE = 5, ACT_CATALYSTS = 6,
+        ACT_BLANKS = 7, ACT_BLANK_SLOT_BASE = 2000, ACT_BLANK_BUY_BASE = 3000,   // buy: base + slot * 10 + quality
         ACT_BUY_BASE = 50, ACT_MODEL_BASE = 100, ACT_MOUNT_PAGE_BASE = 500000, ACT_MOUNT_BUY_BASE = 1000000 };
     uint32 const MountVendorEntry = 1000002;   // npc_vendor list of the mount shop (never spawned)
 
@@ -323,6 +325,8 @@ namespace
                     "Uniques are kept.", 0, false);
             AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Buy catalysts (" + std::to_string(player->GetItemCount(700010)) +
                 " essences)", GOSSIP_SENDER_MAIN, ACT_CATALYSTS);
+            if (sArpgConfig.Get().blankEnabled)
+                AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Blank bases for essences", GOSSIP_SENDER_MAIN, ACT_BLANKS);
             if (sArpgConfig.Get().mountShopEnabled)
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Mounts for gold", GOSSIP_SENDER_MAIN, ACT_MOUNT_PAGE_BASE);
             AddGossipItemFor(player, GOSSIP_ICON_TABARD, "Change appearance", GOSSIP_SENDER_MAIN, ACT_LOOKS);
@@ -347,6 +351,35 @@ namespace
                 // reputation requirement, sql 2026_11_27_01) shown on the companion; buying works like any vendor.
                 CloseGossipMenuFor(player);
                 player->GetSession()->SendListInventory(creature->GetGUID(), MountVendorEntry);
+                return true;
+            }
+            // Typed blank bases (m6-blank-bases c): slot -> quality -> buy for essences; the blank rolls at once.
+            if (action == ACT_BLANKS)
+            {
+                std::vector<Arpg::Loot::BlankShopSlot> const& slots = Arpg::Loot::BlankShopSlots();
+                for (size_t i = 0; i < slots.size(); ++i)
+                    AddGossipItemFor(player, GOSSIP_ICON_VENDOR, slots[i].name, GOSSIP_SENDER_MAIN, ACT_BLANK_SLOT_BASE + uint32(i));
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                return true;
+            }
+            if (action >= ACT_BLANK_SLOT_BASE && action < ACT_BLANK_BUY_BASE)
+            {
+                uint32 slot = action - ACT_BLANK_SLOT_BASE;
+                static char const* const names[] = { "", "", "Green", "Blue", "Epic" };
+                for (uint32 q = ITEM_QUALITY_UNCOMMON; q <= ITEM_QUALITY_EPIC; ++q)
+                    AddGossipItemFor(player, GOSSIP_ICON_VENDOR, std::string(names[q]) + " - " + std::to_string(Arpg::Loot::BlankEssenceCost(q)) +
+                        " essences (you have " + std::to_string(player->GetItemCount(700010)) + ")", GOSSIP_SENDER_MAIN,
+                        ACT_BLANK_BUY_BASE + slot * 10 + q);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                return true;
+            }
+            if (action >= ACT_BLANK_BUY_BASE && action < ACT_BLANK_BUY_BASE + 1000)
+            {
+                CloseGossipMenuFor(player);
+                std::string out;
+                uint32 code = action - ACT_BLANK_BUY_BASE;
+                Arpg::Loot::BuyBlank(player, int(code / 10), code % 10, out);
+                ChatHandler(player->GetSession()).SendSysMessage(out.c_str());
                 return true;
             }
             if (action == ACT_CATALYSTS)

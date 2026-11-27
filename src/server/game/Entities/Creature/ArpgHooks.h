@@ -60,6 +60,9 @@ namespace ArpgHooks
     // on it and raise its prices (living auction house, m7).
     using AuctionBotItemFn = void (*)(Item* item, uint32& buyout, uint32& bid);
     TC_GAME_API extern AuctionBotItemFn AuctionBotItem;
+    // Spell::DoCreateItem, before the item is made: mod_arpg may swap a crafted piece of gear for its typed blank base.
+    using CraftedItemFn = uint32 (*)(Player* player, uint32 spellId, uint32 itemId);
+    TC_GAME_API extern CraftedItemFn CraftedItem;
 }
 
 #endif

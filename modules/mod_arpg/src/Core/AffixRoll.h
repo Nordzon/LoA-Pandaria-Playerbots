@@ -41,7 +41,9 @@ namespace Arpg::Core
         int tierCap = 0;             // >0: no affix above this tier (grey recipes: T1)
     };
 
-    struct RolledAffix { uint32_t affixId; int tier; };
+    // roll = where in the tier range the value lands (0..1); < 0 = rolled when the item is made. Corpse loot fixes it when the
+    // loot is planned, so the loot window preview and the picked-up item agree (owner 2026-11-27).
+    struct RolledAffix { uint32_t affixId; int tier; double roll = -1.0; };
 
     // Uniform integer in [0, n). Game code passes urand; tests pass a seeded generator.
     using RandFn = std::function<uint32_t(uint32_t n)>;

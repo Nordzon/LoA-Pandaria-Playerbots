@@ -111,6 +111,18 @@ Arpg.AH.AffixMarkup = 4
 Arpg.MountShop.Enabled = 1
 Arpg.MountShop.Price = 5000
 
+#    Typed blank bases (m6-blank-bases): copies of real gear with only main stat + Stamina; dropped / bought blanks roll the
+#    most affixes for their quality.
+#    Arpg.Blank.DropChance       % of affix-eligible green-epic gear drops that come as their blank
+#    Arpg.Blank.Crafted          1 = crafted gear comes out as its blank (rolled with the crafting wheel's rules)
+#    Arpg.Blank.EssenceCost.*    Salvaged Essence price of a blank in the companion's "Blank bases" menu
+Arpg.Blank.Enabled = 1
+Arpg.Blank.DropChance = 10
+Arpg.Blank.Crafted = 1
+Arpg.Blank.EssenceCost.Green = 5
+Arpg.Blank.EssenceCost.Blue = 15
+Arpg.Blank.EssenceCost.Epic = 45
+
 # --- Salvage (companion dialogue) -------------------------------------------------------------
 #    Takes affixed items from the bags (never equipped gear or the bank) up to MaxQuality (3 = blue); Uniques only with
 #    IncludeUniques = 1. Essences per item = affixes x EssencePerAffix (+ UniqueBonus, + AscendedBonus for T6+ affixes).

@@ -1,5 +1,6 @@
 // .arpg commands. Every command takes an explicit character name (works over SOAP, which has no selected target).
 #include "ArpgConfig.h"
+#include "ArpgHooks.h"
 #include "Scaling/WorldScaling.h"
 #include "Test/TestEvents.h"
 #include "Loot/Budget.h"
@@ -32,12 +33,17 @@
 #include "Bots/BotItemScore.h"
 #include "Loot/AuctionRolls.h"
 #include "Loot/LootBeam.h"
+#include "Loot/Blanks.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "StatsWeightCalculator.h"
 #include <map>
 
 #include "CellImpl.h"
+#include "GameObject.h"
+#include "LootMgr.h"
+#include "Map.h"
+#include <algorithm>
 #include "Chat.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
@@ -205,6 +211,7 @@ public:
             { "visual",   &HandleTestVisual,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "entries",  &HandleTestEntries,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "beams",    &HandleTestBeams,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "lootpreview", &HandleTestLootPreview, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "count",    &HandleTestCount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "salvage",  &HandleTestSalvage,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "mount",    &HandleTestMount,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -321,8 +328,14 @@ public:
             { "move",   &HandleMyFilterMove,   rbac::RBAC_PERM_COMMAND_HELP, Console::No },
             { "reset",  &HandleMyFilterReset,  rbac::RBAC_PERM_COMMAND_HELP, Console::No },
         };
+        static std::vector<ChatCommand> blankTable =
+        {
+            { "for",  &HandleBlankFor,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "buy",  &HandleBlankBuy,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+        };
         static std::vector<ChatCommand> arpgTable =
         {
+            { "blank",   blankTable,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "lootpet", lootpetTable,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "filter",  filterTable,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "dungeon", dungeonTable,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -338,6 +351,11 @@ public:
             { "test",    testTable,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "scale",   scaleTable,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
         };
+        // .lootinfo data - affix lines of the open loot window's items (ArpgUI shows them on the loot tooltip)
+        static std::vector<ChatCommand> playerLootInfoTable =
+        {
+            { "data", &HandleMyLootInfoData, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+        };
         static std::vector<ChatCommand> playerProfessionsTable =
         {
             { "data", &HandleMyProfessionsData, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
@@ -349,6 +367,7 @@ public:
             { "lootpet", playerLootPetTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
             { "lootfilter", playerFilterTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
             { "professions", playerProfessionsTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "lootinfo", playerLootInfoTable, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
         };
         return commandTable;
     }
@@ -387,8 +406,9 @@ public:
         std::string dun = Arpg::Dungeons::LoadInstanceData();
         std::string comp = Arpg::Loot::LoadCompanionModels();
         std::string mounts = Arpg::Loot::LoadMountShop();
-        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
-            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str(), mounts.c_str());
+        std::string blanks = Arpg::Loot::LoadBlanks();
+        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
+            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str(), mounts.c_str(), blanks.c_str());
         return ok;
     }
 
@@ -768,6 +788,120 @@ public:
             return Fail(handler, "character not online");
         uint32 itemId = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
         handler->PSendSysMessage("ok item=%u count=%u", itemId, p->GetItemCount(itemId, true));
+        return true;
+    }
+
+    // Sorted ";"-parts without the Unique marker, so a preview and an item compare regardless of line order.
+    static std::string CanonPreview(std::string const& s)
+    {
+        std::vector<std::string> parts;
+        std::stringstream ss(s);
+        std::string part;
+        while (std::getline(ss, part, ';'))
+            if (!part.empty() && part[0] != 'u')
+                parts.push_back(part);
+        std::sort(parts.begin(), parts.end());
+        std::string out;
+        for (std::string const& p : parts)
+            out += (out.empty() ? "" : ";") + p;
+        return out;
+    }
+
+    // .arpg test lootpreview <char>   the character's last dead Champion: previews each planned item (what the loot window
+    // shows), loots it, and compares with the item it got. "ok previewed=N match=N" when every preview was exact.
+    static bool HandleTestLootPreview(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 1 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test lootpreview <char>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        Creature* c = Arpg::Monsters::LastChampionOf(p);
+        if (!c || c->IsAlive())
+            return Fail(handler, "no dead champion");
+        uint32 previewed = 0, match = 0;
+        p->SetLootGUID(c->GetGUID());
+        for (uint8 i = 0; i < uint8(c->loot.items.size()); ++i)
+        {
+            LootItem const& li = c->loot.items[i];
+            if (li.is_looted || li.currency || li.randomPropertyId >= 0)
+                continue;
+            std::string preview = Arpg::Loot::PlanPreview(p, li.itemid, li.randomPropertyId);
+            if (preview.empty())
+                continue;
+            ++previewed;
+            p->StoreLootItem(i, &c->loot, c);
+            std::string got = Arpg::Loot::LastItemPreview(p);
+            if (CanonPreview(preview) == CanonPreview(got))
+                ++match;
+            else
+                handler->PSendSysMessage("mismatch item=%u preview=%s got=%s", li.itemid, preview.c_str(), got.c_str());
+        }
+        p->SetLootGUID(ObjectGuid::Empty);
+        handler->PSendSysMessage("ok previewed=%u match=%u", previewed, match);
+        return true;
+    }
+
+    // .lootinfo data   one "ARPGV|<item>|<suffix id>|<lines>" per planned item of the loot window the player has open
+    static bool HandleMyLootInfoData(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        ObjectGuid g = p->GetLootGUID();
+        ::Loot* loot = nullptr;
+        if (g.IsCreatureOrVehicle())
+        {
+            if (Creature* c = p->GetMap()->GetCreature(g))
+                loot = &c->loot;
+        }
+        else if (g.IsGameObject())
+        {
+            if (GameObject* go = p->GetMap()->GetGameObject(g))
+                loot = &go->loot;
+        }
+        if (!loot)
+            return true;
+        for (LootItem const& li : loot->items)
+        {
+            if (li.is_looted || li.currency || li.randomPropertyId >= 0)
+                continue;
+            std::string preview = Arpg::Loot::PlanPreview(p, li.itemid, li.randomPropertyId);
+            if (!preview.empty())
+                handler->PSendSysMessage("ARPGV|%u|%d|%s", li.itemid, li.randomPropertyId, preview.c_str());
+        }
+        return true;
+    }
+
+    // .arpg blank for <char> <itemId>   the blank that character would get for this item (its loot level and spec)
+    static bool HandleBlankFor(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg blank for <char> <itemId>");
+        if (!p || t.size() != 2)
+            return p ? Fail(handler, "usage: .arpg blank for <char> <itemId>") : false;
+        uint32 item = uint32(atoi(t[1].c_str()));
+        uint32 blank = Arpg::Loot::BlankForItem(p, item);
+        ItemTemplate const* bp = blank ? sObjectMgr->GetItemTemplate(blank) : nullptr;
+        if (!bp)
+            return Fail(handler, "no blank for that item");
+        handler->PSendSysMessage("ok item=%u blank=%u name=%s q=%u req=%u stat1=%u:%d stat2=%u:%d blank_check=%d", item, blank,
+            bp->Name1.c_str(), bp->Quality, bp->RequiredLevel, bp->ItemStat[0].ItemStatType, bp->ItemStat[0].ItemStatValue,
+            bp->ItemStat[1].ItemStatType, bp->ItemStat[1].ItemStatValue, Arpg::Loot::IsBlank(blank) ? 1 : 0);
+        return true;
+    }
+
+    // .arpg blank buy <char> <slot index> <quality 2-4>   the companion's "Blank bases" purchase (slot index as in the menu)
+    static bool HandleBlankBuy(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = OnlineChar(handler, t, "usage: .arpg blank buy <char> <slot> <quality>");
+        if (!p || t.size() != 3)
+            return p ? Fail(handler, "usage: .arpg blank buy <char> <slot> <quality>") : false;
+        std::string out;
+        bool ok = Arpg::Loot::BuyBlank(p, atoi(t[1].c_str()), uint32(atoi(t[2].c_str())), out);
+        handler->PSendSysMessage("%s %s", ok ? "ok" : "fail", out.c_str());
         return true;
     }
 
@@ -1400,6 +1534,8 @@ public:
             return Fail(handler, "spell " + t[1] + " is not a tradeskill recipe");
         std::string report = Arpg::Loot::DescribeCraft(p, info);
         Arpg::Loot::SetCraftOverride(p, skill, catalyst);                  // again, for the roll itself
+        if (ArpgHooks::CraftedItem)                                       // as Spell::DoCreateItem: crafted gear -> its blank
+            itemId = ArpgHooks::CraftedItem(p, spellId, itemId);
         ItemPosCountVec dest;
         if (p->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1) != EQUIP_ERR_OK)
             return Fail(handler, "bags full");

@@ -10,6 +10,8 @@
 #include "Loot/ZoneLevels.h"
 #include "Loot/BossPity.h"
 #include "Loot/Crafting.h"
+#include "Loot/Blanks.h"
+#include "Core/Blanks.h"
 #include "Loot/LootBeam.h"
 #include "Loot/LootFilter.h"
 #include "Monsters/Champions.h"
@@ -509,6 +511,10 @@ namespace Arpg::Loot
         if (int32 mf = EffectTotal(player, Core::Effect::MagicFindPct))
             if (int32(urand(0, 9999)) < std::min<int32>(mf, 10000))
                 req.tierBonus += 1;
+        // Typed blank bases (m6-blank-bases): a dropped or bought blank rolls the most affixes for its quality; a crafted one
+        // keeps the crafting wheel's count.
+        if (!craft.isCraft && IsBlank(proto->ItemId))
+            req.forceCount = Core::BlankAffixCount(int(proto->Quality), req.maxCount);
         plan.rolled = Core::RollAffixes(pool, tiers, req, [](uint32_t n) { return n ? urand(0, n - 1) : 0u; });
         if (plan.rolled.empty()) { why = "nothing rolled"; return false; }
         if (bossLoot && plan.rolled.size() >= 5)
@@ -524,6 +530,25 @@ namespace Arpg::Loot
                 plan.nameAffixId = r.affixId;
             }
         return true;
+    }
+
+    // One rolled affix's value at `budget` (the item's B budget): the plan's fixed roll when it has one (corpse loot), else a
+    // fresh one. Flat (B) affixes in stat points, pct affixes in hundredths rounded to tenths, flags 1.
+    int32 RolledValue(AffixInfo const& a, Core::RolledAffix const& r, uint32 budget,
+                      std::map<std::pair<uint32, int>, Core::TierRange>& ranges, std::map<int, int> const& ascPct)
+    {
+        Core::TierRange range = ranges[{ a.def.id, r.tier }];
+        if (r.tier > 5 && range.max <= 0.0f)   // Ascended: T5 range x the tier's %
+        {
+            auto it = ascPct.find(r.tier);
+            range = Core::AscendedRange(ranges[{ a.def.id, 5 }], it == ascPct.end() ? 100 : it->second);
+        }
+        double const t = r.roll >= 0.0 ? r.roll : rand_norm();
+        if (a.unit == "B")
+            return int32(Core::FlatValue(budget, range, t));
+        if (a.unit == "pct")
+            return Core::RoundToTenths(Core::PercentValue(range, t));   // shown to 0.1%
+        return 1;
     }
 
     int32 PlanSuffixId(RollPlan const& plan)
@@ -546,12 +571,14 @@ namespace Arpg::Loot
         std::map<uint32, AffixInfo> byId;
         std::map<std::pair<uint32, int>, Core::TierRange> ranges;
         std::vector<Core::TierRule> tiers;
+        std::map<int, int> ascPct;
         {
             std::lock_guard<std::mutex> l(g_lock);
             for (AffixInfo const& a : g_affixes)
                 byId[a.def.id] = a;
             ranges = g_ranges;
             tiers = g_tiers;
+            ascPct = g_ascendedPct;
         }
         uint32 budget = BudgetB(proto, uint8(lootLevel)).budget;
         uint32 itemGuid = item->GetGUID().GetCounter();
@@ -567,22 +594,7 @@ namespace Arpg::Loot
             if (!byId.count(rolled[i].affixId))
                 continue;   // affix removed by a reload since the plan was made
             AffixInfo const& a = byId[rolled[i].affixId];
-            Core::TierRange range = ranges[{ a.def.id, rolled[i].tier }];
-            if (rolled[i].tier > 5 && range.max <= 0.0f)   // Ascended: T5 range x the tier's %
-            {
-                int pct = 100;
-                {
-                    std::lock_guard<std::mutex> l(g_lock);
-                    auto it = g_ascendedPct.find(rolled[i].tier);
-                    pct = it == g_ascendedPct.end() ? 100 : it->second;
-                }
-                range = Core::AscendedRange(ranges[{ a.def.id, 5 }], pct);
-            }
-            int32 value = 1;
-            if (a.unit == "B")
-                value = int32(Core::FlatValue(budget, range, rand_norm()));
-            else if (a.unit == "pct")
-                value = Core::RoundToTenths(Core::PercentValue(range, rand_norm()));   // shown to 0.1%
+            int32 value = RolledValue(a, rolled[i], budget, ranges, ascPct);
 
             uint32 enchantId = 0;    // Blizzard row that APPLIES the stat (core enchant code); 0 = AffixStats applies it
             uint32 displayId = 0;    // our client patch row that only SHOWS the line (server doesn't know it)
@@ -713,6 +725,8 @@ namespace Arpg::Loot
     {
         if (!owner)
             return;
+        // m6-blank-bases (a): a share of the gear (floor items included) comes as its blank, before anything is planned.
+        MaybeBlankLoot(owner, loot);
         uint32 now = getMSTime();
         for (LootItem& li : loot.items)
         {
@@ -740,6 +754,8 @@ namespace Arpg::Loot
             if (!rp)
                 continue;   // no display rows: nothing to show in the loot window - roll at pickup as before
             plan.planned = true;
+            for (Core::RolledAffix& r : plan.rolled)
+                r.roll = rand_norm();   // values fixed now: the loot window preview shows what the pickup gives
             li.randomPropertyId = rp;   // the loot window shows the final name ("X of the Whale", "X - <Unique>")
             // The suffix factor too, as the core gives an item with a suffix (Item::UpdateItemSuffixFactor): with 0 the client
             // shows the plain name in the loot window (owner 2026-11-27: the name only appeared in the bags).
@@ -794,6 +810,77 @@ namespace Arpg::Loot
             Core::TierRange range = ranges[{ r.affixId, std::min(r.tier, 5) }];
             out.push_back({ stat, int32(Core::FlatValue(budget, range, 0.5)), false });
         }
+        return out;
+    }
+
+    uint32 SpecMainStat(Player* player)
+    {
+        return player ? MainStat(player) : 0;
+    }
+
+    std::string PlanPreview(Player* player, uint32 itemId, int32 rp)
+    {
+        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+        if (!player || !proto || rp >= 0)
+            return "";
+        RollPlan plan;
+        std::map<uint32, AffixInfo> byId;
+        std::map<std::pair<uint32, int>, Core::TierRange> ranges;
+        std::map<int, int> ascPct;
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            auto it = g_plans.find({ itemId, rp });
+            if (it == g_plans.end() || it->second.empty())
+                return "";
+            plan = it->second.front();   // the one TakePlan hands out next
+            for (AffixInfo const& a : g_affixes)
+                byId[a.def.id] = a;
+            ranges = g_ranges;
+            ascPct = g_ascendedPct;
+        }
+        uint32 budget = BudgetB(proto, uint8(LootLevelFor(player))).budget;
+        std::string out;
+        for (size_t i = 0; i < plan.rolled.size() && i < 5; ++i)
+        {
+            auto a = byId.find(plan.rolled[i].affixId);
+            if (a == byId.end())
+                continue;
+            int32 value = RolledValue(a->second, plan.rolled[i], budget, ranges, ascPct);
+            std::string part;
+            if (uint32 stat = a->second.unit == "B" ? EffectStat(a->second.effect) : 0)
+            {
+                int ds = Core::DisplayStatFromItemMod(stat);
+                if (ds >= 0)
+                    part = "s:" + std::to_string(ds) + ":" + std::to_string(value);
+            }
+            else if (Core::Effect e = Core::EffectFromName(a->second.effect); e != Core::Effect::None)
+                part = "e:" + std::to_string(int(e)) + ":" + std::to_string(a->second.unit == "pct" ? (value + 5) / 10 : 0);
+            if (!part.empty())
+                out += (out.empty() ? "" : ";") + part;
+        }
+        if (plan.makeUnique)
+            out += std::string(out.empty() ? "" : ";") + "u:" + std::to_string(plan.makeUnique) + ":0";
+        return out;
+    }
+
+    std::string LastItemPreview(Player* player)
+    {
+        std::lock_guard<std::mutex> l(g_lock);
+        auto last = g_lastItem.find(player->GetGUID().GetCounter());
+        if (last == g_lastItem.end())
+            return "";
+        uint32 guid = uint32(last->second);
+        std::vector<std::string> parts;
+        if (auto it = g_itemStats.find(guid); it != g_itemStats.end())
+            for (StatLine const& s : it->second)
+                if (int ds = Core::DisplayStatFromItemMod(s.stat); ds >= 0)
+                    parts.push_back("s:" + std::to_string(ds) + ":" + std::to_string(s.value));
+        if (auto it = g_itemEffects.find(guid); it != g_itemEffects.end())
+            for (EffectLine const& e : it->second)
+                parts.push_back("e:" + std::to_string(e.effect) + ":" + std::to_string((e.value + 5) / 10));
+        std::string out;
+        for (std::string const& p : parts)
+            out += (out.empty() ? "" : ";") + p;
         return out;
     }
 

@@ -21,7 +21,7 @@ namespace
         "Arpg.Companion.Reforge", "Arpg.Companion.Transmog", "Arpg.Companion.VoidStorage", "Arpg.Companion.InCombat",
         "Arpg.LootPet.Enabled", "Arpg.LootPet.WaitForCombatEnd", "Arpg.LootPet.ReachTimeoutMs",
         "Arpg.AnyWeapon.Enabled", "Arpg.AnyWeapon.Bots", "Arpg.AnyWeapon.DualWield",
-        "Arpg.MountShop.Enabled", "Arpg.MountShop.Price", "Arpg.Bots.AffixScoring", "Arpg.Bots.PartyGear", "Arpg.Bots.PartyAffixTierOffset", "Arpg.AH.AffixShare", "Arpg.AH.TierOffset", "Arpg.AH.AffixMarkup",
+        "Arpg.MountShop.Enabled", "Arpg.MountShop.Price", "Arpg.Blank.Enabled", "Arpg.Blank.DropChance", "Arpg.Blank.Crafted", "Arpg.Blank.EssenceCost.Green", "Arpg.Blank.EssenceCost.Blue", "Arpg.Blank.EssenceCost.Epic", "Arpg.Bots.AffixScoring", "Arpg.Bots.PartyGear", "Arpg.Bots.PartyAffixTierOffset", "Arpg.AH.AffixShare", "Arpg.AH.TierOffset", "Arpg.AH.AffixMarkup",
         "Arpg.Catalyst.ChampionChance", "Arpg.Catalyst.SuperuniqueChance", "Arpg.Catalyst.EssenceCostLesser",
         "Arpg.Catalyst.EssenceCostGreater", "Arpg.Catalyst.EssenceCostGrand", "Arpg.Salvage.EssencePerAffix",
         "Arpg.Salvage.UniqueBonus", "Arpg.Salvage.AscendedBonus", "Arpg.Salvage.MaxQuality", "Arpg.Salvage.IncludeUniques",
@@ -74,6 +74,12 @@ namespace Arpg
         s.botAffixScoring = file.GetBool("Arpg.Bots.AffixScoring", true);
         s.mountShopEnabled = file.GetBool("Arpg.MountShop.Enabled", true);
         s.mountShopPriceGold = uint32_t(std::max(0, file.GetInt("Arpg.MountShop.Price", 5000)));
+        s.blankEnabled = file.GetBool("Arpg.Blank.Enabled", true);
+        s.blankDropChance = uint32_t(std::max(0, std::min(100, file.GetInt("Arpg.Blank.DropChance", 10))));
+        s.blankCrafted = file.GetBool("Arpg.Blank.Crafted", true);
+        s.blankEssenceGreen = uint32_t(std::max(0, file.GetInt("Arpg.Blank.EssenceCost.Green", 5)));
+        s.blankEssenceBlue = uint32_t(std::max(0, file.GetInt("Arpg.Blank.EssenceCost.Blue", 15)));
+        s.blankEssenceEpic = uint32_t(std::max(0, file.GetInt("Arpg.Blank.EssenceCost.Epic", 45)));
         s.salvageEssencePerAffix = std::max(0, file.GetInt("Arpg.Salvage.EssencePerAffix", 1));
         s.salvageUniqueBonus = std::max(0, file.GetInt("Arpg.Salvage.UniqueBonus", 5));
         s.salvageAscendedBonus = std::max(0, file.GetInt("Arpg.Salvage.AscendedBonus", 3));

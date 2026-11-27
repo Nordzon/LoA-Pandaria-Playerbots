@@ -9,6 +9,9 @@
 ? ok
 > .arpg config set Arpg.Test.RecordEvents 1
 ? ok
+# Crafted blanks (m6-blank-bases) are covered by 36-blank-bases; here the recipe's own item.
+> .arpg config set Arpg.Blank.Crafted 0
+? ok
 > .arpg pity set Arpgtest craft 164 0
 ? ok craft_misses skill_line=164 = 0
 
@@ -78,4 +81,6 @@
 > .arpg pity set Arpgtest craft 164 0
 ? ok
 > .arpg config set Arpg.Test.RecordEvents 0
+? ok
+> .arpg config set Arpg.Blank.Crafted 1
 ? ok
