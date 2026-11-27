@@ -110,6 +110,7 @@ $overrides = @{
       'AiPlayerbot.MaxRandomBots' = "$BotCount"
       'AiPlayerbot.LfgAnyLevel.Enable'      = '1'   # m7: random bots fill an any-level queue
       'AiPlayerbot.LfgAnyLevel.LevelWindow' = '3'   # within +-3 levels of the player (SPEC 4.10)
+      'AiPlayerbot.LootNeedRollLevel'       = '1'   # m7 owner 2026-11-27: bots never Need (a Need becomes Greed), the player wins
       # m7 bot crowding (owner 2026-11-26): upstream's dynamic level brackets put many more random bots in the real
       # player's level bracket (bots then quest and grind in that level's zones = around the player). Weight 10 is the
       # conf's "large congestion of bots in your bracket"; SyncFactions so one player draws both factions.

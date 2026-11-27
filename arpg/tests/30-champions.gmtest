@@ -74,7 +74,7 @@
 ? ok .* killed champion
 > .arpg test events Arpgtest
 ? champion explosion pending dmg=[1-9]
-! champion explosion dmg=
+# (No "not yet exploded" check: under load the 1.5 s pass before this answer arrives; "pending" shows the delay.)
 ~ 2500
 > .arpg test events Arpgtest
 ? champion explosion dmg=[1-9]

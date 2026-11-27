@@ -397,14 +397,16 @@ namespace
             uint32 blue = Arpg::Monsters::FloorItem(killer, ITEM_QUALITY_RARE);
             if (blue)
                 Arpg::Monsters::AddLootItem(killed->loot, blue);
-            // Unique ladder per character and Superunique (creature entry): 10% + 5% per kill without one.
-            uint32 const baseEntry = Arpg::Monsters::BaseEntry(killed->GetEntry());   // pity is per original creature
-            int misses = Arpg::Loot::UniqueMisses(killer, baseEntry);
+            // Unique ladder per character: 10% + 5% per Superunique kill without one. One counter shared by all Superuniques
+            // (owner 2026-11-27, Arpg.Superunique.SharedBadLuck); 0 = one counter per Superunique (original creature).
+            uint32 const baseEntry = Arpg::Monsters::BaseEntry(killed->GetEntry());
+            uint32 const pityKey = s.superuniqueSharedBadLuck ? Arpg::Loot::SharedSuperuniquePityKey : baseEntry;
+            int misses = Arpg::Loot::UniqueMisses(killer, pityKey);
             Arpg::Core::PityLadder ladder;
             ladder.base = s.superuniqueUniqueChancePct / 100.0f;
             ladder.step = s.superuniqueUniqueStepPct / 100.0f;
             bool won = Arpg::Core::RollWithPity(ladder, misses, rand_norm());
-            Arpg::Loot::SetUniqueMisses(killer, baseEntry, misses);
+            Arpg::Loot::SetUniqueMisses(killer, pityKey, misses);
             uint32 uniqueBase = 0;
             if (won)
             {

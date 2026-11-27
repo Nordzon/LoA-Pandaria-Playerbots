@@ -19,6 +19,10 @@
 > .arpg loot applied Arpgtest
 ? applied items=[01]\b
 
+# Relog (task 5.2): item mods off, the affix cache re-read from the database, item mods on (the login path) - same stats.
+> .arpg test relog Arpgtest
+? ok relog affixed_equipped=[01] removed=[1-9]\d* match=yes
+
 # Swap for another rolled robe: the old robe's affixes come off, the new ones go on.
 > .arpg test equip Arpgtest 82437
 ? match=yes

@@ -58,6 +58,8 @@
 #include "Log.h"
 #include "World.h"
 #include "WorldSession.h"
+#include "WorldPacket.h"
+#include "Opcodes.h"
 
 #include <cctype>
 #include <cstdlib>
@@ -219,6 +221,9 @@ public:
             { "planscore", &HandleTestPlanScore, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "ah",       &HandleTestAh,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "money",    &HandleTestMoney,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "sell",     &HandleTestSell,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "relog",    &HandleTestRelog,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "bot",      &HandleTestBot,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "events",   &HandleTestEvents,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "pack",     &HandleTestPack,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "give",     &HandleTestGive,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -746,6 +751,178 @@ public:
         p->SetMoney(copper);
         handler->PSendSysMessage("ok money gold=%u", uint32(copper / 10000));
         return true;
+    }
+
+    // .arpg test sell <char> <vendorEntry>   (m2 5.4) sells the last item rolled for the character through the real
+    // CMSG_SELL_ITEM handler (a vendor of that entry is summoned next to it for 30 s): money delta vs the affix sell formula.
+    static bool HandleTestSell(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test sell <char> <vendorEntry>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        uint32 low = Arpg::Loot::LastItemGuid(p);
+        Item* item = low ? p->GetItemByGuid(ObjectGuid(HighGuid::Item, low)) : nullptr;
+        if (!item)
+            return Fail(handler, "no rolled item in the bags (use .arpg test give first)");
+        uint32 entry = uint32(std::strtoul(t[1].c_str(), nullptr, 10));
+        CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(entry);
+        if (!ct || !(ct->npcflag & UNIT_NPC_FLAG_VENDOR))
+            return Fail(handler, "creature " + t[1] + " is not a vendor");
+        Position pos = p->GetNearPosition(2.0f, 0.0f);
+        TempSummon* vendor = p->SummonCreature(entry, pos, TEMPSUMMON_TIMED_DESPAWN, Milliseconds(30000));
+        if (!vendor)
+            return Fail(handler, "vendor not summoned");
+        uint64 expected = Arpg::Loot::AffixSellPrice(item, uint64(item->GetTemplate()->SellPrice) * item->GetCount());
+        int affixes = int(Arpg::Loot::ItemStatLines(low, true).size() + Arpg::Loot::ItemEffectLines(low).size());
+        uint64 before = p->GetMoney();
+
+        // The client's packet: uint32 count (0 = the whole stack), then the two guids as masked bits + byte sequence.
+        ObjectGuid itemGuid = item->GetGUID(), vendorGuid = vendor->GetGUID();
+        WorldPacket pkt(CMSG_SELL_ITEM, 4 + 2 + 16);
+        pkt << uint32(0);
+        pkt.WriteBit(itemGuid[4]); pkt.WriteBit(itemGuid[3]); pkt.WriteBit(itemGuid[7]); pkt.WriteBit(vendorGuid[6]);
+        pkt.WriteBit(vendorGuid[5]); pkt.WriteBit(vendorGuid[1]); pkt.WriteBit(itemGuid[5]); pkt.WriteBit(itemGuid[2]);
+        pkt.WriteBit(itemGuid[1]); pkt.WriteBit(vendorGuid[2]); pkt.WriteBit(itemGuid[6]); pkt.WriteBit(vendorGuid[4]);
+        pkt.WriteBit(vendorGuid[0]); pkt.WriteBit(vendorGuid[7]); pkt.WriteBit(vendorGuid[3]); pkt.WriteBit(itemGuid[0]);
+        pkt.FlushBits();
+        pkt.WriteByteSeq(vendorGuid[6]); pkt.WriteByteSeq(vendorGuid[3]); pkt.WriteByteSeq(vendorGuid[1]); pkt.WriteByteSeq(itemGuid[1]);
+        pkt.WriteByteSeq(vendorGuid[2]); pkt.WriteByteSeq(itemGuid[7]); pkt.WriteByteSeq(itemGuid[5]); pkt.WriteByteSeq(vendorGuid[7]);
+        pkt.WriteByteSeq(itemGuid[2]); pkt.WriteByteSeq(vendorGuid[0]); pkt.WriteByteSeq(vendorGuid[5]); pkt.WriteByteSeq(itemGuid[3]);
+        pkt.WriteByteSeq(itemGuid[6]); pkt.WriteByteSeq(vendorGuid[4]); pkt.WriteByteSeq(itemGuid[4]); pkt.WriteByteSeq(itemGuid[0]);
+        p->GetSession()->HandleSellItemOpcode(pkt);
+
+        bool gone = p->GetItemByGuid(itemGuid) == nullptr;
+        vendor->DespawnOrUnsummon();
+        handler->PSendSysMessage("ok sold=%u item=%u affixes=%d delta=%llu expected=%llu", gone ? 1u : 0u, low, affixes,
+            (unsigned long long)(p->GetMoney() - before), (unsigned long long)expected);
+        return true;
+    }
+
+    // .arpg test relog <char>   (m2 5.2) what a relog does to affixed gear, without logging out: all item mods off, the
+    // affix cache re-read from the database (as at server start), all item mods on again (the login path). Stats must match.
+    static bool HandleTestRelog(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 1 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test relog <char>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        int affixed = 0;
+        for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+            if (Item* it = p->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+                if (!Arpg::Loot::ItemStatLines(it->GetGUID().GetCounter(), true).empty())
+                    ++affixed;
+        StatVec before = Snapshot(p);
+        p->_RemoveAllItemMods();
+        StatVec off = Snapshot(p);
+        Arpg::Loot::LoadStatCache();
+        p->_ApplyAllItemMods();
+        StatVec after = Snapshot(p);
+        int64 removed = 0;
+        std::string diff;
+        for (size_t i = 0; i < kProbeStats; ++i)
+        {
+            removed += before[i] - off[i];
+            if (before[i] != after[i])
+                diff += std::string(" ") + kProbeNames[i] + "=" + std::to_string(before[i]) + "->" + std::to_string(after[i]);
+        }
+        handler->PSendSysMessage("ok relog affixed_equipped=%d removed=%lld match=%s%s", affixed, (long long)removed,
+            diff.empty() ? "yes" : "no", diff.c_str());
+        return true;
+    }
+
+    // .arpg test bot <char> join [minLevel] | bring | item <itemId> | leave   (m7 2.x) a real random bot for tests: join groups
+    // an online random bot with the character, bring teleports it next to the character (same map / instance), item gives
+    // the bot an item through the roller (bots' own items get no affixes), leave disbands the group.
+    static Player* TestBotOf(Player* p)
+    {
+        if (Group* g = p->GetGroup())
+            for (GroupReference* ref = g->GetFirstMember(); ref; ref = ref->next())
+                if (Player* m = ref->GetSource())
+                    if (m != p && !Arpg::Scaling::IsRealPlayer(m))
+                        return m;
+        return nullptr;
+    }
+
+    static bool HandleTestBot(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        char const* usage = "usage: .arpg test bot <char> join [minLevel]|bring|item <itemId>|leave";
+        if (t.size() < 2 || !IsNameLike(t[0]))
+            return Fail(handler, usage);
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        if (t[1] == "join")
+        {
+            if (Player* b = TestBotOf(p))
+            {
+                handler->PSendSysMessage("ok bot=%s level=%u real=%d (already grouped)", b->GetName().c_str(), b->GetLevel(),
+                    Arpg::Scaling::IsRealPlayer(b) ? 1 : 0);
+                return true;
+            }
+            uint32 minLevel = t.size() > 2 ? uint32(std::strtoul(t[2].c_str(), nullptr, 10)) : 1;
+            Player* bot = nullptr;
+            for (auto const& [guid, b] : ObjectAccessor::GetPlayers())
+                if (b && b != p && !Arpg::Scaling::IsRealPlayer(b) && b->IsInWorld() && b->IsAlive() && !b->GetGroup() &&
+                    b->GetLevel() >= minLevel && !b->IsInCombat() && !b->GetMap()->Instanceable())
+                {
+                    bot = b;
+                    break;
+                }
+            if (!bot)
+                return Fail(handler, "no free online random bot");
+            Group* g = p->GetGroup();
+            if (!g)
+            {
+                g = new Group();
+                g->Create(p);
+                sGroupMgr->AddGroup(g);
+            }
+            g->AddMember(bot);
+            handler->PSendSysMessage("ok bot=%s level=%u real=%d", bot->GetName().c_str(), bot->GetLevel(),
+                Arpg::Scaling::IsRealPlayer(bot) ? 1 : 0);
+            return true;
+        }
+        if (t[1] == "leave")
+        {
+            if (Group* g = p->GetGroup())
+                g->Disband();
+            handler->SendSysMessage("ok bot left");
+            return true;
+        }
+        Player* bot = TestBotOf(p);
+        if (!bot || !bot->IsInWorld())
+            return Fail(handler, "no bot in the character's group (join first)");
+        if (t[1] == "bring")
+        {
+            Position pos = p->GetNearPosition(2.0f, float(M_PI));
+            bot->TeleportTo(p->GetMapId(), pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), p->GetOrientation());
+            handler->PSendSysMessage("ok bot=%s brought map=%u", bot->GetName().c_str(), p->GetMapId());
+            return true;
+        }
+        if (t[1] == "item" && t.size() == 3)
+        {
+            uint32 itemId = uint32(std::strtoul(t[2].c_str(), nullptr, 10));
+            ItemPosCountVec dest;
+            if (!sObjectMgr->GetItemTemplate(itemId))
+                return Fail(handler, "unknown item " + t[2]);
+            if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1) != EQUIP_ERR_OK)
+                return Fail(handler, "bot's bags full");
+            Item* item = bot->StoreNewItem(dest, itemId, true);
+            if (!item)
+                return Fail(handler, "could not create item");
+            std::string why;
+            int n = Arpg::Loot::RollForItem(bot, item, ItemPickupSourceType::CreatureLoot, why);
+            handler->PSendSysMessage("ok bot=%s item=%u affixes=%d (%s)", bot->GetName().c_str(), itemId, n, why.c_str());
+            bot->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
+            return true;
+        }
+        return Fail(handler, usage);
     }
 
     // .arpg test salvage <char> preview|do|buy <band>   the companion's Salvage / Buy catalysts, by name over SOAP
@@ -1363,7 +1540,7 @@ public:
         bool godroll = t.size() == 3 && t[1] == "godroll", unique = t.size() == 4 && t[1] == "unique";
         bool craft = t.size() == 4 && t[1] == "craft";
         if ((!godroll && !unique && !craft) || !IsNameLike(t[0]))
-            return Fail(handler, "usage: .arpg pity set <char> godroll <n> | unique <bossEntry> <misses> | craft <skillLine> <misses>");
+            return Fail(handler, "usage: .arpg pity set <char> godroll <n> | unique <bossEntry>|superunique <misses> | craft <skillLine> <misses>");
         Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
         if (!p || !p->IsInWorld())
             return Fail(handler, "character not online");
@@ -1378,7 +1555,8 @@ public:
         }
         else
         {
-            uint32 boss = uint32(std::strtoul(t[2].c_str(), nullptr, 10));
+            // "superunique" = the shared Superunique counter
+            uint32 boss = t[2] == "superunique" ? Arpg::Loot::SharedSuperuniquePityKey : uint32(std::strtoul(t[2].c_str(), nullptr, 10));
             Arpg::Loot::SetUniqueMisses(p, boss, atoi(t[3].c_str()));
             handler->PSendSysMessage("ok unique_misses boss=%u = %d", boss, Arpg::Loot::UniqueMisses(p, boss));
             return true;
@@ -2417,8 +2595,9 @@ public:
     {
         static std::map<uint32, ObjectGuid> standIns;   // spawnId -> stand-in
         std::vector<std::string> t = Tokens(args);
-        if (t.size() != 3 || !IsNameLike(t[0]) || (t[2] != "on" && t[2] != "off" && t[2] != "status"))
-            return Fail(handler, "usage: .arpg scale combat <char> <spawnId> on|off|status");
+        static std::map<uint32, uint32> savedHealth;    // spawnId -> max health before "bot"
+        if (t.size() != 3 || !IsNameLike(t[0]) || (t[2] != "on" && t[2] != "off" && t[2] != "status" && t[2] != "bot"))
+            return Fail(handler, "usage: .arpg scale combat <char> <spawnId> on|bot|off|status");
         Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
         if (!p || !p->IsInWorld())
             return Fail(handler, "character not online");
@@ -2443,6 +2622,13 @@ public:
             auto it = standIns.find(spawnId);
             if (it != standIns.end())
                 d = ObjectAccessor::GetCreature(*p, it->second);
+            if (v && v->ToPlayer())   // "bot" mode: a real random bot is the opponent
+            {
+                handler->PSendSysMessage("ok combat status spawn=%u incombat=%u victim_player=%s real=%d level=%u alive=%u hp=%u", spawnId,
+                    c->IsInCombat() ? 1u : 0u, v->GetName().c_str(), Arpg::Scaling::IsRealPlayer(v->ToPlayer()) ? 1 : 0, c->GetLevel(),
+                    c->IsAlive() ? 1u : 0u, c->GetHealth());
+                return true;
+            }
             handler->PSendSysMessage("ok combat status spawn=%u incombat=%u victim=%u evading=%u standin=%u alive=%u hp=%u faction=%u "
                 "hostile=%u valid=%u standin_combat=%u", spawnId, c->IsInCombat() ? 1u : 0u,
                 v && v->ToCreature() ? v->ToCreature()->GetEntry() : 0u, c->IsInEvadeMode() ? 1u : 0u, d ? 1u : 0u,
@@ -2461,7 +2647,41 @@ public:
             }
             c->RestoreFaction();
             c->CombatStop(true);
+            if (auto h = savedHealth.find(spawnId); h != savedHealth.end())
+            {
+                c->SetMaxHealth(h->second);
+                c->SetFullHealth();
+                savedHealth.erase(h);
+            }
+            if (Player* b = TestBotOf(p))
+            {
+                b->CombatStop(true);
+                b->UpdateMaxHealth();
+                b->SetFullHealth();
+                // Away from the mob: left next to it, the bot attacks it again and kills it at its normal health.
+                b->TeleportTo(b->m_homebindMapId, b->m_homebindX, b->m_homebindY, b->m_homebindZ, 0.0f);
+            }
             handler->PSendSysMessage("ok combat off spawn=%u", spawnId);
+            return true;
+        }
+
+        if (t[2] == "bot")   // m7 2.1: the character's grouped random bot fights it (both made unkillable for the test)
+        {
+            Player* b = TestBotOf(p);
+            if (!b || !b->IsInWorld() || b->GetMapId() != c->GetMapId())
+                return Fail(handler, "no grouped bot on this map (.arpg test bot <char> join, then bring)");
+            Position pos = c->GetNearPosition(2.0f, 0.0f);
+            b->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), c->GetOrientation());
+            b->SetMaxHealth(1000000);
+            b->SetFullHealth();
+            savedHealth[spawnId] = c->GetMaxHealth();
+            c->SetMaxHealth(200000000);   // a level-90 bot must not kill it during the test
+            c->SetFullHealth();
+            c->SetFaction(14);
+            c->GetThreatManager().AddThreat(b, 1000.0f, nullptr, true, true);
+            if (c->AI())
+                c->AI()->AttackStart(b);
+            handler->PSendSysMessage("ok combat bot spawn=%u bot=%s incombat=%u", spawnId, b->GetName().c_str(), c->IsInCombat() ? 1u : 0u);
             return true;
         }
 

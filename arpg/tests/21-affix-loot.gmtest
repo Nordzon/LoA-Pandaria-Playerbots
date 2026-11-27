@@ -15,6 +15,10 @@
 ? affixes=[12] item guid=\d+ .*\| .+ T[1-4]=\d+
 # Vendor value (task 4.5): template 689 copper + affixes x level 15 x 200 -> 3689 (1 affix) or 6689 (2). Same for buyback.
 ? affixes=1 .*sell=3689\b|affixes=2 .*sell=6689\b
+# Real sale (task 5.4): the green goes to a vendor (Brother Danil, summoned next to Arpgtest) through the client's
+# CMSG_SELL_ITEM handler; the money gained is exactly the affix sell value.
+> .arpg test sell Arpgtest 152
+? ok sold=1 item=\d+ affixes=[12] delta=(3689|6689) expected=\1\b
 
 # Blue: 2-3. Epic: 3-5. Level 60 -> tiers up to T4 only.
 > .arpg test give Arpgtest 1489

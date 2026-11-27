@@ -52,6 +52,7 @@ namespace Arpg
         uint32_t superuniqueRespawnDelaySec = 300; // Arpg.Superunique.RespawnDelay
         float superuniqueUniqueChancePct = 10.0f;  // Arpg.Superunique.UniqueChance
         float superuniqueUniqueStepPct = 5.0f;     // Arpg.Superunique.UniqueBadLuckStep
+        bool superuniqueSharedBadLuck = true;      // Arpg.Superunique.SharedBadLuck (one counter for all Superuniques)
         float superuniqueScale = 1.4f;             // Arpg.Superunique.Scale
         float superuniquePatrolRadius = 15.0f;     // Arpg.Superunique.PatrolRadius (yards around its point; 0 = stand)
         bool superuniqueAnnounce = true;           // Arpg.Superunique.Announce (zone message on spawn)

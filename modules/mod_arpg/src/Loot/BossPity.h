@@ -28,6 +28,8 @@ namespace Arpg::Loot
     void SetGodRollKills(Player* player, int kills);
     // Unique ladder (BALANCE §13): 20% on the first kill of a boss, +20% per kill without its Unique (guaranteed by the 5th).
     int UniqueMisses(Player* player, uint32 bossEntry);
+    // Counter key of the one Unique ladder all Superuniques share (owner 2026-11-27; creature entry 1 is never a boss).
+    constexpr uint32 SharedSuperuniquePityKey = 1;
     void SetUniqueMisses(Player* player, uint32 bossEntry, int misses);
     // A boss kill won the ladder: the next item from that boss's loot whose slot has a Unique becomes one. Returns the boss
     // entry owed (0 = none) and clears it when `take` is true.

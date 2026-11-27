@@ -134,6 +134,7 @@ namespace Arpg
         s.superuniqueRespawnDelaySec = uint32_t(std::max(0, file.GetInt("Arpg.Superunique.RespawnDelay", 300)));
         s.superuniqueUniqueChancePct = std::max(0.0f, file.GetFloat("Arpg.Superunique.UniqueChance", 10.0f));
         s.superuniqueUniqueStepPct = std::max(0.0f, file.GetFloat("Arpg.Superunique.UniqueBadLuckStep", 5.0f));
+        s.superuniqueSharedBadLuck = file.GetBool("Arpg.Superunique.SharedBadLuck", true);
         s.superuniqueScale = std::max(0.0f, file.GetFloat("Arpg.Superunique.Scale", 1.4f));
         s.superuniquePatrolRadius = std::max(0.0f, file.GetFloat("Arpg.Superunique.PatrolRadius", 15.0f));
         s.superuniqueAnnounce = file.GetBool("Arpg.Superunique.Announce", true);

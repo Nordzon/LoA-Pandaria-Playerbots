@@ -1,0 +1,69 @@
+# Earlier features with a real random bot (m7 tasks 2.1-2.3). Needs Arpgtest online and random bots on (rebuild-and-test
+# runs with bots on). The bot is one of the server's own random bots, grouped with Arpgtest for the test.
+# The bot is brought only after the mob is at 30: a bot next to it attacks it on its own, which (rightly) locks its level.
+
+# Northshire's zone cap (max level + 15 = 20) would hold its mobs at 20: lifted for the test, as in 10-world-scaling.
+> .arpg config set Arpg.Scale.ZoneCapAbove 100
+? ok
+> .arpg test bot Arpgtest leave
+? ok
+> .arpg test setup Arpgtest 30 westfall-sentinelhill
+? ok .*\(online\)
+~ 6000
+> .arpg test setup Arpgtest 30 elwynn-northshire
+? ok .*\(online\)
+~ 6000
+> .arpg scale probe Arpgtest 178359
+* scaled=30\b
+
+> .arpg test bot Arpgtest join 20
+? ok bot=\S+ level=\d+ real=0\b
+> .arpg test bot Arpgtest bring
+? ok bot=\S+ brought map=0\b
+~ 8000
+
+# 2.3 (m2): an item a bot gets for itself rolls no affixes (bots are not real players).
+> .arpg test bot Arpgtest item 1489
+? ok bot=\S+ item=1489 affixes=0\b
+
+# 2.1 (m1 "Bots are not disturbed"): the bot fights the mob (level 30); Arpgtest comes back at 60; the mob keeps level 30
+# while the fight lasts and scales once it ends (10-world-scaling covers the same rule with a stand-in).
+> .arpg scale combat Arpgtest 178359 bot
+? ok combat bot spawn=178359 bot=\S+ incombat=1
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+~ 6000
+> .arpg scale combat Arpgtest 178359 status
+? incombat=1 victim_player=\S+ real=0 level=30\b
+> .arpg scale probe Arpgtest 178359
+? scaled=30\b
+> .arpg scale combat Arpgtest 178359 off
+? ok combat off
+> .arpg scale probe Arpgtest 178359
+* scaled=60\b
+
+# 2.2 (m5): Arpgtest + the bot in the Deadmines = a party of 2: 45% health / 55% damage, no solo role factor.
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg dungeon level Arpgtest 36 0
+? ok
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test setup Arpgtest 90 deadmines-inside
+? ok .*\(online\)
+~ 12000
+> .arpg test bot Arpgtest bring
+? ok bot=\S+ brought map=36\b
+~ 12000
+> .arpg dungeon info Arpgtest
+*10 dungeon map=36 instance=1 raid=0 players=2\b
+> .arpg test events Arpgtest
+? instance scale map=36 players=2 boss=0 health=0\.450 damage=0\.550
+
+> .arpg test bot Arpgtest leave
+? ok bot left
+> .arpg config set Arpg.Scale.ZoneCapAbove 15
+? ok
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 8000

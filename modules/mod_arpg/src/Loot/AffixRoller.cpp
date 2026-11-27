@@ -897,6 +897,13 @@ namespace Arpg::Loot
         return true;
     }
 
+    uint32 LastItemGuid(Player* player)
+    {
+        std::lock_guard<std::mutex> l(g_lock);
+        auto it = g_lastItem.find(player->GetGUID().GetCounter());
+        return it == g_lastItem.end() ? 0 : uint32(it->second);
+    }
+
     std::string DescribeLastItem(Player* player)
     {
         uint64 itemGuid = 0;

@@ -102,6 +102,8 @@ namespace Arpg::Loot
 
     // ".arpg loot last <char>": the last item rolled for that character, read back from the database.
     std::string DescribeLastItem(Player* player);
+    // Tests: low guid of the last item rolled for this character (0 = none since the server started).
+    uint32 LastItemGuid(Player* player);
 }
 
 #endif
