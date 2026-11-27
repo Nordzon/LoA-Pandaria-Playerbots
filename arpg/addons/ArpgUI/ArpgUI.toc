@@ -6,3 +6,5 @@
 Paragon.lua
 Loot.lua
 Professions.lua
+PotionData.lua
+Potions.lua

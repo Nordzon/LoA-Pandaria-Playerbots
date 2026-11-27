@@ -85,6 +85,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-27 07:40 owner morning checks: beam/glow/mount vendor/potion text/starter gear ok. "Plain blues" = stock Wow-64.exe (use Wow-64-all.exe). Potion "Use:" text moved from the patch Spell.dbc to ArpgUI Potions.lua (generated PotionData.lua); `--spell` keeps the old way. Open: blank-bases answer, Unique pity per Superunique (ask owner).
 - 2026-11-27 02:43 all work without owner input done; server healthy (500 bots); check-in cron stopped. Next: owner's OWNER-CHECKS round + blank-bases answer; recreate the check-in job when work runs again.
 - 2026-11-27 02:10 m7 3b.3: party bots score corpse loot by its plan (PlannedStatLines: plan affixes at mid range, read-only); `.arpg test planscore`; test 52. Full run ALL OK (26 files).
 - 2026-11-27 01:40 overnight queue done and pushed: world Superuniques (461/83 zones), Champions 5%, glow + loot beam (test 30), potion tooltips (client patch installed). OWNER-CHECKS rewritten for the morning. Waiting: blank-bases answer.
