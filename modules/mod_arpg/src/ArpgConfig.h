@@ -9,6 +9,7 @@
 
 #include <mutex>
 #include <set>
+#include <vector>
 #include <string>
 
 #define ARPG_VERSION "0.1.0"
@@ -62,6 +63,8 @@ namespace Arpg
         bool anyWeaponEnabled = true;          // Arpg.AnyWeapon.Enabled (every weapon proficiency + Shield for real players)
         bool anyWeaponBots = false;            // Arpg.AnyWeapon.Bots
         bool anyWeaponDualWield = false;       // Arpg.AnyWeapon.DualWield
+        bool anyWeaponSkills = true;           // Arpg.AnyWeapon.Skills (class spells take any melee weapon; startup / .arpg reload)
+        std::vector<uint32_t> anyWeaponMainHandSpells{ 1329, 60103, 100130 }; // Arpg.AnyWeapon.MainHandSpells (no off hand needed)
         bool lootPetEnabled = true;            // Arpg.LootPet.Enabled (players may turn their companion on)
         bool lootPetWaitForCombatEnd = true;   // Arpg.LootPet.WaitForCombatEnd
         uint32_t lootPetReachTimeoutMs = 3000; // Arpg.LootPet.ReachTimeoutMs (then loots from where it is)

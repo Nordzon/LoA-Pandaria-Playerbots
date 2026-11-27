@@ -17,6 +17,7 @@
 #include "Dungeons/InstanceScaling.h"
 #include "Loot/LootPet.h"
 #include "Character/AnyWeapon.h"
+#include "Character/AnyWeaponSkills.h"
 #include "Loot/Crafting.h"
 #include "Loot/MountShop.h"
 #include "Bots/BotItemScore.h"
@@ -62,6 +63,7 @@ namespace
             Arpg::Loot::LoadCompanionModels();
             Arpg::Loot::LoadMountShop();
             Arpg::Loot::LoadBlanks();
+            Arpg::Character::ApplyAnyWeaponSkills();
         }
     };
 }

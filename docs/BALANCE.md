@@ -365,6 +365,10 @@ die. So their power comes in **level bands** (by the player's level, `arpg_monst
 - Is 40% damage solo too easy for a geared BrM in heroics? (Then use the `Arpg.Dungeon.Difficulty` knob, per player.)
 - T5 god rolls: is 5 flat affixes on one item too strong next to Paragon? Watch the main-stat totals.
 - Thirsty on a fast BrM: cap total heal-on-hit at 1.5% max health per second?
+- **Any weapon for class abilities** (m6-any-weapon-skills): bonuses tied to a weapon now always apply - Fury gets Single-
+  Minded Fury (+damage) with two-handers too, Arms gets Seasoned Soldier with one-handers, Frost DKs get Might of the Frozen
+  Wastes with anything, Monks get both Way of the Monk bonuses. If Fury with two two-handers is too strong, put Single-Minded
+  Fury's one-hand limit back (remove its row from the widening).
 - Raid tier ladder: check a few raids per tier for one-shot mechanics that don't scale (those need per-boss exceptions).
 
 ## 16. Affix values calibrated to real items (owner 2026-11-22)

@@ -307,6 +307,86 @@ def build_spell_descriptions(path_out):
     return done
 
 
+# m6-any-weapon-skills: class spells take any melee weapon in any hand. SAME RULE as
+# modules/mod_arpg/src/Core/WeaponReq.cpp (WidenWeaponRequirement); the server prints its count on startup / .arpg reload
+# ("weapon skills: widened=N mainhand=M") and this prints the client's - they must match.
+CLASS_FAMILIES = {3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 53}
+MELEE_MASK = sum(1 << b for b in (0, 1, 4, 5, 6, 7, 8, 10, 13, 15, 17))
+SERVER_DBC_DIR = os.path.dirname(SERVER_DBC)
+REQ_OFFHAND = 0x01000000
+
+
+def widen_weapon_requirement(family, item_class, sub_mask, inv_mask):
+    """-> (sub_mask, inv_mask) or None when unchanged."""
+    if family not in CLASS_FAMILIES or item_class != 2:
+        return None
+    any_sub = sub_mask in (0, -1)
+    if not any_sub and not (sub_mask & MELEE_MASK):
+        return None
+    new_sub = sub_mask if any_sub else sub_mask | MELEE_MASK
+    if new_sub == sub_mask and inv_mask == 0:
+        return None
+    return new_sub, 0
+
+
+def conf_id_list(key, default):
+    for path in CONF_FILES:
+        if os.path.exists(path):
+            m = re.search(rf'^\s*{re.escape(key)}\s*=\s*"?([0-9 ,]*)"?\s*$', open(path, encoding='utf-8', errors='replace').read(), re.M)
+            if m:
+                return [int(x) for x in re.split(r'[ ,]+', m.group(1).strip()) if x]
+    return default
+
+
+def read_dbc(name):
+    d = open(os.path.join(SERVER_DBC_DIR, name), 'rb').read()
+    magic, n, f, sz, ssz = struct.unpack('<4s4I', d[:20])
+    assert magic == b'WDBC' and sz == f * 4, f'unexpected {name} layout'
+    return d, n, f, sz
+
+
+def build_weapon_skills(eq_out, misc_out):
+    """Client SpellEquippedItems.dbc (widened rows) and SpellMisc.dbc (REQ_OFFHAND cleared for MainHandSpells).
+    Only those fields change; every other byte stays Blizzard's. Returns (widened spells, main-hand spells)."""
+    if conf_int('Arpg.AnyWeapon.Skills', 1) == 0:
+        return None
+    spell, sn, sf, ssz_ = read_dbc('Spell.dbc')
+    eq, en, ef, esz = read_dbc('SpellEquippedItems.dbc')
+    co, cn, cf, csz = read_dbc('SpellClassOptions.dbc')
+    misc, mn, mf, msz = read_dbc('SpellMisc.dbc')
+    rec = lambda d, i, sz, f: struct.unpack_from(f'<{f}i', d, 20 + i * sz)
+    eq_index = {rec(eq, i, esz, ef)[0]: i for i in range(en)}
+    family = {r[0]: r[6] for r in (rec(co, i, csz, cf) for i in range(cn))}
+    misc_index = {rec(misc, i, msz, mf)[0]: i for i in range(mn)}
+    eq_new, misc_new = bytearray(eq), bytearray(misc)
+    widened, main_hand, row_users = set(), set(), {}
+    want_main = set(conf_id_list('Arpg.AnyWeapon.MainHandSpells', [1329, 60103, 100130]))
+    for i in range(sn):
+        s = rec(spell, i, ssz_, sf)
+        sid, co_id, eq_id, misc_id = s[0], s[14], s[16], s[24]
+        if eq_id in eq_index:
+            row_users.setdefault(eq_id, []).append(sid)
+            r = rec(eq, eq_index[eq_id], esz, ef)
+            w = widen_weapon_requirement(family.get(co_id, 0), r[3], r[5], r[4])
+            if w:
+                off = 20 + eq_index[eq_id] * esz
+                struct.pack_into('<i', eq_new, off + 4 * 4, w[1])   # inventory type mask (field 4)
+                struct.pack_into('<i', eq_new, off + 5 * 4, w[0])   # subclass mask (field 5)
+                widened.add(sid)
+        if sid in want_main and misc_id in misc_index:
+            off = 20 + misc_index[misc_id] * msz + 6 * 4            # AttributesEx3 (field 6)
+            a3 = struct.unpack_from('<I', misc_new, off)[0]
+            if a3 & REQ_OFFHAND:
+                struct.pack_into('<I', misc_new, off, a3 & ~REQ_OFFHAND)
+                main_hand.add(sid)
+    shared = [(k, v) for k, v in row_users.items() if len(v) > 1 and any(x in widened for x in v) and not all(x in widened for x in v)]
+    if shared:
+        print(f'  ! {len(shared)} SpellEquippedItems rows shared with non-class spells (those spells widen on the client too): {shared[:5]}')
+    open(eq_out, 'wb').write(bytes(eq_new))
+    open(misc_out, 'wb').write(bytes(misc_new))
+    return len(widened), len(main_hand)
+
+
 def build_mpq(files, mpq_path):
     """files: {inner name (bytes): local path}. Plain MPQ v4 entries (the unlocked exe loads plain files)."""
     s = ctypes.WinDLL(DLL)
@@ -352,6 +432,12 @@ def main():
     pairs = build_charbaseinfo(charbase)
     files = {b'DBFilesClient\\SpellItemEnchantment.dbc': dbc, b'DBFilesClient\\ItemRandomSuffix.dbc': suffix,
              b'DBFilesClient\\CharBaseInfo.dbc': charbase}
+    eq_dbc = os.path.join(OUT_DIR, 'SpellEquippedItems.client.dbc')
+    misc_dbc = os.path.join(OUT_DIR, 'SpellMisc.client.dbc')
+    wskills = build_weapon_skills(eq_dbc, misc_dbc)
+    if wskills:
+        files[b'DBFilesClient\\SpellEquippedItems.dbc'] = eq_dbc
+        files[b'DBFilesClient\\SpellMisc.dbc'] = misc_dbc
     spells = 0
     write_potion_addon_data()   # the potion tooltip text now comes from ArpgUI (Potions.lua) instead of Spell.dbc
     write_affix_addon_data()    # corpse-loot preview lines (ArpgUI LootTooltip.lua)
@@ -368,6 +454,8 @@ def main():
     print(f'  + {len(srows)} random-suffix rows ({srows[0][0]}..{srows[-1][0]}) for 5 lines + item names')
     print(f'  + CharBaseInfo: {pairs} race x class pairs (any race, any class)')
     print(f'  + Spell: {spells} potion tooltips (% heal / mana, shared cooldown)')
+    print(f'  + weapon skills: widened={wskills[0]} mainhand={wskills[1]} (server prints the same on startup)' if wskills
+          else '  + weapon skills: off (Arpg.AnyWeapon.Skills 0)')
     if '--install' in sys.argv:
         shutil.copyfile(mpq, TARGET)
         print('installed', TARGET)

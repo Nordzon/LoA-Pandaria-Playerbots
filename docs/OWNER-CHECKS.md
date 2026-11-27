@@ -15,6 +15,17 @@ glow (2), mount vendor window (4), potion tooltip (5), blank bases use (7: "all 
 | Gold (6000 g) | target yourself, then `.modify money 60000000` |
 | Teleport | `.tele goldshire`, `.tele stormwind`, `.tele ValeofEternalBlossoms` |
 
+## A. New 2026-11-27 20:45 - class abilities with any weapon (close the client, then I install the new patch; or run
+`py -I arpg\client-patch\build-client-patch.py --install` yourself with the client closed)
+1. A Rogue with a **two-handed sword** (`.additem 2489`): Backstab, Mutilate (with no off-hand weapon), Dispatch, poisons and
+   Shiv all work; none is red on the action bar.
+2. A Shaman with a **staff** (`.additem 2132`): Lava Lash works without an off-hand weapon.
+3. Still needed: Shield Slam needs a shield; Hunter shots need a bow, gun or crossbow.
+4. Question: should Hunter shots also work without a ranged weapon (they'd hit for very little - the shot uses the ranged
+   weapon's damage)? My suggestion: keep as is.
+
+> Result:
+
 ## 1. New 2026-11-27 08:15 - start `Wow-64-all.exe` fresh (the addon got new files)
 1. **Corpse loot preview** (replaces the old "loot names on the corpse" check): companion off (L), kill something with a
    green/blue: hovering the item in the loot window shows its affix lines; after looting, the bag item has exactly the same lines.

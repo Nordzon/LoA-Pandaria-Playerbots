@@ -80,6 +80,13 @@ Arpg.Craft.UniquePityStep = 1.0
 Arpg.AnyWeapon.Enabled = 1
 Arpg.AnyWeapon.Bots = 0
 Arpg.AnyWeapon.DualWield = 0
+#    Skills          1 = class abilities take any melee weapon in any hand (no dagger / one-hand / two-hand / off-hand
+#                    limit; shield, armour and ranged-only needs stay). Spell data is shared: players and bots. Needs the
+#                    client patch (build-client-patch.py) for the client side. Startup and .arpg reload.
+#    MainHandSpells  spells that normally need an off-hand weapon and now hit with the main hand (Mutilate 1329,
+#                    Lava Lash 60103, Wild Strike 100130); space or comma separated. The client patch reads this line too.
+Arpg.AnyWeapon.Skills = 1
+Arpg.AnyWeapon.MainHandSpells = 1329 60103 100130
 
 # --- Catalysts (SPEC 4.8, change m6-custom-items) ---------------------------------------------
 #    A Champion leader / Superunique drops a catalyst of its tier band (Lesser T1-T2, Greater T3-T4, Grand T5+) with

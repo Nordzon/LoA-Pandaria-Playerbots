@@ -1,0 +1,46 @@
+# Class abilities with any melee weapon (change m6-any-weapon-skills, owner 2026-11-27): no dagger / one-hand / two-hand /
+# off-hand limits; shield and ranged-only needs stay. Items: 2489 Two-Handed Sword, 35 Bent Staff, 2092 Worn Dagger,
+# 25 Worn Shortsword (main hand), 2504 Worn Shortbow, 2129 Large Round Shield. No character needed.
+
+> .arpg reload
+? weapon skills: widened=[1-9]\d* mainhand=3\b
+
+# Daggers only before: Backstab, Mutilate, Dispatch, Assassin's Resolve - now a two-handed sword fits.
+> .arpg test spellreq 53 2489
+? ok spell=53 .* fits=1
+> .arpg test spellreq 1329 2489
+? ok spell=1329 .* offhand=0 .* fits=1
+> .arpg test spellreq 111240 12282
+? ok .* fits=1
+> .arpg test spellreq 84601 2489
+? ok .* inv=0 .* fits=1
+
+# One-handers only: poisons and Shiv with a two-hander; Single-Minded Fury with a two-hander.
+> .arpg test spellreq 2823 2489
+? ok .* fits=1
+> .arpg test spellreq 5938 2361
+? ok .* fits=1
+> .arpg test spellreq 81099 2489
+? ok .* inv=0 .* fits=1
+
+# Two-handers only: Seasoned Soldier, Might of the Frozen Wastes with a dagger / one-hand sword.
+> .arpg test spellreq 12712 2092
+? ok .* fits=1
+> .arpg test spellreq 81333 25
+? ok .* fits=1
+
+# Off hand only: Lava Lash and Wild Strike need no off-hand weapon and take a staff / two-hander in the main hand.
+> .arpg test spellreq 60103 35
+? ok spell=60103 .* inv=0 offhand=0 .* fits=1
+> .arpg test spellreq 100130 2489
+? ok spell=100130 .* inv=0 offhand=0 .* fits=1
+
+# Kept: Shield Slam needs a shield; Hunter shots need a ranged weapon; a sword is not one.
+> .arpg test spellreq 23922 2489
+? ok spell=23922 .* fits=0
+> .arpg test spellreq 23922 2129
+? ok spell=23922 .* fits=1
+> .arpg test spellreq 3044 2489
+? ok spell=3044 .* fits=0
+> .arpg test spellreq 3044 2504
+? ok spell=3044 .* fits=1

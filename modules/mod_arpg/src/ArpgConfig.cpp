@@ -20,7 +20,7 @@ namespace
         "Arpg.Companion.Vendor", "Arpg.Companion.Repair", "Arpg.Companion.Bank", "Arpg.Companion.Mail",
         "Arpg.Companion.Reforge", "Arpg.Companion.Transmog", "Arpg.Companion.VoidStorage", "Arpg.Companion.InCombat",
         "Arpg.LootPet.Enabled", "Arpg.LootPet.WaitForCombatEnd", "Arpg.LootPet.ReachTimeoutMs",
-        "Arpg.AnyWeapon.Enabled", "Arpg.AnyWeapon.Bots", "Arpg.AnyWeapon.DualWield",
+        "Arpg.AnyWeapon.Enabled", "Arpg.AnyWeapon.Bots", "Arpg.AnyWeapon.DualWield", "Arpg.AnyWeapon.Skills", "Arpg.AnyWeapon.MainHandSpells",
         "Arpg.MountShop.Enabled", "Arpg.MountShop.Price", "Arpg.Blank.Enabled", "Arpg.Blank.DropChance", "Arpg.Blank.Crafted", "Arpg.Blank.EssenceCost.Green", "Arpg.Blank.EssenceCost.Blue", "Arpg.Blank.EssenceCost.Epic", "Arpg.Bots.AffixScoring", "Arpg.Bots.PartyGear", "Arpg.Bots.PartyAffixTierOffset", "Arpg.AH.AffixShare", "Arpg.AH.TierOffset", "Arpg.AH.AffixMarkup",
         "Arpg.Catalyst.ChampionChance", "Arpg.Catalyst.SuperuniqueChance", "Arpg.Catalyst.EssenceCostLesser",
         "Arpg.Catalyst.EssenceCostGreater", "Arpg.Catalyst.EssenceCostGrand", "Arpg.Salvage.EssencePerAffix",
@@ -108,6 +108,21 @@ namespace Arpg
         s.anyWeaponEnabled = file.GetBool("Arpg.AnyWeapon.Enabled", true);
         s.anyWeaponBots = file.GetBool("Arpg.AnyWeapon.Bots", false);
         s.anyWeaponDualWield = file.GetBool("Arpg.AnyWeapon.DualWield", false);
+        s.anyWeaponSkills = file.GetBool("Arpg.AnyWeapon.Skills", true);
+        s.anyWeaponMainHandSpells.clear();
+        {
+            std::string list = file.GetString("Arpg.AnyWeapon.MainHandSpells", "1329 60103 100130"), cur;
+            for (char ch : list + " ")
+            {
+                if (ch >= '0' && ch <= '9')
+                    cur += ch;
+                else if (!cur.empty())
+                {
+                    s.anyWeaponMainHandSpells.push_back(uint32_t(std::stoul(cur)));
+                    cur.clear();
+                }
+            }
+        }
         s.lootPetEnabled = file.GetBool("Arpg.LootPet.Enabled", true);
         s.lootPetWaitForCombatEnd = file.GetBool("Arpg.LootPet.WaitForCombatEnd", true);
         s.lootPetReachTimeoutMs = uint32_t(std::max(500, file.GetInt("Arpg.LootPet.ReachTimeoutMs", 3000)));

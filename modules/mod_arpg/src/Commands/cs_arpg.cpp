@@ -28,6 +28,7 @@
 #include "ObjectMgr.h"
 #include "TemporarySummon.h"
 #include "Character/AnyWeapon.h"
+#include "Character/AnyWeaponSkills.h"
 #include "Loot/Salvage.h"
 #include "Loot/MountShop.h"
 #include "Bots/BotItemScore.h"
@@ -210,6 +211,7 @@ public:
             { "learnall", &HandleTestLearnAll, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "professions", &HandleTestProfessions, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "weapons",  &HandleTestWeapons,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "spellreq", &HandleTestSpellReq, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "visual",   &HandleTestVisual,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "entries",  &HandleTestEntries,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "beams",    &HandleTestBeams,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -413,8 +415,9 @@ public:
         std::string comp = Arpg::Loot::LoadCompanionModels();
         std::string mounts = Arpg::Loot::LoadMountShop();
         std::string blanks = Arpg::Loot::LoadBlanks();
-        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
-            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str(), mounts.c_str(), blanks.c_str());
+        std::string wskills = Arpg::Character::ApplyAnyWeaponSkills();
+        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
+            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str(), mounts.c_str(), blanks.c_str(), wskills.c_str());
         return ok;
     }
 
@@ -1243,6 +1246,23 @@ public:
             line += " item=" + std::to_string(itemId) + " canuse=" + std::to_string(uint32(p->CanUseItem(proto)));
         }
         handler->SendSysMessage(line.c_str());
+        return true;
+    }
+
+    // .arpg test spellreq <spellId> [itemId]   (m6-any-weapon-skills) a spell's equipped-item requirement as the server
+    // has it now, and whether the item would satisfy it in the main hand. No character needed (spell data is shared).
+    static bool HandleTestSpellReq(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.empty() || t.size() > 2)
+            return Fail(handler, "usage: .arpg test spellreq <spellId> [itemId]");
+        uint32 spellId = uint32(std::strtoul(t[0].c_str(), nullptr, 10));
+        uint32 itemId = t.size() == 2 ? uint32(std::strtoul(t[1].c_str(), nullptr, 10)) : 0;
+        bool ok = false;
+        std::string line = Arpg::Character::DescribeSpellRequirement(spellId, itemId, ok);
+        if (!ok)
+            return Fail(handler, line);
+        handler->SendSysMessage(("ok " + line).c_str());
         return true;
     }
 

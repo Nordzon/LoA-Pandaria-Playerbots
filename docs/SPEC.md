@@ -292,7 +292,15 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
 - **Any weapon** (owner 2026-11-26, change `m6-any-weapon`): any class can equip any weapon type and a shield. Every real
   player gets every weapon proficiency + Shield (spell for the client, skill at the level max for the server's equip check)
   at login and on level change. `Arpg.AnyWeapon.Enabled` (1), `.Bots` (0: bots keep their class's weapons), `.DualWield`
-  (0). Not covered: items limited to a class by the item itself (`AllowableClass`) and class abilities tied to a weapon.
+  (0). Not covered: items limited to a class by the item itself (`AllowableClass`).
+- **Class abilities with any weapon** (owner 2026-11-27, change `m6-any-weapon-skills`): no class ability needs a specific
+  weapon type or a one-hand/two-hand/off-hand weapon. Class spells whose requirement includes a melee weapon accept any melee
+  weapon in any hand (35 spells: Backstab, Mutilate, Dispatch, poisons, Shiv, Envenom, Blade Flurry, Seasoned Soldier,
+  Single-Minded Fury, Titan's Grip, Might of the Frozen Wastes, Way of the Monk, ...); Mutilate, Lava Lash and Wild Strike
+  (`Arpg.AnyWeapon.MainHandSpells`) need no off-hand weapon and hit with the main hand. **Kept:** shield requirements (Shield
+  Slam, ...), Hunter shots (a bow, gun or crossbow), armour specialisations, script damage bonuses (Ambush/Hemorrhage with a
+  dagger, Heroic Strike with a one-hander). Server: `Arpg.AnyWeapon.Skills` (1, all characters incl. bots); client: same
+  edits in the patch MPQ (`SpellEquippedItems.dbc`, `SpellMisc.dbc`).
 
 ### 4.10 Bots (m7, last)
 - *Implemented 2026-11-26:* 500 random bots (write-confs default). Dungeon Finder any level = upstream's switches, set by
