@@ -18,6 +18,11 @@ namespace Arpg::Loot
 
     // ".arpg loot applied <char>": items and stat totals mod_arpg currently applies to this character.
     std::string DescribeApplied(Player* player);
+
+    // Adds (apply) or removes one flat stat (ITEM_MOD_* id) on the player, the way equipped affix lines do (charms, m9).
+    void ApplyStatLine(Player* player, uint32 itemMod, int32 value, bool apply);
+    // ITEM_MOD_* id for an affix stat name ("stamina", "crit_rating"...), 0 if unknown.
+    uint32 StatModFromName(std::string const& name);
 }
 
 #endif

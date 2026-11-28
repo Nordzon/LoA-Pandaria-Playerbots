@@ -68,7 +68,7 @@
 ? ok Arpgtest killed superunique
 > .arpg test events Arpgtesttwo
 ? superunique share id=1 entry=99 .* unique won misses=0 unique_base=[1-9]
-? personal loot from=\d+ items=[2-9]\d* mailed=0
+? personal loot from=\d+ items=([2-9]|[1-9]\d+) mailed=0
 ? affix item=\d+ .*unique=
 > .arpg pity set Arpgtesttwo unique superunique 0
 ? ok

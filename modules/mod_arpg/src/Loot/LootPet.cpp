@@ -1,4 +1,5 @@
 #include "Loot/LootPet.h"
+#include "Dungeons/Rifts.h"
 
 #include "ArpgConfig.h"
 #include "ArpgHooks.h"
@@ -291,7 +292,7 @@ namespace
 
     // Right-click on the companion: its owner gets a menu of the enabled roles; each opens the game's own window.
     enum CompanionAction : uint32 { ACT_VENDOR = 1, ACT_BANK = 2, ACT_MAIL = 3, ACT_LOOKS = 4, ACT_SALVAGE = 5, ACT_CATALYSTS = 6,
-        ACT_BLANKS = 7, ACT_BLANK_SLOT_BASE = 2000, ACT_BLANK_BUY_BASE = 3000,   // buy: base + slot * 10 + quality
+        ACT_BLANKS = 7, ACT_RIFT = 8, ACT_RIFT_CLOSE = 9, ACT_RIFT_LEVEL_BASE = 400000, ACT_BLANK_SLOT_BASE = 2000, ACT_BLANK_BUY_BASE = 3000,   // buy: base + slot * 10 + quality
         ACT_BUY_BASE = 50, ACT_MODEL_BASE = 100, ACT_MOUNT_PAGE_BASE = 500000, ACT_MOUNT_BUY_BASE = 1000000 };
     uint32 const MountVendorEntry = 1000002;   // npc_vendor list of the mount shop (never spawned)
 
@@ -329,6 +330,9 @@ namespace
                 AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Blank bases for essences", GOSSIP_SENDER_MAIN, ACT_BLANKS);
             if (sArpgConfig.Get().mountShopEnabled)
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Mounts for gold", GOSSIP_SENDER_MAIN, ACT_MOUNT_PAGE_BASE);
+            if (sArpgConfig.Get().m9.riftEnabled)
+                AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Open a Rift (your key: " + std::to_string(Arpg::Dungeons::KeyLevel(player)) + ")",
+                    GOSSIP_SENDER_MAIN, ACT_RIFT);
             AddGossipItemFor(player, GOSSIP_ICON_TABARD, "Change appearance", GOSSIP_SENDER_MAIN, ACT_LOOKS);
             SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             return true;
@@ -351,6 +355,33 @@ namespace
                 // reputation requirement, sql 2026_11_27_01) shown on the companion; buying works like any vendor.
                 CloseGossipMenuFor(player);
                 player->GetSession()->SendListInventory(creature->GetGUID(), MountVendorEntry);
+                return true;
+            }
+            // Rifts (m9-rifts): pick a level up to the key; the next 5-man dungeon entered becomes the rift.
+            if (action == ACT_RIFT)
+            {
+                std::string levels = Arpg::Dungeons::OfferedLevels(player), cur;
+                for (char ch : levels + ",")
+                    if (ch >= '0' && ch <= '9')
+                        cur += ch;
+                    else if (!cur.empty())
+                    {
+                        AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Rift level " + cur, GOSSIP_SENDER_MAIN,
+                            ACT_RIFT_LEVEL_BASE + uint32(std::stoul(cur)));
+                        cur.clear();
+                    }
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Close my open rift", GOSSIP_SENDER_MAIN, ACT_RIFT_CLOSE);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                return true;
+            }
+            if (action == ACT_RIFT_CLOSE || (action > ACT_RIFT_LEVEL_BASE && action < ACT_MOUNT_PAGE_BASE))
+            {
+                CloseGossipMenuFor(player);
+                std::string out = action == ACT_RIFT_CLOSE ? Arpg::Dungeons::CloseRift(player) : std::string();
+                if (action != ACT_RIFT_CLOSE && !Arpg::Dungeons::OpenRift(player, int(action - ACT_RIFT_LEVEL_BASE), out))
+                    ChatHandler(player->GetSession()).SendSysMessage(out.c_str());
+                else if (action == ACT_RIFT_CLOSE)
+                    ChatHandler(player->GetSession()).SendSysMessage("The rift closes.");
                 return true;
             }
             // Typed blank bases (m6-blank-bases c): slot -> quality -> buy for essences; the blank rolls at once.

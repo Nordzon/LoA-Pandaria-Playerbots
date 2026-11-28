@@ -122,6 +122,26 @@ namespace
 
 namespace Arpg::Loot
 {
+    void ApplyStatLine(Player* player, uint32 itemMod, int32 value, bool apply)
+    {
+        if (player && value)
+            ApplyStat(player, itemMod, value, apply);
+    }
+
+    uint32 StatModFromName(std::string const& name)
+    {
+        static std::map<std::string, uint32> const m =
+        {
+            { "strength", ITEM_MOD_STRENGTH }, { "agility", ITEM_MOD_AGILITY }, { "intellect", ITEM_MOD_INTELLECT },
+            { "stamina", ITEM_MOD_STAMINA }, { "spirit", ITEM_MOD_SPIRIT }, { "crit_rating", ITEM_MOD_CRIT_RATING },
+            { "haste_rating", ITEM_MOD_HASTE_RATING }, { "mastery_rating", ITEM_MOD_MASTERY_RATING },
+            { "hit_rating", ITEM_MOD_HIT_RATING }, { "expertise_rating", ITEM_MOD_EXPERTISE_RATING },
+            { "dodge_rating", ITEM_MOD_DODGE_RATING }, { "parry_rating", ITEM_MOD_PARRY_RATING },
+        };
+        auto it = m.find(name);
+        return it == m.end() ? 0 : it->second;
+    }
+
     void InstallAffixStats()
     {
         ArpgHooks::ItemBonuses = &ItemBonusesHook;

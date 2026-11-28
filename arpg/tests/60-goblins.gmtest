@@ -1,0 +1,73 @@
+# Treasure Goblins (change m9-goblins). Needs Arpgtest online. A goblin never fights, flees when hit and escapes after
+# Arpg.Goblin.EscapeSeconds; killed, it showers gold, affixed gear, essences and (here forced) a charm.
+
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+
+# --- Spawn: the player's level (pinned), 8x health.
+> .arpg goblin spawn Arpgtest
+? ok Arpgtest goblin level=60 hp=\d+
+> .arpg goblin info Arpgtest
+? goblin alive=1 fleeing=0 engaged=0
+
+# --- Escape: 3 s after the first hit it is gone, no loot.
+> .arpg config set Arpg.Goblin.EscapeSeconds 3
+? ok
+> .arpg goblin hit Arpgtest
+? ok goblin alive=1 fleeing=1 engaged=1
+~ 5000
+> .arpg goblin info Arpgtest
+* goblin alive=0 escaped=1 killed=0
+> .arpg config set Arpg.Goblin.EscapeSeconds 30
+? ok
+
+# --- Kill: 4 gear items + a charm (forced) + 6 essences + gold.
+> .arpg config set Arpg.Goblin.CharmChance 100
+? ok
+> .arpg test events Arpgtest clear
+? ok
+> .arpg goblin spawn Arpgtest
+? ok
+> .arpg goblin kill Arpgtest
+? ok Arpgtest killed goblin loot_items=([6-9]|\d\d) gold=[1-9]\d*
+> .arpg test events Arpgtest
+? goblin killed gold=[1-9]\d* items=([5-9]|\d\d) essences=6\b
+> .arpg goblin info Arpgtest
+? goblin alive=0 escaped=0 killed=1
+> .arpg goblin loot Arpgtest
+? ok Arpgtest looted=([6-9]|\d\d) gold=[1-9]\d*
+> .arpg test count Arpgtest 700010
+? count=6\b
+> .arpg test events Arpgtest
+? affix item=\d+ guid=\d+
+? charm rolled item=72000[123]
+> .arpg config set Arpg.Goblin.CharmChance 35
+? ok
+
+# --- Kill roll: chance 100%, no cooldown -> a goblin appears.
+> .arpg config set Arpg.Goblin.KillChance 100
+? ok
+> .arpg config set Arpg.Goblin.Cooldown 0
+? ok
+> .arpg test events Arpgtest clear
+? ok
+> .arpg champion make Arpgtest 49871
+? ok
+> .arpg champion kill Arpgtest all
+? ok .* killed champion
+> .arpg test events Arpgtest
+? goblin spawn level=60
+> .arpg config set Arpg.Goblin.KillChance 0.4
+? ok
+> .arpg config set Arpg.Goblin.Cooldown 600
+? ok
+> .arpg goblin kill Arpgtest
+? ok
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

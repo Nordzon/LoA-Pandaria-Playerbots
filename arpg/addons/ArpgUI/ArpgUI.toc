@@ -10,3 +10,4 @@ PotionData.lua
 Potions.lua
 AffixText.lua
 LootTooltip.lua
+Rift.lua

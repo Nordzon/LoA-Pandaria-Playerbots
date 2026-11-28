@@ -1,4 +1,5 @@
 #include "Loot/AffixRoller.h"
+#include "Charms/Charms.h"
 
 #include "ArpgConfig.h"
 #include "ArpgHooks.h"
@@ -188,6 +189,11 @@ namespace Arpg::Loot
     void ApplyPickupRoll(Player* player, Item* item, ItemPickupSourceType source, uint32 sourceId)
     {
         std::string why;
+        if (item && Arpg::Charms::IsCharm(item->GetEntry()))   // m9: charms roll their own lines
+        {
+            Arpg::Charms::RollCharm(player, item, why);
+            return;
+        }
         // Rolled when the loot was made (the loot window showed its name): apply exactly that plan.
         int32 rp = item ? item->GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) : 0;
         Arpg::Loot::RollPlan plan;

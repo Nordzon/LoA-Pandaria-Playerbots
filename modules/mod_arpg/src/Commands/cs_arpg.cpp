@@ -37,6 +37,10 @@
 #include "Loot/AuctionRolls.h"
 #include "Loot/LootBeam.h"
 #include "Loot/Blanks.h"
+#include "Commands/M9Commands.h"
+#include "Charms/Charms.h"
+#include "World/Shrines.h"
+#include "Dungeons/Rifts.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "StatsWeightCalculator.h"
@@ -348,6 +352,10 @@ public:
         static std::vector<ChatCommand> arpgTable =
         {
             { "blank",   blankTable,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "charm",   Arpg::Commands::CharmTable(),  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "shrine",  Arpg::Commands::ShrineTable(), rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "goblin",  Arpg::Commands::GoblinTable(), rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "rift",    Arpg::Commands::RiftTable(),   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "lootpet", lootpetTable,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "filter",  filterTable,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "dungeon", dungeonTable,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -421,8 +429,9 @@ public:
         std::string blanks = Arpg::Loot::LoadBlanks();
         std::string wskills = Arpg::Character::ApplyAnyWeaponSkills();
         std::string squests = Arpg::Character::LoadStartQuests();
-        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
-            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str(), mounts.c_str(), blanks.c_str(), wskills.c_str(), squests.c_str());
+        std::string m9 = Arpg::Charms::LoadCharmData() + ", " + Arpg::World::LoadShrineData() + ", " + Arpg::Dungeons::LoadRiftData();
+        handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
+            subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str(), mounts.c_str(), blanks.c_str(), wskills.c_str(), squests.c_str(), m9.c_str());
         return ok;
     }
 

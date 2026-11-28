@@ -204,6 +204,8 @@ namespace Arpg
             s.epicIlvlCurve.Parse(DefaultEpicIlvlCurve);
         }
 
+        s.m9.Load(file);
+
         std::lock_guard<std::mutex> l(_lock);
         _settings = s;
     }
@@ -231,7 +233,7 @@ namespace Arpg
 
     bool Config::SetOverride(std::string const& key, std::string const& value, std::string& message)
     {
-        if (!KnownKeys.count(key))
+        if (!KnownKeys.count(key) && !M9Settings::KnownKey(key))
         {
             message = "unknown key " + key;
             return false;

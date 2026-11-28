@@ -85,6 +85,7 @@ $overrides = @{
       'Rate.XP.Quest'          = $XpRate.ToString([cultureinfo]::InvariantCulture)
       'Rate.XP.Explore'        = $XpRate.ToString([cultureinfo]::InvariantCulture)
       'Rate.XP.Gather'         = (Num $GatherXpRate)
+      'AccountInstancesPerHour' = '60'               # m9-rifts: every rift is a fresh instance (stock 5/hour blocks a session)
       'MaxPrimaryTradeSkill'   = "$MaxProfessions"   # core reads it without a clamp (World.cpp); conf comment says 0-10
       'Rate.MoveSpeed'         = (Num $MoveSpeed)
       'Rate.Drop.Item.Uncommon' = (Num $DropGreenBlue)

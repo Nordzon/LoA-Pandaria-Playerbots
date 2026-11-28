@@ -1,0 +1,72 @@
+# Shrines (change m9-shrines). Needs Arpgtest online. A used shrine gives its buff (our amount + duration on a client
+# spell) and vanishes; Fortune adds magic/gold find while its buff lasts; kills raise shrines by chance.
+
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg shrine clear Arpgtest
+? ok
+
+# --- Shrine of Combat: +15% damage for 120 s.
+> .arpg shrine spawn Arpgtest 2
+? ok Arpgtest shrine id=2 entry=800202 name=Shrine of Combat
+> .arpg shrine info Arpgtest
+? shrines nearby=[1-9]\d* nearest=800202
+> .arpg shrine use Arpgtest
+? ok Arpgtest used id=2 name=Shrine of Combat targets=1\b
+> .arpg shrine info Arpgtest
+? buff id=2 amount=15 left=1[01]\ds
+! nearest=800202
+
+# --- Shrine of Protection: the amount can be negative (-20% damage taken).
+> .arpg shrine spawn Arpgtest 3
+? ok
+> .arpg shrine use Arpgtest
+? used id=3
+> .arpg shrine info Arpgtest
+? buff id=3 amount=-20 left=
+
+# --- Shrine of Fortune: +50% magic find and gold find until the buff ends.
+> .arpg shrine spawn Arpgtest 6
+? ok
+> .arpg shrine use Arpgtest
+? used id=6
+> .arpg loot effects Arpgtest
+? gold_find_pct=5000\b
+? magic_find_pct=5000\b
+> .arpg shrine info Arpgtest
+? effects id=6 lines=2
+> .arpg shrine clear Arpgtest
+? ok shrine buffs removed=[1-9]
+~ 3000
+> .arpg loot effects Arpgtest
+! magic_find_pct=5000
+> .arpg shrine info Arpgtest
+! effects id=6
+
+# --- Kill roll: chance 100%, no cooldown -> a shrine at the corpse.
+> .arpg config set Arpg.Shrine.KillChance 100
+? ok
+> .arpg config set Arpg.Shrine.Cooldown 0
+? ok
+> .arpg test events Arpgtest clear
+? ok
+> .arpg champion make Arpgtest 49871
+? ok
+> .arpg champion kill Arpgtest all
+? ok .* killed champion
+> .arpg test events Arpgtest
+? shrine spawn id=[1-6] entry=80020[1-6]
+> .arpg shrine info Arpgtest
+? nearby=[1-9]
+> .arpg config set Arpg.Shrine.KillChance 1
+? ok
+> .arpg config set Arpg.Shrine.Cooldown 240
+? ok
+> .arpg shrine clear Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

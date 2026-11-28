@@ -1,0 +1,77 @@
+# Charms and the Charm Pouch (change m9-charms, SPEC 4.4). Needs Arpgtest online. The pouch is granted once; charms roll
+# their lines when they reach the bags and grant them only while inside the equipped pouch.
+
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+
+# --- Pouch: granted when missing, never twice; equipped into a bag slot.
+> .arpg charm pouch Arpgtest remove
+? ok pouch removed=\d+
+> .arpg charm pouch Arpgtest
+? ok pouch granted=1 where=(bagslot|bags) count=1\b
+> .arpg charm pouch Arpgtest
+? ok pouch granted=0 count=1\b
+> .arpg charm pouch Arpgtest equip
+? ok pouch equipped slot=(19|20|21|22)
+
+# --- Random charms: 1 / 2 / 3 lines. With the pouch equipped they land in it (the game fills a special bag first).
+> .arpg charm give Arpgtest small
+? ok Arpgtest charm item=720001 guid=\d+ mailed=0 lines=1\b
+> .arpg charm give Arpgtest large
+? item=720002 .* lines=2\b
+> .arpg charm give Arpgtest grand
+? item=720003 .* lines=3 [a-z_]+=\d+ [a-z_]+=\d+ [a-z_]+=\d+
+> .arpg charm info Arpgtest
+? charms pouch=1 equipped=1 active=3 [a-z_]+=\+\d+
+
+# --- Only the pouch counts: out -> its lines go, back in -> they return.
+> .arpg charm move Arpgtest last out
+? ok moved out .* active=2\b
+> .arpg charm move Arpgtest last in
+? ok moved in .* active=3\b
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg charm info Arpgtest
+? charms pouch=1 equipped=1 active=0\b
+
+# --- Unique charm: fixed lines (Goblin's Lucky Coin: gold find + magic find), real effect totals, one per character.
+> .arpg charm give Arpgtest coin
+? item=720011 .* lines=2 gf=(2\d\d\d|3000) mf=(1\d\d\d|2000)\b
+> .arpg charm info Arpgtest
+? active=1 gf=\+\d+ mf=\+\d+
+> .arpg loot effects Arpgtest
+? gold_find_pct=[1-9]\d*
+? magic_find_pct=[1-9]\d*
+> .arpg charm give Arpgtest coin
+? error
+> .arpg charm move Arpgtest last out
+? active=0\b
+> .arpg loot effects Arpgtest
+! gold_find_pct=
+
+# --- Drops: a Champion kill with Arpg.Charms.DropChampion 100 puts a charm on the corpse; looting rolls its lines.
+> .arpg config set Arpg.Charms.DropChampion 100
+? ok
+> .arpg test events Arpgtest clear
+? ok
+> .arpg champion make Arpgtest 49871
+? ok Arpgtest champion entry=49871
+> .arpg champion kill Arpgtest all
+? ok .* killed champion
+> .arpg test events Arpgtest
+? charm drop item=72000[123] kind=2\b
+> .arpg champion loot Arpgtest
+? ok Arpgtest looted=[1-9]
+> .arpg test events Arpgtest
+? charm rolled item=72000[123] guid=\d+ lines=[123]\b
+> .arpg config set Arpg.Charms.DropChampion 6
+? ok
+
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

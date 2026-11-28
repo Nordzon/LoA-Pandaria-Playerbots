@@ -1,0 +1,77 @@
+# Rifts (change m9-rifts). Needs Arpgtest online. Open a level up to the key, enter a 5-man dungeon: it runs as the rift
+# (growth^level on top of party scaling); finishing in time raises the key by time; late runs keep it.
+
+> .arpg test setup Arpgtest 90 elwynn-northshire
+? ok .*\(online\)
+~ 6000
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg dungeon level Arpgtest 36 0
+? ok
+> .arpg rift close Arpgtest
+? ok rift closed=
+> .arpg rift key Arpgtest 2
+? ok rift key=2\b
+
+# --- Above the key: refused.
+> .arpg rift open Arpgtest 4
+? error: level 4 is above your key \(2\)
+> .arpg rift info Arpgtest
+? pending=0 active=0
+
+# --- Level 3 in the Deadmines.
+> .arpg rift key Arpgtest 5
+? ok rift key=5\b
+> .arpg rift open Arpgtest 3
+? ok Arpgtest rift open level=3 key=5\b
+> .arpg rift info Arpgtest
+? pending=3 active=0
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test setup Arpgtest 90 deadmines-inside
+? ok .*\(online\)
+~ 12000
+> .arpg rift info Arpgtest
+? rift key=5 .* pending=0 active=1 level=3 map=36 elapsed=\d+ par=1500 deaths=0 affix=(Fortified|Tyrannical) health=1\.331 damage=1\.225
+> .arpg test events Arpgtest
+? rift start level=3 map=36 par=1500
+? instance scale map=36 players=1 .* rift=3\b
+
+# --- A death adds the penalty; a fast finish: 800 s + 10 s <= 60% of 1500 -> key +3 = 6; 3 reward items as boss loot.
+> .arpg rift death Arpgtest
+? ok rift deaths=1\b
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg rift finish Arpgtest 800
+? ok rift finish level=3 elapsed=800 effective=810 par=1500 deaths=1 upgrade=3 key=6 best=3 items=3 mailed=0 gold=[1-9]\d*
+> .arpg rift info Arpgtest
+? rift key=6 best=3 runs=\d+ pending=0 active=0
+> .arpg test events Arpgtest
+? affix item=\d+ guid=\d+
+
+# --- Late: no key change, half the items.
+> .arpg test setup Arpgtest 90 elwynn-northshire
+? ok .*\(online\)
+~ 8000
+> .arpg rift open Arpgtest 2
+? ok Arpgtest rift open level=2
+> .arpg test setup Arpgtest 90 deadmines-inside
+? ok .*\(online\)
+~ 12000
+> .arpg rift info Arpgtest
+? active=1 level=2 map=36
+> .arpg rift finish Arpgtest 1700
+? upgrade=0 key=6 best=3 items=1 mailed=0
+> .arpg rift info Arpgtest
+? rift key=6 best=3
+
+# --- Clean up.
+> .arpg rift key Arpgtest 1
+? ok
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 8000
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

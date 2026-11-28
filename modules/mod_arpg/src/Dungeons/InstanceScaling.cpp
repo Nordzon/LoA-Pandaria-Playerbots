@@ -1,4 +1,5 @@
 #include "Dungeons/InstanceScaling.h"
+#include "Dungeons/Rifts.h"
 
 #include "ArpgConfig.h"
 #include "ArpgHooks.h"
@@ -84,9 +85,10 @@ namespace
                 role = Arpg::Core::SoloCreatureDamage(Arpg::Core::RoleForSpec(p->GetTalentSpecialization()), true, Knobs());
         health = h * tierMult;
         damage = d * tierMult * role;
-        char buf[160];
-        std::snprintf(buf, sizeof(buf), "instance scale map=%u players=%u boss=%d health=%.3f damage=%.3f tier=%d role=%.2f",
-            map->GetId(), playerCount, boss ? 1 : 0, health, damage, raid ? tier : 0, role);
+        int const rift = raid ? 0 : Arpg::Dungeons::RiftScale(map, boss, health, damage);   // m9: rift level multipliers
+        char buf[200];
+        std::snprintf(buf, sizeof(buf), "instance scale map=%u players=%u boss=%d health=%.3f damage=%.3f tier=%d role=%.2f rift=%d",
+            map->GetId(), playerCount, boss ? 1 : 0, health, damage, raid ? tier : 0, role, rift);
         // One line per change per instance (every creature of the instance goes through here: the recorder keeps 30).
         static std::unordered_map<uint32, std::string> lastLine;
         bool fresh;

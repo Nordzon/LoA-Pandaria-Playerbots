@@ -6,6 +6,7 @@
 #include "Core/LevelCurve.h"
 #include "Core/Scaling.h"
 #include "Core/Paragon.h"
+#include "M9Settings.h"
 
 #include <mutex>
 #include <set>
@@ -126,6 +127,7 @@ namespace Arpg
         uint32_t displayEffectBase = 100000; // Arpg.Display.EffectBase (must match the client patch)
         uint32_t displaySuffixBase = 30000;  // Arpg.Display.SuffixBase (random-suffix rows: 5 lines + item name)
         uint32_t displayUniqueBase = 200000; // Arpg.Display.UniqueBase (Unique power lines: base + power*1000 + tier*100 + roll)
+        M9Settings m9;                   // charms, shrines, Treasure Goblins, rifts (Arpg.Charms./Shrine./Goblin./Rift.*)
     };
 
     class Config

@@ -26,6 +26,11 @@
 #include "Loot/AuctionRolls.h"
 #include "Loot/LootBeam.h"
 #include "Loot/Blanks.h"
+#include "Charms/Charms.h"
+#include "World/Shrines.h"
+#include "Monsters/TreasureGoblin.h"
+#include "Dungeons/Rifts.h"
+#include "Commands/M9Commands.h"
 
 #include "Chat.h"
 #include "Player.h"
@@ -67,6 +72,9 @@ namespace
             Arpg::Loot::LoadBlanks();
             Arpg::Character::ApplyAnyWeaponSkills();
             Arpg::Character::LoadStartQuests();
+            Arpg::Charms::LoadCharmData();
+            Arpg::World::LoadShrineData();
+            Arpg::Dungeons::LoadRiftData();
         }
     };
 }
@@ -94,7 +102,12 @@ void AddSC_mod_arpg()
     Arpg::Bots::InstallBotItemScore();
     Arpg::Loot::InstallAuctionRolls();
     Arpg::Loot::InstallLootBeam();
+    Arpg::Charms::InstallCharms();        // m9: charm drops are kill extras (before the planner)
+    Arpg::World::InstallShrines();
+    Arpg::Monsters::InstallTreasureGoblins();
+    Arpg::Dungeons::InstallRifts();
     Arpg::Loot::InstallLootPlanner();   // plans corpse loot after the others added items and pity
     Arpg::Loot::InstallPersonalLoot();  // last kill script (m8): friends' own loot, after every extra was queued
     AddSC_arpg_commandscript();
+    AddSC_arpg_m9_commandscript();
 }

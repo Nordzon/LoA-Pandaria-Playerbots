@@ -299,3 +299,89 @@ Arpg.Test.RecordEvents = 0
 #    Arpg.Test.ForceProcs    1 = every chance-on-hit affix procs (Fire Nova, Chain Lightning, Frost Nova, poison, bleed,
 #                            crushing blow, struck chain); tests switch it on with ".arpg config set". 0 = normal play.
 Arpg.Test.ForceProcs = 0
+
+# --- Charms (m9-charms, SPEC 4.4) -------------------------------------------------
+#    Arpg.Charms.Enabled        1 = charms grant lines while inside an equipped Charm Pouch (item 720000)
+#    Arpg.Charms.GrantPouch     1 = a character without a pouch gets one at login (free bag slot, else bags, else mail)
+#    Arpg.Charms.Drop<Kind>     % chance per kill to add a charm to the corpse, by monster kind
+#    Arpg.Charms.Weight<Size>   size weights of a dropped charm (Small 1 line, Large 2, Grand 3)
+#    Arpg.Charms.UniqueSuperunique  % chance per Superunique kill for the Unique charm Heart of the Pandaren
+#    Arpg.Charms.ScanMs         how often the pouch is checked (ms)
+#    Line pools: SQL arpg_charm_affix (random) / arpg_charm_unique (fixed); pouch size: item_template 720000 ContainerSlots.
+Arpg.Charms.Enabled = 1
+Arpg.Charms.GrantPouch = 1
+Arpg.Charms.DropNormal = 0.3
+Arpg.Charms.DropElite = 1.5
+Arpg.Charms.DropChampion = 6
+Arpg.Charms.DropSuperunique = 20
+Arpg.Charms.DropBoss = 12
+Arpg.Charms.WeightSmall = 70
+Arpg.Charms.WeightLarge = 25
+Arpg.Charms.WeightGrand = 5
+Arpg.Charms.UniqueSuperunique = 2
+Arpg.Charms.ScanMs = 1000
+
+# --- Shrines (m9-shrines) ----------------------------------------------------------
+#    Arpg.Shrine.KillChance     % per kill by a real player to raise a shrine at the corpse
+#    Arpg.Shrine.Cooldown       seconds between two shrines for one player
+#    Arpg.Shrine.Lifetime       seconds an unused shrine stays
+#    Arpg.Shrine.InDungeons     1 = also in 5-man dungeons and rifts (never raids or battlegrounds)
+#    Arpg.Shrine.GroupRange     group members within this many yards get the buff too
+#    Buffs (spell, amount, duration, weight): SQL arpg_shrine.
+Arpg.Shrine.Enabled = 1
+Arpg.Shrine.KillChance = 1
+Arpg.Shrine.Cooldown = 240
+Arpg.Shrine.Lifetime = 180
+Arpg.Shrine.InDungeons = 1
+Arpg.Shrine.GroupRange = 40
+
+# --- Treasure Goblins (m9-goblins) -------------------------------------------------
+#    Arpg.Goblin.KillChance     % per open-world kill by a real player to summon a goblin 15 yd away
+#    Arpg.Goblin.Cooldown       seconds between two goblins for one player
+#    Arpg.Goblin.EscapeSeconds  seconds after the first hit before it escapes (no loot)
+#    Arpg.Goblin.Lifetime       seconds an untouched goblin stays
+#    Arpg.Goblin.HealthMult     health x a normal monster of the player's level
+#    Arpg.Goblin.GoldPerLevel   copper x goblin level (+-20%)
+#    Arpg.Goblin.Items          gear drops (green; BlueChance % blue; EpicChance % epic), all with affixes
+#    Arpg.Goblin.Essences       salvage essences; CatalystChance / CharmChance / UniqueCharmChance in %
+Arpg.Goblin.Enabled = 1
+Arpg.Goblin.KillChance = 0.4
+Arpg.Goblin.Cooldown = 600
+Arpg.Goblin.EscapeSeconds = 30
+Arpg.Goblin.Lifetime = 180
+Arpg.Goblin.HealthMult = 8
+Arpg.Goblin.GoldPerLevel = 3000
+Arpg.Goblin.Items = 4
+Arpg.Goblin.BlueChance = 50
+Arpg.Goblin.EpicChance = 10
+Arpg.Goblin.Essences = 6
+Arpg.Goblin.CatalystChance = 25
+Arpg.Goblin.CharmChance = 35
+Arpg.Goblin.UniqueCharmChance = 5
+
+# --- Rifts (m9-rifts) ----------------------------------------------------------------
+#    Monsters in a rift: health x HealthGrowth^level, damage x DamageGrowth^level (on top of party scaling); from AffixLevel a
+#    run is Fortified (trash +20% health, +30% damage) or Tyrannical (bosses +30% health, +15% damage).
+#    Par time: SQL arpg_rift_dungeon, else DefaultParMinutes. Each death adds DeathPenalty seconds.
+#    Key: +3 at <= 60% of par, +2 at <= 80%, +1 in time, 0 late.
+#    Rewards: RewardItems + level/3 gear items (max RewardItemsMax; half when late) as boss loot, epic chance
+#    EpicChance + EpicChancePerLevel x level (max EpicChanceCap); gold GoldPerLevel x rift level x character level (copper);
+#    Paragon XP ParagonXpPerLevel x level at the max level; a charm at CharmChance + CharmChancePerLevel x level %; the Unique
+#    charm Riftwalker's Sigil at UniqueCharmLevel+ with UniqueCharmChance %. Late runs: half gold/XP, no charms.
+Arpg.Rift.Enabled = 1
+Arpg.Rift.HealthGrowth = 1.10
+Arpg.Rift.DamageGrowth = 1.07
+Arpg.Rift.AffixLevel = 2
+Arpg.Rift.DefaultParMinutes = 25
+Arpg.Rift.DeathPenalty = 10
+Arpg.Rift.RewardItems = 2
+Arpg.Rift.RewardItemsMax = 8
+Arpg.Rift.EpicChance = 10
+Arpg.Rift.EpicChancePerLevel = 3
+Arpg.Rift.EpicChanceCap = 60
+Arpg.Rift.GoldPerLevel = 50
+Arpg.Rift.ParagonXpPerLevel = 40000
+Arpg.Rift.CharmChance = 20
+Arpg.Rift.CharmChancePerLevel = 2
+Arpg.Rift.UniqueCharmLevel = 10
+Arpg.Rift.UniqueCharmChance = 10
