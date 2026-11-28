@@ -416,3 +416,12 @@ Arpg.Champion.Camps = 1
 Arpg.Champion.CampSize = 100
 Arpg.Champion.CampMin = 4
 Arpg.Champion.CampRespawn = 600
+
+###################################################################################################
+# Companion professions (change m10-companion-professions)
+#    Arpg.Companion.ProfessionTrainer - 1 = companion "Professions": per profession a trainer window with every rank and
+#                                       recipe any trainer of that profession teaches (stock prices).
+#    Arpg.Companion.RecipeShop        - 1 = per profession, reputation / token / daily recipes sold for gold (world table
+#                                       arpg_recipe_price: price by required skill, epic x2; arpg_recipe_shop: the list).
+Arpg.Companion.ProfessionTrainer = 1
+Arpg.Companion.RecipeShop = 1

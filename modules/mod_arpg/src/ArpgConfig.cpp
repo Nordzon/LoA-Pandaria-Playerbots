@@ -102,6 +102,7 @@ namespace Arpg
             if (file.GetBool("Arpg.Companion.Reforge", true))     f |= 0x8000000;
             if (file.GetBool("Arpg.Companion.Transmog", true))    f |= 0x10000000;
             if (file.GetBool("Arpg.Companion.VoidStorage", true)) f |= 0x20000000;
+            if (file.GetBool("Arpg.Companion.ProfessionTrainer", true)) f |= 0x10;   // trainer (m10-companion-professions)
             s.companionNpcFlags = f;
         }
         s.companionInCombat = file.GetBool("Arpg.Companion.InCombat", false);

@@ -288,6 +288,10 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
 - **Big stacks (m9-stacks-trainer, owner 2026-11-28):** every stackable item stacks to `Arpg.Stacks.Max` = 999 (server in
   memory + Item-sparse hotfix rows for the client). Camera: ArpgUI raises the max zoom distance (~2x, `/arpgcam`).
 
+- **Companion professions (m10-companion-professions, owner 2026-11-28):** companion "Professions" -> per known profession a
+  trainer window with every rank and recipe of all its trainers, and "Reputation recipes for gold" pages (rep / token / daily
+  recipes as copies without reputation; `arpg_recipe_price`: 25 / 75 / 150 / 300 / 600 g by required skill <=300/375/450/525/600, epic x2).
+
 ### 4.8 All professions (m1b)
 - Primary-profession limit 2 → 11: `MaxPrimaryTradeSkill = 11` (config, no core patch; set by `write-confs.ps1`). ArpgUI professions panel
   (spellbook only shows 2 primaries).

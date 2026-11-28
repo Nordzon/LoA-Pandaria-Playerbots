@@ -26,9 +26,9 @@
 > .arpg test events Arpgtest
 ? lootpet looted corpse=6 items=\d+ gold=[1-9]\d*
 
-# Companion roles (Arpg.Companion.*): gossip + vendor + repair + bank + mailbox + reforge + transmog + void = 0x3C021081.
+# Companion roles (Arpg.Companion.*): gossip + vendor + repair + bank + mailbox + reforge + transmog + void + trainer = 0x3C021091.
 > .arpg lootpet info Arpgtest
-? npcflags=0x3C021081\b
+? npcflags=0x3C021091\b
 # Full bags: the companion mails what doesn't fit (affixes rolled first). A Champion's floor = a green + a blue.
 > .arpg test fillbags Arpgtest 25
 ? ok Arpgtest filled=[1-9]\d*

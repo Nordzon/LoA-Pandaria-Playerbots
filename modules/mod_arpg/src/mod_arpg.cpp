@@ -1,6 +1,7 @@
 // mod_arpg entry point: Pandaria ARPG layer (see docs/SPEC.md). Called by the generated modules/ModulesLoader.cpp.
 #include "Items/Stacks.h"
 #include "Character/ProfessionGuard.h"
+#include "Character/ProfessionShop.h"
 #include "ArpgConfig.h"
 #include "Scaling/WorldScaling.h"
 #include "Loot/PersonalLoot.h"
@@ -78,6 +79,7 @@ namespace
             Arpg::World::LoadShrineData();
             Arpg::Dungeons::LoadRiftData();
             Arpg::Items::ApplyStacks();
+            Arpg::Character::LoadProfessionShop();
         }
     };
 }
@@ -105,7 +107,8 @@ void AddSC_mod_arpg()
     Arpg::Bots::InstallBotItemScore();
     Arpg::Loot::InstallAuctionRolls();
     Arpg::Loot::InstallLootBeam();
-    Arpg::Character::InstallProfessionGuard();   // m9-stacks-trainer: refuse the client abandon, log changes
+    Arpg::Character::InstallProfessionGuard();
+    Arpg::Character::InstallProfessionShop();     // m10: companion profession trainers + recipe shop   // m9-stacks-trainer: refuse the client abandon, log changes
     Arpg::Charms::InstallCharms();        // m9: charm drops are kill extras (before the planner)
     Arpg::World::InstallShrines();
     Arpg::Monsters::InstallTreasureGoblins();

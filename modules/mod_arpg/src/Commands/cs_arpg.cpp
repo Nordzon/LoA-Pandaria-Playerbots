@@ -1,6 +1,8 @@
 // .arpg commands. Every command takes an explicit character name (works over SOAP, which has no selected target).
 #include "Items/Stacks.h"
 #include "Character/ProfessionGuard.h"
+#include "Character/ProfessionShop.h"
+#include "Loot/LootPet.h"
 #include "Opcodes.h"
 #include "ArpgConfig.h"
 #include "ArpgHooks.h"
@@ -221,6 +223,8 @@ public:
             { "professions", &HandleTestProfessions, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "unlearnskill", &HandleTestUnlearnSkill, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "abandon", &HandleTestAbandon, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "profshop", &HandleTestProfShop, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "setskill", &HandleTestSetSkill, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "weapons",  &HandleTestWeapons,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "spellreq", &HandleTestSpellReq, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "questproxy", &HandleTestQuestProxy, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -439,7 +443,7 @@ public:
         std::string wskills = Arpg::Character::ApplyAnyWeaponSkills();
         std::string squests = Arpg::Character::LoadStartQuests();
         std::string m9 = Arpg::Charms::LoadCharmData() + ", " + Arpg::World::LoadShrineData() + ", " + Arpg::Dungeons::LoadRiftData() + ", " +
-            Arpg::Items::ApplyStacks();
+            Arpg::Items::ApplyStacks() + ", " + Arpg::Character::LoadProfessionShop();
         handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
             subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str(), mounts.c_str(), blanks.c_str(), wskills.c_str(), squests.c_str(), m9.c_str());
         return ok;
@@ -1367,6 +1371,61 @@ public:
         pkt << uint32(skill);
         p->GetSession()->HandleUnlearnSkillOpcode(pkt);
         handler->PSendSysMessage("ok %s", Arpg::Character::DescribeProfessions(p).c_str());
+        return true;
+    }
+
+    // .arpg test profshop <skill>                       (m10) trainer spells / recipe pages of a profession
+    // .arpg test profshop <char> buy <skill> <spellId> [checkSpellId]  buys from the companion's profession trainer through the real
+    //                                                   CMSG_TRAINER_BUY_SPELL handler; replies "learned=0|1 served=..."
+    static bool HandleTestProfShop(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() == 1)
+        {
+            handler->PSendSysMessage("ok %s", Arpg::Character::DescribeProfessionShop(uint32(std::strtoul(t[0].c_str(), nullptr, 10))).c_str());
+            return true;
+        }
+        if ((t.size() != 4 && t.size() != 5) || t[1] != "buy" || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test profshop <skill> | <char> buy <skill> <spellId> [checkSpellId]");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        Creature* pet = Arpg::Loot::CompanionOf(p);
+        if (!pet)
+            return Fail(handler, "no companion (use .arpg lootpet on)");
+        uint32 const skill = uint32(std::strtoul(t[2].c_str(), nullptr, 10));
+        uint32 const spell = uint32(std::strtoul(t[3].c_str(), nullptr, 10));
+        Arpg::Character::SelectTrainer(p, skill);
+        ObjectGuid g = pet->GetGUID();
+        WorldPacket pkt(CMSG_TRAINER_BUY_SPELL, 4 + 4 + 9);
+        pkt << uint32(spell) << uint32(pet->GetEntry());
+        pkt.WriteBit(g[1]); pkt.WriteBit(g[4]); pkt.WriteBit(g[0]); pkt.WriteBit(g[6]);
+        pkt.WriteBit(g[3]); pkt.WriteBit(g[2]); pkt.WriteBit(g[5]); pkt.WriteBit(g[7]);
+        pkt.FlushBits();
+        pkt.WriteByteSeq(g[3]); pkt.WriteByteSeq(g[1]); pkt.WriteByteSeq(g[4]); pkt.WriteByteSeq(g[7]);
+        pkt.WriteByteSeq(g[0]); pkt.WriteByteSeq(g[5]); pkt.WriteByteSeq(g[6]); pkt.WriteByteSeq(g[2]);
+        p->GetSession()->HandleTrainerBuySpellOpcode(pkt);
+        uint32 const check = t.size() == 5 ? uint32(std::strtoul(t[4].c_str(), nullptr, 10)) : spell;
+        handler->PSendSysMessage("ok %s learned=%u %s", p->GetName().c_str(), p->HasSpell(check) ? 1u : 0u,
+            Arpg::Character::DescribeServedTrainer(p).c_str());
+        return true;
+    }
+
+    // .arpg test setskill <char> <skillId> <value>   sets a skill the character has (max raised if needed)
+    static bool HandleTestSetSkill(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 3 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test setskill <char> <skillId> <value>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        uint16 const skill = uint16(std::strtoul(t[1].c_str(), nullptr, 10));
+        uint16 const value = uint16(std::strtoul(t[2].c_str(), nullptr, 10));
+        if (!p->HasSkill(skill))
+            return Fail(handler, "character lacks that skill");
+        p->SetSkill(skill, p->GetSkillStep(skill), value, std::max<uint16>(value, p->GetPureMaxSkillValue(skill)));
+        handler->PSendSysMessage("ok skill=%u value=%u", uint32(skill), uint32(p->GetPureSkillValue(skill)));
         return true;
     }
 

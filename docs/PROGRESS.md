@@ -96,6 +96,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-28 — m10-companion-professions: companion Professions -> per-profession trainer (all ranks/recipes, hook ArpgHooks::TrainerSpells) + 996 rep/token recipes for gold (13 vendor pages, arpg_recipe_price): ALL OK 39 GM files 16:27, pushed.
 - 2026-11-28 — ArpgGatherData addon: 45,475 nodes from our world DB (herbs 23,084, ore 17,622, fishing 2,848, treasure 1,921) injected into GatherMate2 1.27-2 (last 5.4.8 build; Data v23.2 is the matching official DB). Not yet tried in the client.
 - 2026-11-28 — m9-rare-loot-floor: 164 rare-exclusive drops (mounts/toys/pets) of pooled rares floored at 30% (stock kept in arpg_rare_loot_floor), live via .reload; 31-superuniques PASS.
 - 2026-11-28 — ArpgNPCScan helper addon (600 Superuniques watched, 456 replaced rares ignored in _NPCScan); owner add-on list doc (minimap/quests/coords). Superunique copies keep the rare's loot + achievement credit (KillCredit).

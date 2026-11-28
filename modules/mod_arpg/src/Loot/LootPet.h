@@ -9,6 +9,7 @@
 
 #include <string>
 
+class Creature;
 class Player;
 
 namespace Arpg::Loot
@@ -22,6 +23,8 @@ namespace Arpg::Loot
     bool LootPetOn(Player* player);
     // "lootpet on|off pet=<guid|0> queue=N looted=N"
     std::string DescribeLootPet(Player* player);
+    // The character's companion creature on its map (null when not summoned).
+    Creature* CompanionOf(Player* player);
 }
 
 #endif

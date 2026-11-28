@@ -1,0 +1,41 @@
+# Companion professions (change m10-companion-professions): per profession a trainer with every rank and recipe, served
+# from the companion (ArpgHooks::TrainerSpells), and reputation / token recipes as gold copies on vendor pages.
+# Needs Arpgtest online.
+
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+
+# --- Data: trainer lists per profession; recipe pages (Leatherworking 2 pages, Jewelcrafting 3).
+> .arpg test profshop 165
+? ok profshop skill=165 trainer_spells=[1-9]\d* recipes=[1-9]\d* pages=2\b
+> .arpg test profshop 755
+? ok profshop skill=755 trainer_spells=[1-9]\d* recipes=[1-9]\d* pages=3\b
+> .arpg test profshop 185
+? ok profshop skill=185 trainer_spells=[1-9]\d* recipes=[1-9]\d* pages=1\b
+
+# --- Buying from the companion's Leatherworking trainer through the real buy handler: Apprentice (2155 teaches 2108),
+# then a recipe (2153 needs skill 15, 50 c).
+> .arpg test learnall Arpgtest
+? professions=11 of 11
+> .arpg test abandon Arpgtest leatherworking
+? ok abandoned leatherworking professions count=10\b
+> .arpg test money Arpgtest 10
+? ok
+> .arpg lootpet on Arpgtest
+? ok lootpet on
+~ 3000
+> .arpg test profshop Arpgtest buy 165 2155 2108
+? ok Arpgtest learned=1 served skill=165 spells=[1-9]\d*
+> .arpg test setskill Arpgtest 165 20
+? ok skill=165 value=20
+> .arpg test profshop Arpgtest buy 165 2153
+? ok Arpgtest learned=1 served skill=165
+> .arpg test learnall Arpgtest
+? professions=11 of 11
+
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

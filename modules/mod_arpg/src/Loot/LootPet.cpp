@@ -25,6 +25,7 @@
 #include "Loot/Blanks.h"
 #include "LFGMgr.h"
 #include "Character/ProfessionGuard.h"
+#include "Character/ProfessionShop.h"
 #include "World.h"
 #include "Group.h"
 #include "Loot/Salvage.h"
@@ -297,7 +298,8 @@ namespace
     // Right-click on the companion: its owner gets a menu of the enabled roles; each opens the game's own window.
     enum CompanionAction : uint32 { ACT_VENDOR = 1, ACT_BANK = 2, ACT_MAIL = 3, ACT_LOOKS = 4, ACT_SALVAGE = 5, ACT_CATALYSTS = 6,
         ACT_BLANKS = 7, ACT_RIFT = 8, ACT_RIFT_CLOSE = 9, ACT_TRAINER = 10, ACT_RESET_SPEC = 11, ACT_RESET_TALENTS = 12, ACT_DUAL_SPEC = 13,
-        ACT_PROVING = 14, ACT_PROF_MENU = 15, ACT_PROF_BASE = 4000, ACT_RIFT_LEVEL_BASE = 400000, ACT_BLANK_SLOT_BASE = 2000, ACT_BLANK_BUY_BASE = 3000,   // buy: base + slot * 10 + quality
+        ACT_PROVING = 14, ACT_PROF_MENU = 15, ACT_PROF_BASE = 4000, ACT_PROFESSIONS = 16, ACT_PROF_SKILL_BASE = 5000,
+        ACT_PROF_TRAIN_BASE = 6000, ACT_RECIPE_PAGE_BASE = 10000, ACT_RIFT_LEVEL_BASE = 400000, ACT_BLANK_SLOT_BASE = 2000, ACT_BLANK_BUY_BASE = 3000,   // buy: base + slot * 10 + quality
         ACT_BUY_BASE = 50, ACT_MODEL_BASE = 100, ACT_MOUNT_PAGE_BASE = 500000, ACT_MOUNT_BUY_BASE = 1000000 };
     uint32 const MountVendorEntry = 1000002;   // npc_vendor list of the mount shop (never spawned)
 
@@ -340,6 +342,8 @@ namespace
                     GOSSIP_SENDER_MAIN, ACT_RIFT);
             if (sArpgConfig.Get().m9.companionTrainer)
                 AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Class trainer", GOSSIP_SENDER_MAIN, ACT_TRAINER);
+            if (sArpgConfig.Get().m9.companionProfessions)
+                AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Professions", GOSSIP_SENDER_MAIN, ACT_PROFESSIONS);
             AddGossipItemFor(player, GOSSIP_ICON_TABARD, "Change appearance", GOSSIP_SENDER_MAIN, ACT_LOOKS);
             SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             return true;
@@ -384,6 +388,54 @@ namespace
                 if (player->GetLevel() < 10)
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "(Talent resets come at level 10)", GOSSIP_SENDER_MAIN, ACT_TRAINER);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                return true;
+            }
+            // Professions (m10-companion-professions): profession -> its trainer window + recipe pages for gold.
+            if (action == ACT_PROFESSIONS)
+            {
+                std::vector<uint32> skills = Arpg::Character::ShopSkills(player);
+                for (uint32 skill : skills)
+                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, Arpg::Character::SkillName(skill), GOSSIP_SENDER_MAIN,
+                        ACT_PROF_SKILL_BASE + skill);
+                if (skills.empty())
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "(No professions yet: Class trainer -> Learn a new profession)",
+                        GOSSIP_SENDER_MAIN, ACT_TRAINER);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                return true;
+            }
+            if (action > ACT_PROF_SKILL_BASE && action < ACT_PROF_SKILL_BASE + 1000)
+            {
+                uint32 const skill = action - ACT_PROF_SKILL_BASE;
+                std::string const name = Arpg::Character::SkillName(skill);
+                AddGossipItemFor(player, GOSSIP_ICON_TRAINER, name + " trainer (all ranks and recipes)", GOSSIP_SENDER_MAIN,
+                    ACT_PROF_TRAIN_BASE + skill);
+                if (sArpgConfig.Get().m9.recipeShop)
+                {
+                    auto pages = Arpg::Character::RecipePages(skill);
+                    for (auto const& pg : pages)
+                        AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Reputation recipes for gold" + (pages.size() > 1 ?
+                            " (page " + std::to_string(pg.first + 1) + "/" + std::to_string(pages.size()) + ")" : std::string()) +
+                            " - " + std::to_string(pg.second) + " recipes", GOSSIP_SENDER_MAIN, ACT_RECIPE_PAGE_BASE + skill * 10 + pg.first);
+                }
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Back", GOSSIP_SENDER_MAIN, ACT_PROFESSIONS);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                return true;
+            }
+            if (action > ACT_PROF_TRAIN_BASE && action < ACT_PROF_TRAIN_BASE + 1000)
+            {
+                CloseGossipMenuFor(player);
+                std::string out;
+                if (!Arpg::Character::OpenProfessionTrainer(player, creature, action - ACT_PROF_TRAIN_BASE, out))
+                    ChatHandler(player->GetSession()).SendSysMessage(out.c_str());
+                return true;
+            }
+            if (action >= ACT_RECIPE_PAGE_BASE && action < ACT_RECIPE_PAGE_BASE + 10000)
+            {
+                CloseGossipMenuFor(player);
+                uint32 const code = action - ACT_RECIPE_PAGE_BASE;
+                std::string out;
+                if (!Arpg::Character::OpenRecipePage(player, creature, code / 10, code % 10, out))
+                    ChatHandler(player->GetSession()).SendSysMessage(out.c_str());
                 return true;
             }
             if (action == ACT_PROF_MENU)
@@ -650,6 +702,18 @@ namespace Arpg::Loot
     {
         std::lock_guard<std::mutex> l(g_lock);
         return State(player->GetGUID().GetCounter()).on;
+    }
+
+    Creature* CompanionOf(Player* player)
+    {
+        uint64 pet = 0;
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            auto it = g_state.find(player->GetGUID().GetCounter());
+            if (it != g_state.end())
+                pet = it->second.pet;
+        }
+        return pet ? ObjectAccessor::GetCreature(*player, ObjectGuid(pet)) : nullptr;
     }
 
     std::string DescribeLootPet(Player* player)
