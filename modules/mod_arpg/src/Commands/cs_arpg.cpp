@@ -215,6 +215,7 @@ public:
         static std::vector<ChatCommand> configTable =
         {
             { "set",   &HandleConfigSet,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "reset", &HandleConfigReset, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
         };
         static std::vector<ChatCommand> testTable =
         {
@@ -446,6 +447,16 @@ public:
             Arpg::Items::ApplyStacks() + ", " + Arpg::Character::LoadProfessionShop();
         handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
             subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str(), mounts.c_str(), blanks.c_str(), wskills.c_str(), squests.c_str(), m9.c_str());
+        return ok;
+    }
+
+    // .arpg config reset   drops every ".arpg config set" override and reloads arpg.conf (end of a test run: the live
+    // server must not keep the tests' values - 2026-11-28 Champion camps stayed off after a run).
+    static bool HandleConfigReset(ChatHandler* handler, char const* /*args*/)
+    {
+        std::string msg;
+        bool ok = sArpgConfig.ClearOverrides(msg);
+        handler->PSendSysMessage("%s %s", ok ? "ok" : "error:", msg.c_str());
         return ok;
     }
 

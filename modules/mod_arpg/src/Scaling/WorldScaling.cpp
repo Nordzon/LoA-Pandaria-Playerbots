@@ -234,7 +234,7 @@ namespace
             // Zone cap (task 4.9): scale to at most the zone's max level + Arpg.Scale.ZoneCapAbove (Vale: no cap).
             int effective = Arpg::Core::LootLevel(playerLevel, Arpg::Loot::ZoneLevelsFor(c->GetZoneId(), c->GetAreaId()),
                 s.scaleZoneCapAbove, false);
-            uint8 target = Arpg::Core::ScaledLevel(s.scale, original, effective);
+            uint8 target = Arpg::Core::ScaledLevel(s.scale, original, effective, c->GetGUID().GetCounter());
             // World tier (m4, SPEC 4.1 "Paragon grind"): in uncapped zones (the Vale) monsters grow with the player's Paragon.
             float tier = 1.0f;
             if (s.uncappedZones.count(c->GetZoneId()))

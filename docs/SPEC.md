@@ -155,6 +155,8 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
 - Quests scale with the player (quest level −1). Quest reward items don't scale in v1.
 - Kill switch `Arpg.Scale.Enabled`. Multiplayer later: scale to the highest-level real player nearby.
 
+- **Trash below the player (owner 2026-11-28):** open-world monsters scale to player level minus 2-4 (`Arpg.Scale.LevelBelowMin/Max`, one value per monster by its guid, never below its own level); Champions and Superuniques keep their band levels, Champion minions follow the trash rule. Dungeons unchanged.
+
 ### 4.3 Champions and Superuniques (m3)
 - **Champions:** on open-world spawn, `Arpg.Champion.Chance` (2%) → Champion + 2–4 minions, every zone from level 1.
   Player level +2, ~3× health, 1.5× damage, slightly larger, glow visual. 1–2 monster affixes: Extra Strong, Extra Fast,

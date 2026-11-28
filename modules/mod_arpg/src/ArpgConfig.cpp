@@ -11,7 +11,7 @@ namespace
     // Keys .arpg config set accepts (the ones Apply reads).
     std::set<std::string> const KnownKeys =
     {
-        "Arpg.Scale.Enabled", "Arpg.Scale.LevelOffset", "Arpg.Scale.Radius", "Arpg.Scale.HealthMod",
+        "Arpg.Scale.Enabled", "Arpg.Scale.LevelOffset", "Arpg.Scale.LevelBelowMin", "Arpg.Scale.LevelBelowMax", "Arpg.Scale.Radius", "Arpg.Scale.HealthMod",
         "Arpg.Scale.DamageMod", "Arpg.Scale.TickMs", "Arpg.Test.RecordEvents", "Arpg.Loot.EpicIlvlCurve",
         "Arpg.Loot.Enabled", "Arpg.Loot.AffixBotItems", "Arpg.Loot.SmartLootPct", "Arpg.Display.Enabled",
         "Arpg.Display.EnchantBase", "Arpg.Display.EnchantStride", "Arpg.Display.EffectBase", "Arpg.Display.SuffixBase", "Arpg.Display.UniqueBase", "Arpg.Test.ForceProcs", "Arpg.Scale.ZoneCapAbove", "Arpg.Scale.UncappedZones",
@@ -53,6 +53,8 @@ namespace Arpg
         Settings s;
         s.scale.enabled = file.GetBool("Arpg.Scale.Enabled", true);
         s.scale.levelOffset = file.GetInt("Arpg.Scale.LevelOffset", 0);
+        s.scale.levelBelowMin = std::max(0, file.GetInt("Arpg.Scale.LevelBelowMin", 2));
+        s.scale.levelBelowMax = std::max(s.scale.levelBelowMin, file.GetInt("Arpg.Scale.LevelBelowMax", 4));
         s.scale.healthMod = file.GetFloat("Arpg.Scale.HealthMod", 1.0f);
         s.scale.damageMod = file.GetFloat("Arpg.Scale.DamageMod", 1.0f);
         s.scale.maxLevel = int(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL));
@@ -230,6 +232,12 @@ namespace Arpg
             + std::to_string(_overrides.Values().size()) + " overrides)";
         TC_LOG_INFO("server.loading", "mod_arpg %s: %s", ARPG_VERSION, message.c_str());
         return true;
+    }
+
+    bool Config::ClearOverrides(std::string& message)
+    {
+        _overrides = Core::ConfigFile();
+        return Load(message);
     }
 
     bool Config::SetOverride(std::string const& key, std::string const& value, std::string& message)

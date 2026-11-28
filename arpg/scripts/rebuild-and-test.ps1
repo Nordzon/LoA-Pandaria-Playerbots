@@ -117,6 +117,9 @@ $args2 = @('-ExecutionPolicy', 'Bypass', '-File', (Join-Path $Scripts 'run-gmtes
 if ($Filter) { $args2 += @('-Filter', $Filter) }
 & powershell @args2 *> (Join-Path $Work 'rebuild-gmtests.log')
 $failed = $LASTEXITCODE
+# The live server must not keep the tests' ".arpg config set" values (2026-11-28: Champion camps stayed off after a run).
+$reset = (& powershell -ExecutionPolicy Bypass -File (Join-Path $Scripts 'gm.ps1') '.arpg config reset' 2>&1 | Out-String).Trim()
+Say "config overrides cleared: $reset"
 if (-not $hold.HasExited) { $hold.Kill() }
 if ($hold2 -and -not $hold2.HasExited) { $hold2.Kill() }
 $summary = (Select-String -Path (Join-Path $Work 'rebuild-gmtests.log') -Pattern '^(PASS|FAIL)\s' | ForEach-Object { $_.Line.Trim() }) -join '; '

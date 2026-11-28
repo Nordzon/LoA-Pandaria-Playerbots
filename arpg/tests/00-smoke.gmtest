@@ -13,6 +13,11 @@
 ? ok
 > .arpg config set Arpg.Champion.Camps 0
 ? ok
+# Monsters scale to exactly the player level during the run (the 2-4 below rule is tested in 65-trash-levels).
+> .arpg config set Arpg.Scale.LevelBelowMin 0
+? ok
+> .arpg config set Arpg.Scale.LevelBelowMax 0
+? ok
 # The companion starts off (a leftover "on" from an earlier run would loot every test kill; 34 counts its corpses).
 > .arpg lootpet off Arpgtest
 ? ok lootpet off

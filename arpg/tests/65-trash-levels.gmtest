@@ -1,0 +1,35 @@
+# Trash below the player (owner 2026-11-28: "scaling 2-4 levels below the player to keep thrash from overwhelming players";
+# Champions / Superuniques keep their levels). Arpg.Scale.LevelBelowMin/Max: each monster picks one value by its guid.
+# Probe: Blackrock Spy 178359 (Northshire, level 1-2), as in 10-world-scaling. Needs Arpgtest online.
+
+> .arpg config set Arpg.Scale.ZoneCapAbove 100
+? ok
+> .arpg config set Arpg.Scale.LevelBelowMin 3
+? ok
+> .arpg config set Arpg.Scale.LevelBelowMax 3
+? ok
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+~ 6000
+> .arpg champion clear Arpgtest 178359
+? ok
+~ 3000
+> .arpg scale probe Arpgtest 178359
+? scaled=57\b
+
+# A range: 56-58 for a level 60 player.
+> .arpg config set Arpg.Scale.LevelBelowMax 4
+? ok
+> .arpg config set Arpg.Scale.LevelBelowMin 2
+? ok
+~ 4000
+> .arpg scale probe Arpgtest 178359
+? scaled=5[678]\b
+
+# Back to the run's values (00-smoke: exact player level).
+> .arpg config set Arpg.Scale.LevelBelowMin 0
+? ok
+> .arpg config set Arpg.Scale.LevelBelowMax 0
+? ok
+> .arpg config set Arpg.Scale.ZoneCapAbove 15
+? ok

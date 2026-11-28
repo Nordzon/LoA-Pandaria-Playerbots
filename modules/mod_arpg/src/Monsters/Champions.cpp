@@ -8,6 +8,7 @@
 #include "Loot/Substitution.h"
 #include "Loot/ZoneLevels.h"
 #include "Scaling/WorldScaling.h"
+#include "Core/Scaling.h"
 #include "Monsters/Superuniques.h"
 #include "SpellInfo.h"
 #include "Timer.h"
@@ -651,7 +652,10 @@ namespace Arpg::Monsters
             if (TempSummon* m = c->SummonCreature(baseEntry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, Milliseconds(120000)))
             {
                 m->SetHomePosition(pos);
-                Arpg::Scaling::Pin(m, level, 1.0f, 1.0f);
+                // Minions are trash (owner 2026-11-28): the player's level minus 2-4 like other monsters, never below their own.
+                uint8 const trash = Arpg::Core::ScaledLevel(sArpgConfig.Get().scale, m->GetLevel(), int(player->GetLevel()),
+                    m->GetGUID().GetCounter());
+                Arpg::Scaling::Pin(m, trash ? trash : m->GetLevel(), 1.0f, 1.0f);
                 m->GetMotionMaster()->MoveFollow(c, 3.0f, angle);
                 info.minions.push_back(m->GetGUID().GetRawValue());
             }

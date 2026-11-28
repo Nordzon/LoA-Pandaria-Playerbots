@@ -139,6 +139,8 @@ namespace Arpg
         bool Load(std::string& message);
         // .arpg config set: in-memory override (kept across .arpg reload, lost on restart). False if the key is unknown.
         bool SetOverride(std::string const& key, std::string const& value, std::string& message);
+        // Drops every ".arpg config set" override and reloads arpg.conf (the test runner calls it at the end of a run).
+        bool ClearOverrides(std::string& message);
 
         Settings Get() const { std::lock_guard<std::mutex> l(_lock); return _settings; }
         std::string Path() const { return _path; }

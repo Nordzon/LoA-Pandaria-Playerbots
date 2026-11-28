@@ -13,6 +13,11 @@ Arpg.Scale.Enabled = 1
 
 #    Arpg.Scale.LevelOffset  levels added to the player's level (may be negative)
 Arpg.Scale.LevelOffset = 0
+# Trash below the player (owner 2026-11-28): each scaled monster picks one value in [Min, Max] (by its guid) and scales to
+# player level - that value (never below its own level). Champions / Superuniques keep their band levels; Champion minions
+# follow this rule. 0 / 0 = exactly the player level.
+Arpg.Scale.LevelBelowMin = 2
+Arpg.Scale.LevelBelowMax = 4
 
 #    Arpg.Scale.Radius       yards around the player in which creatures are scaled (~visibility range)
 Arpg.Scale.Radius = 100
