@@ -63,6 +63,20 @@ namespace Arpg
         int riftUniqueCharmLevel = 10;      // Arpg.Rift.UniqueCharmLevel
         float riftUniqueCharmPct = 10.0f;   // Arpg.Rift.UniqueCharmChance
 
+        // Stacks + companion class trainer (change m9-stacks-trainer)
+        int stackMax = 999;                 // Arpg.Stacks.Max (every stackable item stacks to this; 0 = stock sizes)
+        bool companionTrainer = true;       // Arpg.Companion.Trainer (class trainer page on the companion)
+        uint32_t dualSpecCost = 100000;     // Arpg.Companion.DualSpecCost (copper; stock trainers ask 10 g)
+        bool allowClientAbandon = false;    // Arpg.Professions.AllowClientAbandon (0 = the client's abandon is refused)
+        uint32_t professionCost = 10;       // Arpg.Companion.ProfessionCost (copper for an Apprentice rank, as trainers)
+        uint32_t professionLevel = 5;       // Arpg.Companion.ProfessionLevel
+
+        // Champion camps (change m9-champion-camps)
+        bool campsEnabled = true;           // Arpg.Champion.Camps (one Champion per square with enough monsters)
+        float campSize = 100.0f;            // Arpg.Champion.CampSize (yards)
+        int campMin = 4;                    // Arpg.Champion.CampMin (eligible monsters a square needs)
+        uint32_t campRespawnS = 600;        // Arpg.Champion.CampRespawn (seconds after the last Champion is gone)
+
         void Load(Core::ConfigFile const& f)
         {
             auto pos = [](float v) { return std::max(0.0f, v); };
@@ -118,11 +132,25 @@ namespace Arpg
             riftCharmStepPct = pos(f.GetFloat("Arpg.Rift.CharmChancePerLevel", 2.0f));
             riftUniqueCharmLevel = std::max(1, f.GetInt("Arpg.Rift.UniqueCharmLevel", 10));
             riftUniqueCharmPct = pos(f.GetFloat("Arpg.Rift.UniqueCharmChance", 10.0f));
+
+            stackMax = std::clamp(f.GetInt("Arpg.Stacks.Max", 999), 0, 100000);
+            companionTrainer = f.GetBool("Arpg.Companion.Trainer", true);
+            dualSpecCost = uint32_t(std::max(0, f.GetInt("Arpg.Companion.DualSpecCost", 100000)));
+            allowClientAbandon = f.GetBool("Arpg.Professions.AllowClientAbandon", false);
+            professionCost = uint32_t(std::max(0, f.GetInt("Arpg.Companion.ProfessionCost", 10)));
+            professionLevel = uint32_t(std::clamp(f.GetInt("Arpg.Companion.ProfessionLevel", 5), 1, 90));
+
+            campsEnabled = f.GetBool("Arpg.Champion.Camps", true);
+            campSize = std::clamp(f.GetFloat("Arpg.Champion.CampSize", 100.0f), 20.0f, 1000.0f);
+            campMin = std::clamp(f.GetInt("Arpg.Champion.CampMin", 4), 1, 100);
+            campRespawnS = uint32_t(std::max(0, f.GetInt("Arpg.Champion.CampRespawn", 600)));
         }
 
         static bool KnownKey(std::string const& key)
         {
-            for (char const* p : { "Arpg.Charms.", "Arpg.Shrine.", "Arpg.Goblin.", "Arpg.Rift." })
+            for (char const* p : { "Arpg.Charms.", "Arpg.Shrine.", "Arpg.Goblin.", "Arpg.Rift.", "Arpg.Stacks.",
+                                  "Arpg.Companion.Trainer", "Arpg.Companion.DualSpecCost", "Arpg.Professions.AllowClientAbandon",
+                                  "Arpg.Companion.ProfessionCost", "Arpg.Companion.ProfessionLevel", "Arpg.Champion.Camp" })
                 if (key.rfind(p, 0) == 0)
                     return true;
             return false;

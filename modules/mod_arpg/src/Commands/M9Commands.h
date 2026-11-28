@@ -13,6 +13,7 @@ namespace Arpg::Commands
     std::vector<ChatCommand> const& ShrineTable();
     std::vector<ChatCommand> const& GoblinTable();
     std::vector<ChatCommand> const& RiftTable();
+    std::vector<ChatCommand> const& StackTable();
 }
 
 void AddSC_arpg_m9_commandscript();

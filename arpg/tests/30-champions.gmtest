@@ -138,3 +138,6 @@
 # Back to the conf values (Champion chance was set to 0 by 00-smoke for the test run).
 > .arpg reload
 ? ok .*monster bands
+# Camps stay off for the rest of the run (fixed probes elsewhere); 63-champion-camps tests them and reloads at the end.
+> .arpg config set Arpg.Champion.Camps 0
+? ok

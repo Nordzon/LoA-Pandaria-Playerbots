@@ -1,0 +1,46 @@
+# Champion camps (change m9-champion-camps): one Champion per square of Arpg.Champion.CampSize yards with enough monsters; a
+# new one CampRespawn seconds after it is gone; quest/menu NPCs never. Needs Arpgtest online. Ends with .arpg reload (conf
+# values back for play).
+
+> .arpg test setup Arpgtest 20 elwynn-northshire
+? ok .*\(online\)
+~ 4000
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+> .arpg config set Arpg.Champion.Camps 1
+? ok
+> .arpg config set Arpg.Champion.CampMin 1
+? ok
+> .arpg config set Arpg.Champion.CampRespawn 0
+? ok
+> .arpg champion camp Arpgtest reset
+? ok camps reset
+
+# --- A square without a Champion gets one; asking again changes nothing.
+> .arpg champion camp Arpgtest
+? ok camp live=0 wait=0 eligible=[1-9]\d* made=1 champion_entry=\d+
+> .arpg champion camp Arpgtest
+? ok camp live=1 .*made=0
+# --- Killed: with CampRespawn 0 the square gets the next one at once ...
+> .arpg champion kill Arpgtest
+? ok .* killed champion
+> .arpg champion camp Arpgtest
+? ok camp live=0 wait=0 .*made=1
+# ... with CampRespawn 600 it waits.
+> .arpg config set Arpg.Champion.CampRespawn 600
+? ok
+> .arpg champion kill Arpgtest
+? ok .* killed champion
+> .arpg champion camp Arpgtest
+? ok camp live=0 wait=([1-9]\d*) made=0
+
+# --- Never Champions: a quest giver (Marshal McBride) - not eligible (or not near).
+> .arpg champion eligible Arpgtest 197
+? ok eligible (none|entry=197 ok=0)
+
+> .arpg champion camp Arpgtest reset
+? ok camps reset
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok
+> .arpg reload
+? ok .*champion exclusions

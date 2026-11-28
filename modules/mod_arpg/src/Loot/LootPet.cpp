@@ -23,6 +23,10 @@
 #include "Chat.h"
 #include "ScriptedGossip.h"
 #include "Loot/Blanks.h"
+#include "LFGMgr.h"
+#include "Character/ProfessionGuard.h"
+#include "World.h"
+#include "Group.h"
 #include "Loot/Salvage.h"
 #include "Loot/MountShop.h"
 #include "WorldSession.h"
@@ -292,7 +296,8 @@ namespace
 
     // Right-click on the companion: its owner gets a menu of the enabled roles; each opens the game's own window.
     enum CompanionAction : uint32 { ACT_VENDOR = 1, ACT_BANK = 2, ACT_MAIL = 3, ACT_LOOKS = 4, ACT_SALVAGE = 5, ACT_CATALYSTS = 6,
-        ACT_BLANKS = 7, ACT_RIFT = 8, ACT_RIFT_CLOSE = 9, ACT_RIFT_LEVEL_BASE = 400000, ACT_BLANK_SLOT_BASE = 2000, ACT_BLANK_BUY_BASE = 3000,   // buy: base + slot * 10 + quality
+        ACT_BLANKS = 7, ACT_RIFT = 8, ACT_RIFT_CLOSE = 9, ACT_TRAINER = 10, ACT_RESET_SPEC = 11, ACT_RESET_TALENTS = 12, ACT_DUAL_SPEC = 13,
+        ACT_PROVING = 14, ACT_PROF_MENU = 15, ACT_PROF_BASE = 4000, ACT_RIFT_LEVEL_BASE = 400000, ACT_BLANK_SLOT_BASE = 2000, ACT_BLANK_BUY_BASE = 3000,   // buy: base + slot * 10 + quality
         ACT_BUY_BASE = 50, ACT_MODEL_BASE = 100, ACT_MOUNT_PAGE_BASE = 500000, ACT_MOUNT_BUY_BASE = 1000000 };
     uint32 const MountVendorEntry = 1000002;   // npc_vendor list of the mount shop (never spawned)
 
@@ -333,6 +338,8 @@ namespace
             if (sArpgConfig.Get().m9.riftEnabled)
                 AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Open a Rift (your key: " + std::to_string(Arpg::Dungeons::KeyLevel(player)) + ")",
                     GOSSIP_SENDER_MAIN, ACT_RIFT);
+            if (sArpgConfig.Get().m9.companionTrainer)
+                AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Class trainer", GOSSIP_SENDER_MAIN, ACT_TRAINER);
             AddGossipItemFor(player, GOSSIP_ICON_TABARD, "Change appearance", GOSSIP_SENDER_MAIN, ACT_LOOKS);
             SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             return true;
@@ -355,6 +362,79 @@ namespace
                 // reputation requirement, sql 2026_11_27_01) shown on the companion; buying works like any vendor.
                 CloseGossipMenuFor(player);
                 player->GetSession()->SendListInventory(creature->GetGUID(), MountVendorEntry);
+                return true;
+            }
+            // Class trainer (m9-stacks-trainer): what a MoP class trainer offers (spells come by themselves on level-up):
+            // reset specialization / talents (the game's own confirm box and price), Dual Specialization, Proving Grounds.
+            if (action == ACT_TRAINER)
+            {
+                if (player->GetLevel() >= 10)
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Reset my class specialization", GOSSIP_SENDER_MAIN, ACT_RESET_SPEC);
+                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Reset my talents", GOSSIP_SENDER_MAIN, ACT_RESET_TALENTS);
+                }
+                uint32 const cost = sArpgConfig.Get().m9.dualSpecCost;
+                if (player->GetSpecsCount() == 1 && player->GetLevel() >= sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
+                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Learn Dual Specialization", GOSSIP_SENDER_MAIN, ACT_DUAL_SPEC,
+                        "Learn Dual Specialization?", cost, false);
+                if (!Arpg::Character::LearnableProfessions(player).empty())
+                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Learn a new profession", GOSSIP_SENDER_MAIN, ACT_PROF_MENU);
+                if (player->GetLevel() >= 90)
+                    AddGossipItemFor(player, GOSSIP_ICON_BATTLE, "Enter the Proving Grounds", GOSSIP_SENDER_MAIN, ACT_PROVING);
+                if (player->GetLevel() < 10)
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "(Talent resets come at level 10)", GOSSIP_SENDER_MAIN, ACT_TRAINER);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                return true;
+            }
+            if (action == ACT_PROF_MENU)
+            {
+                for (auto const& pr : Arpg::Character::LearnableProfessions(player))
+                {
+                    std::string label = pr.first;
+                    label[0] = char(std::toupper((unsigned char)label[0]));
+                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Apprentice " + label, GOSSIP_SENDER_MAIN, ACT_PROF_BASE + pr.second);
+                }
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                return true;
+            }
+            if (action > ACT_PROF_BASE && action < ACT_PROF_BASE + 1000)
+            {
+                CloseGossipMenuFor(player);
+                std::string out;
+                Arpg::Character::LearnProfession(player, action - ACT_PROF_BASE, out);
+                ChatHandler(player->GetSession()).SendSysMessage(out.c_str());
+                return true;
+            }
+            if (action == ACT_RESET_SPEC || action == ACT_RESET_TALENTS)
+            {
+                CloseGossipMenuFor(player);
+                if (player->GetLevel() >= 10)
+                    player->SendTalentWipeConfirm(creature->GetGUID(), action == ACT_RESET_SPEC);
+                return true;
+            }
+            if (action == ACT_DUAL_SPEC)
+            {
+                CloseGossipMenuFor(player);
+                uint32 const cost = sArpgConfig.Get().m9.dualSpecCost;
+                if (player->GetSpecsCount() != 1 || player->GetLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
+                    return true;
+                if (!player->HasEnoughMoney(uint64(cost)))
+                {
+                    player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, creature, 0, 0);
+                    return true;
+                }
+                player->ModifyMoney(-int64(cost));
+                player->CastSpell(player, 63680, true, nullptr, nullptr, player->GetGUID());   // as the stock trainer option
+                player->CastSpell(player, 63624, true, nullptr, nullptr, player->GetGUID());
+                return true;
+            }
+            if (action == ACT_PROVING)
+            {
+                CloseGossipMenuFor(player);
+                if (player->GetGroup() || player->IsUsingLfg() || player->GetLevel() < 90)
+                    return true;
+                lfg::LfgDungeonSet scenario = { 658 };
+                sLFGMgr->JoinLfg(player, lfg::PLAYER_ROLE_DAMAGE, scenario, "");
                 return true;
             }
             // Rifts (m9-rifts): pick a level up to the key; the next 5-man dungeon entered becomes the rift.

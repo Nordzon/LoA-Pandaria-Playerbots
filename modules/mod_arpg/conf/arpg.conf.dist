@@ -221,7 +221,7 @@ Arpg.Potion.DropMult = 1
 #    Zones with a pool (arpg_superunique) keep PerZone alive while a real player is in the zone; RespawnDelay seconds after a
 #    kill a DIFFERENT one spawns at one of its points. Kill: 40% orb, a guaranteed blue, Unique chance + step per kill without.
 Arpg.Superunique.Enabled = 1
-Arpg.Superunique.PerZone = 1
+Arpg.Superunique.PerZone = 3
 Arpg.Superunique.RespawnDelay = 300
 Arpg.Superunique.UniqueChance = 10
 Arpg.Superunique.UniqueBadLuckStep = 5
@@ -237,7 +237,7 @@ Arpg.Superunique.Announce = 1
 #    An open-world creature becomes a Champion the first time a real player's scaling tick sees it (once per life).
 #    Level / health / damage / monster affixes / minions come from arpg_monster_band by the player's level.
 #    Arpg.Champion.Enabled         1 = on
-#    Arpg.Champion.Chance          % chance per creature (rares and bosses never)
+#    Arpg.Champion.Chance          % extra random Champions per creature on top of the camps (rares and bosses never)
 #    Arpg.Champion.Scale           model size multiplier (0 = unchanged)
 #    Arpg.Champion.VisualAura      spell id of a glow aura on the Champion (0 = none until one is picked in game)
 #    Arpg.Champion.LootBlueChance  % chance the loot floor adds a blue (it always adds a green); items looted from a
@@ -247,7 +247,7 @@ Arpg.Champion.Enabled = 1
 #    "Unique <name>" rank Rare Elite) made by sql/tools/gen_monster_tags.py with these offsets; 0 = no tag (keep the name)
 Arpg.Champion.EntryOffset = 400000
 Arpg.Superunique.EntryOffset = 700000
-Arpg.Champion.Chance = 5.0
+Arpg.Champion.Chance = 0
 Arpg.Champion.Scale = 1.25
 Arpg.Champion.VisualAura = 117230
 #    Arpg.Superunique.VisualAura   the same kind of glow on Superuniques (0 = none)
@@ -385,3 +385,34 @@ Arpg.Rift.CharmChance = 20
 Arpg.Rift.CharmChancePerLevel = 2
 Arpg.Rift.UniqueCharmLevel = 10
 Arpg.Rift.UniqueCharmChance = 10
+
+###################################################################################################
+# Stacks + companion class trainer (change m9-stacks-trainer)
+#    Arpg.Stacks.Max               - every stackable item (stock size 2 or more) stacks to this many; 0 = stock sizes.
+#                                    Applied at startup and on ".arpg reload".
+#    Arpg.Companion.Trainer        - 1 = "Class trainer" page on the companion (reset spec/talents, Dual Specialization,
+#                                    Proving Grounds).
+#    Arpg.Companion.DualSpecCost   - copper for Dual Specialization from the companion (stock trainers: 10 g = 100000).
+Arpg.Stacks.Max = 999
+Arpg.Companion.Trainer = 1
+Arpg.Companion.DualSpecCost = 100000
+#    Arpg.Companion.ProfessionCost - copper for an Apprentice rank from the companion ("Learn a new profession").
+#    Arpg.Companion.ProfessionLevel - level for that.
+#    Arpg.Professions.AllowClientAbandon - 1 = the game's own "abandon profession" works; 0 (default) = refused, use
+#                                    ".professions abandon <name>" (the client believes in 2 professions and can drop the wrong one).
+Arpg.Companion.ProfessionCost = 10
+Arpg.Companion.ProfessionLevel = 5
+Arpg.Professions.AllowClientAbandon = 0
+
+###################################################################################################
+# Champion camps (change m9-champion-camps)
+#    Arpg.Champion.Camps           - 1 = every square of CampSize yards with at least CampMin monsters holds one Champion.
+#    Arpg.Champion.CampSize        - square size in yards.
+#    Arpg.Champion.CampMin         - monsters (that may become Champions) a square needs.
+#    Arpg.Champion.CampRespawn     - seconds after a square's Champion is gone before it gets a new one.
+#    Never Champions: NPCs with a menu/quest, scripted story NPCs, monsters friendly to the player, training dummies, and the
+#    entries in world table arpg_champion_exclude.
+Arpg.Champion.Camps = 1
+Arpg.Champion.CampSize = 100
+Arpg.Champion.CampMin = 4
+Arpg.Champion.CampRespawn = 600

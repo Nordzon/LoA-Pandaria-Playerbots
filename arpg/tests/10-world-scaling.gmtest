@@ -118,5 +118,5 @@
 ? scaled=60\b
 > .arpg config set Arpg.Scale.UncappedZones 5840
 ? ok
-> .arpg config set Arpg.Champion.Chance 5
+> .arpg config set Arpg.Champion.Chance 0
 ? ok

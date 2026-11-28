@@ -1,5 +1,5 @@
 # Superuniques (m3 tasks 3.4/4.2, BALANCE §14). Needs Arpgtest online. Elwynn Forest (zone 12) has a pool of 5; the zone keeps
-# one alive while a real player is in it. Level 20: band 15 (+2 levels, 4x health, 1.35x damage, 3 abilities, 40% orb).
+# Arpg.Superunique.PerZone (3 since 2026-11-28) alive while a real player is in it. Level 20: band 15 (+2 levels, 4x health, 1.35x damage, 3 abilities, 40% orb).
 # Rules, not rates: the respawn delay is set to 5 s, a Superunique is spawned next to the character, the Unique pity is full.
 
 # A second real player on ANOTHER map (friends on different continents, bug 2026-11-27): its ticks must not drop Elwynn's
@@ -21,7 +21,7 @@
 ? ok
 ~ 2500
 > .arpg superunique info Arpgtest
-? superunique zone=12 pool=5 alive=1 \[id=[1-5] entry=\d+ abilities=3
+? superunique zone=12 pool=5 alive=[1-3] \[id=[1-5] entry=\d+ abilities=3
 
 # Morgaine the Sly (id 1, caster kit) next to the character, replacing the live one.
 > .arpg superunique spawn Arpgtest 1
@@ -67,10 +67,10 @@
 
 # Rotation: 5 s later a DIFFERENT Superunique of the zone spawns.
 > .arpg superunique info Arpgtest
-? alive=0 respawn_in=[0-5] last_killed=1
+? alive=[0-2] (?!.*\[id=1 entry=99).*respawn_in=[0-5] last_killed=1
 ~ 7000
 > .arpg superunique info Arpgtest
-? alive=1 \[id=[2-5] entry=
+? alive=[1-3] (?!.*\[id=1 entry=99)\[id=[2-5] entry=
 
 # (The kill event above shows the win reset the counter: "unique won misses=0".)
 > .arpg pity set Arpgtest unique superunique 0
@@ -92,7 +92,7 @@
 > .arpg superunique spawn Arpgtest
 ? ok
 > .arpg superunique info Arpgtest
-? zone=5785 pool=8 alive=1
+? zone=5785 pool=8 alive=[1-3]
 > .arpg superunique kill Arpgtest
 ? ok
 > .arpg test setup Arpgtest 20 elwynn-northshire

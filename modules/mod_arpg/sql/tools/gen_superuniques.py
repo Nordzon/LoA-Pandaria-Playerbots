@@ -57,5 +57,63 @@ for zone in sorted(zones):
         next_id += 1
         pools += 1
         spawns += len(pts)
+# Stand-ins (owner 2026-11-28 "add rare monsters - several per zone"): a zone with fewer than MIN_POOL rares (the Wandering
+# Isle has none) is topped up with its toughest ordinary hostile monsters (highest level, then most spawns; at least 2
+# spawns; no menu/quest NPCs, no scripted story NPCs, no critters). Ids from STAND_IN_FIRST_ID so the rare ids stay stable.
+MIN_POOL = 5
+STAND_IN_FIRST_ID = 5000
+DBC = os.path.join(os.path.dirname(ROOT), 'ServerData', 'data', 'dbc', 'FactionTemplate.dbc')
+
+
+def hostile_factions():
+    import struct
+    d = open(DBC, 'rb').read()
+    _, n, fields, rsize, _ = struct.unpack('<4s4I', d[:20])
+    out = set()
+    for i in range(n):
+        r = struct.unpack('<%dI' % fields, d[20 + i * rsize:20 + (i + 1) * rsize])
+        if r[5] & 1:   # EnemyGroup has "players"
+            out.add(r[0])
+    return out
+
+
+hostile = hostile_factions()
+cand = q("SELECT c.zoneId, t.entry, t.faction, t.maxlevel, c.guid, c.map, c.position_x, c.position_y, c.position_z, c.orientation "
+         "FROM creature c JOIN creature_template t ON t.entry = c.id "
+         "WHERE c.map IN (%s) AND t.`rank` IN (0, 1) AND c.zoneId <> 0 AND c.zoneId NOT IN (%s) AND t.npcflag = 0 AND t.npcflag2 = 0 "
+         "AND t.type <> 8 AND t.ScriptName = '' AND t.entry <= %d AND t.unit_flags & 0x302 = 0 ORDER BY c.zoneId, t.entry, c.guid"
+         % (OPEN_WORLD_MAPS, ','.join(str(z) for z in HAND_MADE_ZONES), MAX_BASE_ENTRY))
+stand = {}
+for zone, entry, faction, maxlevel, guid, mp, x, y, z, o in cand:
+    if int(faction) not in hostile:
+        continue
+    e = stand.setdefault(int(zone), {}).setdefault(int(entry), {'level': int(maxlevel), 'pts': []})
+    e['pts'].append((int(guid), int(mp), x, y, z, o))
+sql += ['', '-- Stand-ins: zones with fewer than %d rares get their toughest ordinary hostile monsters.' % MIN_POOL,
+        'DELETE FROM `arpg_superunique_spawn` WHERE `superunique_id` >= %d;' % STAND_IN_FIRST_ID,
+        'DELETE FROM `arpg_superunique` WHERE `id` >= %d;' % STAND_IN_FIRST_ID]
+next_id = STAND_IN_FIRST_ID
+stand_ins = 0
+stand_zones = 0
+for zone in sorted(stand):
+    have = min(len(zones.get(zone, {})), PER_ZONE)
+    if have >= MIN_POOL:
+        continue
+    taken = set(zones.get(zone, {}))
+    ranked = sorted(((e, v) for e, v in stand[zone].items() if e not in taken and len(v['pts']) >= 2),
+                    key=lambda ev: (-ev[1]['level'], -len(ev[1]['pts']), ev[0]))
+    added = 0
+    for n, (entry, v) in enumerate(ranked[:MIN_POOL - have]):
+        sql.append('INSERT INTO `arpg_superunique` (`id`, `zone_id`, `creature_entry`, `kit_id`, `weight`) VALUES (%d, %d, %d, %d, 100);'
+                   % (next_id, zone, entry, KITS[n % len(KITS)]))
+        pts = v['pts'][:: max(1, len(v['pts']) // POINTS)][:POINTS]   # spread over the zone
+        sql.append('INSERT INTO `arpg_superunique_spawn` (`superunique_id`, `point`, `map`, `x`, `y`, `z`, `o`) VALUES %s;'
+                   % ', '.join('(%d, %d, %d, %s, %s, %s, %s)' % (next_id, g, mp, x, y, z, o) for g, mp, x, y, z, o in pts))
+        next_id += 1
+        added += 1
+        spawns += len(pts)
+    stand_ins += added
+    stand_zones += 1 if added else 0
 open(OUT, 'w', encoding='utf-8', newline='\n').write('\n'.join(sql) + '\n')
-print('wrote %s: %d zones, %d superuniques, %d spawn points' % (OUT, len(zones), pools, spawns))
+print('wrote %s: %d zones, %d superuniques from rares, %d stand-ins in %d zones, %d spawn points'
+      % (OUT, len(zones), pools, stand_ins, stand_zones, spawns))

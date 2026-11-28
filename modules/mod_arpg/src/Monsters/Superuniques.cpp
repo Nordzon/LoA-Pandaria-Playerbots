@@ -598,6 +598,11 @@ namespace Arpg::Monsters
     {
         if (!c || c->IsSummon() || !sArpgConfig.Get().superuniqueEnabled)
             return false;
+        // Only real rares step aside: a pool can also hold a zone's ordinary monster (zones without rares, m9-champion-camps),
+        // and its normal copies must stay.
+        CreatureTemplate const* t = c->GetCreatureTemplate();
+        if (!t || (t->rank != CREATURE_ELITE_RARE && t->rank != CREATURE_ELITE_RAREELITE))
+            return false;
         std::lock_guard<std::mutex> l(g_lock);
         if (g_byGuid.count(c->GetGUID().GetRawValue()))
             return false;

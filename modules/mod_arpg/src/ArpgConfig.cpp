@@ -149,7 +149,7 @@ namespace Arpg
         s.paragonFindPerPoint = std::max(0, file.GetInt("Arpg.Paragon.FindPerPoint", 500));
         s.paragonMagicFindCap = std::max(0, file.GetInt("Arpg.Paragon.MagicFindCap", 10000));
         s.superuniqueEnabled = file.GetBool("Arpg.Superunique.Enabled", true);
-        s.superuniquePerZone = std::max(0, file.GetInt("Arpg.Superunique.PerZone", 1));
+        s.superuniquePerZone = std::max(0, file.GetInt("Arpg.Superunique.PerZone", 3));
         s.superuniqueRespawnDelaySec = uint32_t(std::max(0, file.GetInt("Arpg.Superunique.RespawnDelay", 300)));
         s.superuniqueUniqueChancePct = std::max(0.0f, file.GetFloat("Arpg.Superunique.UniqueChance", 10.0f));
         s.superuniqueUniqueStepPct = std::max(0.0f, file.GetFloat("Arpg.Superunique.UniqueBadLuckStep", 5.0f));
@@ -160,7 +160,7 @@ namespace Arpg
         s.championEntryOffset = uint32_t(std::max(0, file.GetInt("Arpg.Champion.EntryOffset", 400000)));
         s.superuniqueEntryOffset = uint32_t(std::max(0, file.GetInt("Arpg.Superunique.EntryOffset", 700000)));
         s.championEnabled = file.GetBool("Arpg.Champion.Enabled", true);
-        s.championChancePct = std::max(0.0f, file.GetFloat("Arpg.Champion.Chance", 5.0f));
+        s.championChancePct = std::max(0.0f, file.GetFloat("Arpg.Champion.Chance", 0.0f));
         s.championScale = std::max(0.0f, file.GetFloat("Arpg.Champion.Scale", 1.25f));
         s.championVisualAura = uint32_t(std::max(0, file.GetInt("Arpg.Champion.VisualAura", 117230)));
         s.superuniqueVisualAura = uint32_t(std::max(0, file.GetInt("Arpg.Superunique.VisualAura", 117230)));

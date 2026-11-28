@@ -11,3 +11,4 @@ Potions.lua
 AffixText.lua
 LootTooltip.lua
 Rift.lua
+Camera.lua

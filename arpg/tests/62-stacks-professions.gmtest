@@ -1,0 +1,60 @@
+# Bigger stacks and profession guardrails (change m9-stacks-trainer). Needs Arpgtest online.
+
+> .arpg test setup Arpgtest 60 elwynn-northshire
+? ok .*\(online\)
+> .arpg test clearbags Arpgtest
+? ok
+> .arpg config set Arpg.Test.RecordEvents 1
+? ok
+
+# --- Stacks: stock 20-stacks (Linen Cloth) go to 999; non-stacking items (Hearthstone) stay 1; 500 cloth = one stack.
+> .arpg stacks info 2589
+? ok stack item=2589 max=999 stock=20\b
+> .arpg stacks info 6948
+? ok stack item=6948 max=1 stock=1\b
+> .arpg stacks give Arpgtest 2589 500
+? ok Arpgtest stack=500 mailed=0\b
+> .arpg test count Arpgtest 2589
+? ok item=2589 count=500\b
+# Off -> stock sizes come back; on again.
+> .arpg config set Arpg.Stacks.Max 0
+? ok
+> .arpg stacks apply
+? ok stacks max=0 raised=0\b
+> .arpg stacks info 2589
+? max=20 stock=20\b
+> .arpg config set Arpg.Stacks.Max 999
+? ok
+> .arpg stacks apply
+? ok stacks max=999 raised=[1-9]\d*
+> .arpg test clearbags Arpgtest
+? ok
+
+# --- Professions: the client's abandon (CMSG_UNLEARN_SKILL) is refused; changes are logged.
+> .arpg test learnall Arpgtest
+? professions=11 of 11
+> .arpg test events Arpgtest clear
+? ok
+> .arpg test unlearnskill Arpgtest herbalism
+? ok professions count=11 .*herbalism=
+> .arpg test events Arpgtest
+? profession abandon refused herbalism
+# Allowed by setting -> it goes (and is logged); the deliberate command works without the setting.
+> .arpg config set Arpg.Professions.AllowClientAbandon 1
+? ok
+> .arpg test unlearnskill Arpgtest herbalism
+? ok professions count=10\b
+> .arpg config set Arpg.Professions.AllowClientAbandon 0
+? ok
+> .arpg test abandon Arpgtest mining
+? ok abandoned mining professions count=9\b
+> .arpg test events Arpgtest
+? profession removed herbalism
+? profession removed mining
+> .arpg test learnall Arpgtest
+? professions=11 of 11
+> .arpg test events Arpgtest
+? profession learned (herbalism|mining)
+
+> .arpg config set Arpg.Test.RecordEvents 0
+? ok

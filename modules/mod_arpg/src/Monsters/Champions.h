@@ -26,6 +26,13 @@ namespace Arpg::Monsters
     bool MakeChampion(Creature* c, Player* player, std::string& out, std::vector<uint32> const& forcedAffixes = {});
 
     bool IsChampion(Creature* c);
+    // Champion camps (m9-champion-camps), tests: runs the camp check at the nearest eligible monster:
+    // "camp live=0|1 wait=<s> [eligible=N] made=0|1 [champion_entry=E]".
+    std::string CampProbe(Player* player);
+    // "eligible entry=E ok=0|1" for the nearest creature of that entry (100 yd), or "eligible none".
+    std::string EligibleProbe(Player* player, uint32 entry);
+    // Tests: forget all camps.
+    void ResetCamps();
     // Turns a Champion back into its plain creature now (tests: a probe creature that rolled Champion on first sight):
     // minions despawn, the tag entry, aura and size go, scaling forgets it so it scales like any other creature again.
     bool UnmakeChampion(Creature* c, std::string& out);

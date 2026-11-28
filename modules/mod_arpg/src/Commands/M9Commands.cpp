@@ -4,6 +4,7 @@
 #include "ArpgConfig.h"
 #include "Charms/Charms.h"
 #include "Dungeons/Rifts.h"
+#include "Items/Stacks.h"
 #include "Loot/GiveItem.h"
 #include "Monsters/TreasureGoblin.h"
 #include "World/Shrines.h"
@@ -464,6 +465,50 @@ namespace Arpg::Commands
             { "info",  &HandleCharmInfo,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "pouch", &HandleCharmPouch, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "move",  &HandleCharmMove,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+        };
+        return t;
+    }
+
+    // ---- stacks (m9-stacks-trainer) ----
+    bool HandleStacksInfo(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 1)
+            return Fail(handler, "usage: .arpg stacks info <itemId>");
+        handler->PSendSysMessage("ok %s", Arpg::Items::DescribeStack(uint32(Num(t[0]))).c_str());
+        return true;
+    }
+
+    // .arpg stacks give <char> <itemId> <count>   one store of <count> items (no roll): stack = the size of the stack made.
+    bool HandleStacksGive(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        Player* p = Online(handler, t, "usage: .arpg stacks give <char> <itemId> <count>");
+        if (!p)
+            return false;
+        if (t.size() != 3)
+            return Fail(handler, "usage: .arpg stacks give <char> <itemId> <count>");
+        bool mailed = false;
+        Item* item = Arpg::Loot::GiveItem(p, Num(t[1]), Num(t[2]), 0, "Stack test", mailed, false);
+        if (!item)
+            return Fail(handler, "could not give the item");
+        handler->PSendSysMessage("ok %s stack=%u mailed=%u", p->GetName().c_str(), item->GetCount(), mailed ? 1u : 0u);
+        return true;
+    }
+
+    bool HandleStacksApply(ChatHandler* handler, char const* /*args*/)
+    {
+        handler->PSendSysMessage("ok %s", Arpg::Items::ApplyStacks().c_str());
+        return true;
+    }
+
+    std::vector<ChatCommand> const& StackTable()
+    {
+        static std::vector<ChatCommand> t =
+        {
+            { "info",  &HandleStacksInfo,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "apply", &HandleStacksApply, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "give",  &HandleStacksGive,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
         };
         return t;
     }

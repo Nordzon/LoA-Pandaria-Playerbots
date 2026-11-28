@@ -37,7 +37,7 @@ namespace Arpg
         uint32_t championEntryOffset = 400000;     // Arpg.Champion.EntryOffset (tag copies "Champion <name>", gen_monster_tags.py)
         uint32_t superuniqueEntryOffset = 700000;  // Arpg.Superunique.EntryOffset (tag copies "Unique <name>")
         bool championEnabled = true;     // Arpg.Champion.Enabled
-        float championChancePct = 5.0f;  // Arpg.Champion.Chance (% of open-world creatures, rolled once per life on first sight)
+        float championChancePct = 0.0f;  // Arpg.Champion.Chance (% extra random Champions on top of camps, rolled once per life on first sight)
         float championScale = 1.25f;     // Arpg.Champion.Scale (model size multiplier)
         uint32_t championVisualAura = 117230; // Arpg.Champion.VisualAura (glow aura spell; owner pick 2026-11-26 "Empowered"; 0 = none)
         uint32_t superuniqueVisualAura = 117230; // Arpg.Superunique.VisualAura (same glow on Superuniques; 0 = none)
@@ -51,7 +51,7 @@ namespace Arpg
         float championExplosionRadius = 8.0f;    // Arpg.Champion.ExplosionRadius (Fire Enchanted, yards)
         uint32_t championExplosionDelayMs = 1500; // Arpg.Champion.ExplosionDelayMs (time to step out)
         bool superuniqueEnabled = true;          // Arpg.Superunique.Enabled
-        int superuniquePerZone = 1;              // Arpg.Superunique.PerZone
+        int superuniquePerZone = 3;              // Arpg.Superunique.PerZone
         uint32_t superuniqueRespawnDelaySec = 300; // Arpg.Superunique.RespawnDelay
         float superuniqueUniqueChancePct = 10.0f;  // Arpg.Superunique.UniqueChance
         float superuniqueUniqueStepPct = 5.0f;     // Arpg.Superunique.UniqueBadLuckStep

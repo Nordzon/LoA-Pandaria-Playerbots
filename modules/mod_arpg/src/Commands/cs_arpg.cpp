@@ -1,4 +1,7 @@
 // .arpg commands. Every command takes an explicit character name (works over SOAP, which has no selected target).
+#include "Items/Stacks.h"
+#include "Character/ProfessionGuard.h"
+#include "Opcodes.h"
 #include "ArpgConfig.h"
 #include "ArpgHooks.h"
 #include "Scaling/WorldScaling.h"
@@ -216,6 +219,8 @@ public:
             { "setup",    &HandleTestSetup,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "learnall", &HandleTestLearnAll, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "professions", &HandleTestProfessions, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "unlearnskill", &HandleTestUnlearnSkill, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "abandon", &HandleTestAbandon, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "weapons",  &HandleTestWeapons,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "spellreq", &HandleTestSpellReq, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "questproxy", &HandleTestQuestProxy, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -276,6 +281,8 @@ public:
         static std::vector<ChatCommand> championTable =
         {
             { "make", &HandleChampionMake, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "camp", &HandleChampionCamp, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "eligible", &HandleChampionEligible, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "info", &HandleChampionInfo, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "clear",  &HandleChampionClear,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "kill", &HandleChampionKill, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -354,6 +361,7 @@ public:
             { "blank",   blankTable,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "charm",   Arpg::Commands::CharmTable(),  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "shrine",  Arpg::Commands::ShrineTable(), rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "stacks",  Arpg::Commands::StackTable(), rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "goblin",  Arpg::Commands::GoblinTable(), rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "rift",    Arpg::Commands::RiftTable(),   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
             { "lootpet", lootpetTable,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
@@ -379,6 +387,7 @@ public:
         static std::vector<ChatCommand> playerProfessionsTable =
         {
             { "data", &HandleMyProfessionsData, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
+            { "abandon", &HandleMyProfessionsAbandon, rbac::RBAC_PERM_COMMAND_HELP, Console::No },
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -429,7 +438,8 @@ public:
         std::string blanks = Arpg::Loot::LoadBlanks();
         std::string wskills = Arpg::Character::ApplyAnyWeaponSkills();
         std::string squests = Arpg::Character::LoadStartQuests();
-        std::string m9 = Arpg::Charms::LoadCharmData() + ", " + Arpg::World::LoadShrineData() + ", " + Arpg::Dungeons::LoadRiftData();
+        std::string m9 = Arpg::Charms::LoadCharmData() + ", " + Arpg::World::LoadShrineData() + ", " + Arpg::Dungeons::LoadRiftData() + ", " +
+            Arpg::Items::ApplyStacks();
         handler->PSendSysMessage("%s %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s", ok ? "ok" : "error:", msg.c_str(), loot.c_str(), fx.c_str(), zones.c_str(),
             subst.c_str(), uniq.c_str(), champ.c_str(), su.c_str(), pot.c_str(), dun.c_str(), comp.c_str(), mounts.c_str(), blanks.c_str(), wskills.c_str(), squests.c_str(), m9.c_str());
         return ok;
@@ -1326,6 +1336,56 @@ public:
     }
 
     // .professions data   (player) the panel line for ArpgUI
+    // .professions abandon <name>   (m9-stacks-trainer) the deliberate way to drop a primary profession (the client's
+    // abandon button is refused, see Character/ProfessionGuard).
+    static bool HandleMyProfessionsAbandon(ChatHandler* handler, char const* args)
+    {
+        Player* p = Me(handler);
+        if (!p)
+            return false;
+        std::string out;
+        if (!Arpg::Character::AbandonProfession(p, Arpg::Character::ProfessionByName(args ? args : ""), out))
+            return Fail(handler, out);
+        handler->PSendSysMessage("ok %s", out.c_str());
+        return true;
+    }
+
+    // .arpg test unlearnskill <char> <skillName>   the client's abandon (CMSG_UNLEARN_SKILL) through the real handler;
+    // replies with the professions afterwards.
+    static bool HandleTestUnlearnSkill(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test unlearnskill <char> <profession>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        uint32 skill = Arpg::Character::ProfessionByName(t[1]);
+        if (!skill)
+            return Fail(handler, "unknown profession");
+        WorldPacket pkt(CMSG_UNLEARN_SKILL, 4);
+        pkt << uint32(skill);
+        p->GetSession()->HandleUnlearnSkillOpcode(pkt);
+        handler->PSendSysMessage("ok %s", Arpg::Character::DescribeProfessions(p).c_str());
+        return true;
+    }
+
+    // .arpg test abandon <char> <profession>   the ".professions abandon" path for a named character.
+    static bool HandleTestAbandon(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg test abandon <char> <profession>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        std::string out;
+        if (!Arpg::Character::AbandonProfession(p, Arpg::Character::ProfessionByName(t[1]), out))
+            return Fail(handler, out);
+        handler->PSendSysMessage("ok %s %s", out.c_str(), Arpg::Character::DescribeProfessions(p).c_str());
+        return true;
+    }
+
     static bool HandleMyProfessionsData(ChatHandler* handler, char const* /*args*/)
     {
         Player* p = Me(handler);
@@ -1882,6 +1942,38 @@ public:
 
     // .arpg champion make <char> <creatureEntry>   spawns the creature next to the character and makes it a Champion (band by
     // the character's level, minions, affixes) - the same code the first-sight roll uses.
+    // .arpg champion camp <char> [reset]   (m9-champion-camps) the camp check at the character's spot; "reset" forgets all camps.
+    static bool HandleChampionCamp(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.empty() || t.size() > 2 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg champion camp <char> [reset]");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        if (t.size() == 2 && t[1] == "reset")
+        {
+            Arpg::Monsters::ResetCamps();
+            handler->SendSysMessage("ok camps reset");
+            return true;
+        }
+        handler->PSendSysMessage("ok %s", Arpg::Monsters::CampProbe(p).c_str());
+        return true;
+    }
+
+    // .arpg champion eligible <char> <entry>   whether the nearest creature of that entry may become a Champion.
+    static bool HandleChampionEligible(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> t = Tokens(args);
+        if (t.size() != 2 || !IsNameLike(t[0]))
+            return Fail(handler, "usage: .arpg champion eligible <char> <entry>");
+        Player* p = ObjectAccessor::FindPlayerByName(NormalizeName(t[0]));
+        if (!p || !p->IsInWorld())
+            return Fail(handler, "character not online");
+        handler->PSendSysMessage("ok %s", Arpg::Monsters::EligibleProbe(p, uint32(std::strtoul(t[1].c_str(), nullptr, 10))).c_str());
+        return true;
+    }
+
     static bool HandleChampionMake(ChatHandler* handler, char const* args)
     {
         std::vector<std::string> t = Tokens(args);

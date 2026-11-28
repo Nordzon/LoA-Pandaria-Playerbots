@@ -4,6 +4,7 @@
 #include "ArpgConfig.h"
 #include "Core/LootSubstitution.h"
 #include "Core/MonsterBands.h"
+#include "Core/ChampionCamps.h"
 #include "Loot/Substitution.h"
 #include "Loot/ZoneLevels.h"
 #include "Scaling/WorldScaling.h"
@@ -24,6 +25,10 @@
 #include "ScriptMgr.h"
 #include "TemporarySummon.h"
 #include "World.h"
+#include "CellImpl.h"
+#include "GameTime.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 
 #include <algorithm>
 #include <mutex>
@@ -57,6 +62,11 @@ namespace
     std::unordered_map<uint32, std::vector<PendingExplosion>> g_explosions;   // player guid -> Fire Enchanted blasts to resolve
     std::unordered_map<uint32, uint32> g_lastPlayerTick;     // player guid -> getMSTime of the last affix tick
     thread_local int t_depth = 0;                            // our own damage must not trigger affixes again
+
+    // Champion camps (m9-champion-camps): square key -> its Champion (creature guid, 0 = none) and when it may get a new one.
+    struct Camp { uint64 champion = 0; uint32 readyAtS = 0; };
+    std::unordered_map<uint64, Camp> g_camps;
+    std::unordered_set<uint32> g_excluded;                   // arpg_champion_exclude: entries that never become Champions
 
     struct Guard { Guard() { ++t_depth; } ~Guard() { --t_depth; } };
 
@@ -181,6 +191,79 @@ namespace
         c->SetHealth(c->GetMaxHealth());
     }
 
+    // Never Champions (owner 2026-11-28: quest NPCs became Champions): NPCs with a menu or quest, scripted story NPCs,
+    // monsters friendly to the player (sparring partners), rares/bosses, Superunique rares, arpg_champion_exclude.
+    bool ChampionEligible(Creature* c, Player* p)
+    {
+        if (!c || !c->IsAlive() || c->IsInCombat() || c->IsSummon() || !p->IsValidAttackTarget(c))
+            return false;
+        CreatureTemplate const* t = c->GetCreatureTemplate();
+        if (!t || t->rank > CREATURE_ELITE_ELITE || c->IsDungeonBoss() || t->type == CREATURE_TYPE_CRITTER)
+            return false;
+        if (t->npcflag || t->npcflag2 || c->GetUInt32Value(UNIT_FIELD_NPC_FLAGS) || t->ScriptID)
+            return false;
+        if (p->GetReactionTo(c) >= REP_FRIENDLY || c->IsCivilian() || c->IsTrigger())
+            return false;
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            if (g_excluded.count(t->Entry) || g_champions.count(c->GetGUID().GetRawValue()))
+                return false;
+        }
+        return !Arpg::Monsters::IsNativeSuperuniqueRare(c);
+    }
+
+    // A camp square without a live Champion (and past its respawn delay) with enough eligible monsters gets one: a random
+    // eligible monster of the square of `c` (a monster, or the player for tests). Returns true when c itself became it.
+    bool TryCampChampion(WorldObject* c, Player* p, Arpg::Settings const& s, std::string* info = nullptr)
+    {
+        float const size = s.m9.campSize;
+        uint64 const key = Arpg::Core::CampKey(c->GetMapId(), c->GetPositionX(), c->GetPositionY(), size);
+        uint32 const nowS = uint32(GameTime::GetGameTime());
+        bool live;
+        uint32 readyAt;
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            Camp& camp = g_camps[key];
+            if (camp.champion && !g_champions.count(camp.champion))
+            {
+                camp.champion = 0;   // gone (killed, despawned): the square waits CampRespawn seconds
+                camp.readyAtS = nowS + s.m9.campRespawnS;
+            }
+            live = camp.champion != 0;
+            readyAt = camp.readyAtS;
+        }
+        if (info)
+            *info = "camp live=" + std::to_string(live ? 1 : 0) + " wait=" + std::to_string(readyAt > nowS ? readyAt - nowS : 0);
+        if (live || nowS < readyAt)
+            return false;
+        std::list<Unit*> units;
+        Trinity::AnyUnitInObjectRangeCheck check(c, size);
+        Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(c, units, check);
+        Cell::VisitAllObjects(c, searcher, size);
+        std::vector<Creature*> eligible;
+        for (Unit* u : units)
+            if (Creature* m = u->ToCreature())
+                if (Arpg::Core::CampKey(m->GetMapId(), m->GetPositionX(), m->GetPositionY(), size) == key && ChampionEligible(m, p))
+                    eligible.push_back(m);
+        if (info)
+            *info += " eligible=" + std::to_string(eligible.size());
+        if (!Arpg::Core::CampWantsChampion(false, nowS, readyAt, int(eligible.size()), s.m9.campMin))
+            return false;
+        Creature* pick = eligible[urand(0, uint32(eligible.size() - 1))];
+        std::string out;
+        if (!Arpg::Monsters::MakeChampion(pick, p, out))
+            return false;
+        {
+            std::lock_guard<std::mutex> l(g_lock);
+            g_camps[key].champion = pick->GetGUID().GetRawValue();
+        }
+        Arpg::TestEvents::Record(p->GetGUID().GetCounter(), "champion camp entry=" + std::to_string(pick->GetEntry()) +
+            " eligible=" + std::to_string(eligible.size()));
+        if (info)
+            *info += " made=1 champion_entry=" + std::to_string(Arpg::Monsters::BaseEntry(pick->GetEntry()));
+        return pick == c->ToCreature();
+    }
+
     bool RollOnFirstSight(Creature* c, Player* p)
     {
         // A rare that is in a Superunique pool: the zone shows only the Superunique version (no duplicates).
@@ -191,12 +274,11 @@ namespace
             return true;
         }
         Arpg::Settings const& s = sArpgConfig.Get();
-        if (!s.championEnabled || s.championChancePct <= 0.0f || p->GetMap()->Instanceable())
-            return false;
-        CreatureTemplate const* t = c->GetCreatureTemplate();
-        if (!t || t->rank > CREATURE_ELITE_ELITE || c->IsDungeonBoss())
-            return false;   // rares, bosses keep their own identity
-        if (float(rand_chance()) >= s.championChancePct)
+        if (!s.championEnabled || p->GetMap()->Instanceable() || !ChampionEligible(c, p))
+            return false;   // rares, bosses, quest/story NPCs keep their own identity
+        if (s.m9.campsEnabled && TryCampChampion(c, p, s))
+            return true;
+        if (s.championChancePct <= 0.0f || float(rand_chance()) >= s.championChancePct)
             return false;
         std::string out;
         return Arpg::Monsters::MakeChampion(c, p, out);
@@ -426,11 +508,77 @@ namespace Arpg::Monsters
                 pool.push_back(a);
                 meta[a.id] = { f[1].GetString(), f[2].GetString() };
             } while (r->NextRow());
+        std::unordered_set<uint32> excluded;
+        if (QueryResult r = WorldDatabase.Query("SELECT entry FROM arpg_champion_exclude"))
+            do
+                excluded.insert(r->Fetch()[0].GetUInt32());
+            while (r->NextRow());
         std::lock_guard<std::mutex> l(g_lock);
+        g_excluded = excluded;
         g_bands = bands;
         g_affixPool = pool;
         g_affixMeta = meta;
-        return std::to_string(bands.size()) + " monster bands, " + std::to_string(pool.size()) + " monster affixes";
+        return std::to_string(bands.size()) + " monster bands, " + std::to_string(pool.size()) + " monster affixes, " +
+            std::to_string(excluded.size()) + " champion exclusions";
+    }
+
+    static Creature* NearestCreature(Player* p, float radius, uint32 entry, bool eligibleOnly)
+    {
+        std::list<Unit*> units;
+        Trinity::AnyUnitInObjectRangeCheck check(p, radius);
+        Trinity::UnitListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(p, units, check);
+        Cell::VisitAllObjects(p, searcher, radius);
+        Creature* best = nullptr;
+        for (Unit* u : units)
+            if (Creature* m = u->ToCreature())
+                if ((!entry || BaseEntry(m->GetEntry()) == entry) && (!eligibleOnly || ChampionEligible(m, p)) &&
+                    (!best || p->GetExactDist2d(m) < p->GetExactDist2d(best)))
+                    best = m;
+        return best;
+    }
+
+    static std::unordered_map<uint32, uint64>* g_probeAnchors = nullptr;
+    static void CampProbeForget() { if (g_probeAnchors) g_probeAnchors->clear(); }
+
+    std::string CampProbe(Player* p)
+    {
+        Arpg::Settings const& s = sArpgConfig.Get();
+        // Tests: the square of the nearest eligible monster at the first probe, kept until "reset" (that monster may have
+        // become the Champion and died since; its corpse still marks the square).
+        static std::unordered_map<uint32, uint64> anchors;   // player guid -> anchor creature guid (world thread only)
+        g_probeAnchors = &anchors;
+        WorldObject* anchor = nullptr;
+        auto it = anchors.find(p->GetGUID().GetCounter());
+        if (it != anchors.end())
+            anchor = ObjectAccessor::GetCreature(*p, ObjectGuid(it->second));
+        if (!anchor)
+            if (Creature* c = NearestCreature(p, s.m9.campSize, 0, true))
+            {
+                anchors[p->GetGUID().GetCounter()] = c->GetGUID().GetRawValue();
+                anchor = c;
+            }
+        if (!anchor)
+            anchor = p;
+        std::string info;
+        TryCampChampion(anchor, p, s, &info);
+        if (info.find("made=1") == std::string::npos)
+            info += " made=0";
+        return info;
+    }
+
+    std::string EligibleProbe(Player* p, uint32 entry)
+    {
+        Creature* c = NearestCreature(p, 100.0f, entry, false);
+        if (!c)
+            return "eligible none entry=" + std::to_string(entry);
+        return "eligible entry=" + std::to_string(entry) + " ok=" + std::to_string(ChampionEligible(c, p) ? 1 : 0);
+    }
+
+    void ResetCamps()
+    {
+        CampProbeForget();
+        std::lock_guard<std::mutex> l(g_lock);
+        g_camps.clear();
     }
 
     void InstallChampions()
