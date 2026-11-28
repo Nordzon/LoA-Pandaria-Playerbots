@@ -4,6 +4,22 @@ The single source of truth for where work stands. Every session starts by readin
 updating **Now** and adding a **Log** line. If this file and memory disagree, this file wins.
 
 ## Now
+- **NOW (2026-11-28 13:10):** **m9-stacks-trainer** + **m9-champion-camps** done: **ALL OK 38 GM files 13:05**, 103 unit
+  tests, committed + pushed; server up with both. Live: 999 stacks (hotfix rows), companion "Class trainer" (resets, Dual Spec,
+  Proving Grounds, learn any profession), profession guard (client abandon refused + "[ARPG] <char> profession ..." log),
+  Champion camps (100 yd / 4 monsters / 600 s; never quest/menu/scripted/friendly NPCs, `arpg_champion_exclude`), stand-in
+  Superuniques (145 in 50 zones, 5 on the Wandering Isle), PerZone 3, ArpgUI camera ~2x. 51-dungeon-finder failed once
+  (bots never queued; passed in the next two runs - flaky). Professions-lost bug: cause still **unknown**; watch Server.log
+  for "[ARPG] Morda profession" lines. **Next:** OWNER-CHECKS C + D; then archive both changes and m9-charms/shrines/goblins/rifts.
+- **NOW (2026-11-28 11:30, owner playing on account NORDON as Morda - no restart without asking):** change
+  **m9-stacks-trainer** (owner while playing: 999 stacks, class trainer on the companion, ~2x camera zoom; bug "learned
+  herbalism + jewelcrafting and my other professions were wiped"). Built: `Items/Stacks` (in-memory 999 + 9.8k Item-sparse
+  hotfix rows, sql 2026_11_28_02 applied), companion "Class trainer" page (resets, Dual Spec, Proving Grounds, **learn a new
+  profession** - the client's trainer refuses a 3rd because it has 2 profession slots), `Character/ProfessionGuard` (client
+  abandon refused, "[ARPG] <char> profession learned/removed" log, `.professions abandon`), 2 upstream hooks (SetSkill,
+  HandleUnlearnSkillOpcode), ArpgUI `Camera.lua` (installed), GM test 62. Professions bug cause **unknown**: no server path
+  drops a profession on learning; Morda's saves only ever had Leatherworking (skill without spell 2108). **Next:** compile check
+  done -> ask owner for the restart -> `rebuild-and-test.ps1` -> commit + push; OWNER-CHECKS C.
 - **NOW (2026-11-28 04:15, overnight, owner asleep; check-ins :13/:43, wrap-up 09:07):** four new changes built in one go
   (owner: "spec out and start building while I'm asleep"): **m9-charms** (Charm Pouch 720000 granted at login, charms
   720001-3 + Unique charms 720010-12, lines count only inside the equipped pouch), **m9-shrines** (6 shrine buffs, kill roll
@@ -80,6 +96,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-28 — m9-stacks-trainer (999 stacks, companion class trainer, profession guard, camera) + m9-champion-camps (camps, stand-in Superuniques everywhere, PerZone 3): ALL OK 38 GM files, pushed. SPEC 4.3/4.7/4.8 updated.
 - 2026-11-28 — m9-charms/shrines/goblins/rifts specced + built overnight; ALL OK 35 GM files / 101 unit tests 05:04 (fixed: Describe link clash, Warlock-only pouch, charm values, lingering rift scaling, instances/hour 60).
 - 2026-11-27 — Owner: Nordana's dagger affix lines back after relog (login repair works).
 - 2026-11-27 — Fixed: Superuniques dropped from tracking when a real player was on another map; main-hand unequip wiped affix lines (upstream clearing disabled + login repair). ALL OK 31 files.

@@ -15,6 +15,40 @@ glow (2), mount vendor window (4), potion tooltip (5), blank bases use (7: "all 
 | Gold (6000 g) | target yourself, then `.modify money 60000000` |
 | Teleport | `.tele goldshire`, `.tele stormwind`, `.tele ValeofEternalBlossoms` |
 
+## D. New 2026-11-28 afternoon - Champion camps, Superuniques in every zone
+**D1. Camps:** walk through a few monster camps (Wandering Isle is fine): each camp (about 100 yards across, 4+ monsters)
+has one Champion pack; after you kill it, the camp gets a new one about 10 minutes later. Even enough? Too many / too few?
+(Numbers: `Arpg.Champion.CampSize` 100, `CampMin` 4, `CampRespawn` 600.)
+**D2. Never Champions:** quest givers, sparring trainees, Training Targets, story NPCs. If you still see one, tell me its name
+(I add it to the exclusion list, no rebuild needed).
+**D3. Superuniques:** on the Wandering Isle "Unique Pei-Wu Tiger", "Unique Deepscale Ravager", "Unique Darkened Horror" and
+two more show up (up to 3 at a time per zone; the zone chat announces them). Every zone now has at least 5 in its pool.
+
+> Result:
+
+## C. New 2026-11-28 midday - 999 stacks, companion class trainer, professions, camera
+Live after the next server restart (I'll ask before restarting - you're online). The camera part works now: type `/reload`.
+
+**C1. Camera** (works now): `/reload`, then scroll out: about twice as far as before. `/arpgcam` shows the values;
+`/arpgcam 3` (or 2, 4...) sets another distance factor if 4 feels too far.
+
+**C2. Stacks to 999:** loot cloth/herbs/ore: stacks grow past 20 up to 999; merging two stacks works by dragging. If the
+client still says a stack is full at 20, tell me (it means the client didn't take the new size).
+
+**C3. Companion class trainer:** right-click the companion -> **Class trainer**: reset specialization, reset talents (the
+game's own confirm box), Learn Dual Specialization (level 30+, 10 g), Proving Grounds (90), **Learn a new profession**.
+
+**C4. Professions:**
+1. Companion -> Class trainer -> Learn a new profession -> pick any you don't have (also a 4th, 5th...): you keep the others.
+   Morda: Leatherworking was saved as a skill without its spell (that's why its icon is a "?"); it shows in that list too -
+   learning it there fixes it and keeps the points.
+2. The game's own "abandon profession" button is now refused (chat says how to really drop one: `.professions abandon <name>`).
+3. Higher ranks (Journeyman at 50 and up) and recipes: the normal profession trainer, for every profession.
+4. **Question:** which professions did Morda lose, and roughly when? (Morda's last saves only ever had Leatherworking; from now
+   on every learned/removed profession is logged, so if it happens again I can see exactly what did it.)
+
+> Result:
+
 ## B. New 2026-11-28 (built overnight) - charms, shrines, Treasure Goblins, rifts
 Start `Wow-64-all.exe` fresh: ArpgUI got a new file (rift timer), and the new items come from the server (no patch needed).
 Any character works; Nordana is fine. Commands below use Nordana; swap in your character's name.

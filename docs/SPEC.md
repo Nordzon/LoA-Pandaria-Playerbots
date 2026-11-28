@@ -166,6 +166,12 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   minions are copies of the creature at its level following it; soft affixes (Extra Strong/Fast, Stoneskin) work, the
   Enchanted/Arcane ones are picked but their spells come with task 3.2; no glow aura yet (`Arpg.Champion.VisualAura` 0 until
   one is chosen in game).
+- **Champion camps (m9-champion-camps, owner 2026-11-28 "each spawn location with mobs gets a champion"):** replaces the
+  2% / 5% roll (`Arpg.Champion.Chance` now 0, still usable as extra): each 100-yd square with >= 4 eligible monsters holds one
+  Champion, a new one 10 min after it is gone (`Arpg.Champion.Camps/CampSize/CampMin/CampRespawn`). Never Champions:
+  menu/quest NPCs, scripted story NPCs, monsters friendly to the player, critters, rares, bosses, `arpg_champion_exclude`.
+- **Superuniques everywhere (owner 2026-11-28 "add rare monsters - several per zone"):** zones with < 5 rares get "Unique"
+  versions of their toughest hostile monsters (ids 5000+); up to 3 alive per zone (`Arpg.Superunique.PerZone`).
 - **Level bands** (owner 2026-11-22, `arpg_monster_band`): Champion and Superunique level offset, health, damage, affix count and ability set grow with the player's level so early characters can kill them (1-14: Champion +0 / 2.0x / 1.15x / 1 soft affix; Superunique +1 / 3.0x / 1.2x, no must-interrupt; full numbers from 35/60). Affix damage is a % of the player's max health. A Champion kill restores 20% health and power (`Arpg.Champion.HealthOrbPct`), a Superunique 40%. Table: `docs/BALANCE.md` §14.
 - **Superuniques:** 1–2 per zone, **every zone**. Most data-driven (existing model + SQL ability kit, one generic C++ script);
   Pandaria's hand-scripted (MoP rare elites are good candidates). Player level +3, patrol path (`waypoint_data`),
@@ -276,6 +282,11 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   9 looks); roles via gossip menu (Sell and repair, Bank, Mailbox open the native windows; reforge/transmog/void flags set,
   in-game check pending); ArpgUI L button + filter panel over `.lootpet` / `.lootfilter` player commands.
 
+- **Class trainer on the companion (m9-stacks-trainer):** reset specialization/talents, Dual Specialization
+  (`Arpg.Companion.DualSpecCost`, 10 g), Proving Grounds at 90, learn a new profession. (MoP class spells come at level-up.)
+- **Big stacks (m9-stacks-trainer, owner 2026-11-28):** every stackable item stacks to `Arpg.Stacks.Max` = 999 (server in
+  memory + Item-sparse hotfix rows for the client). Camera: ArpgUI raises the max zoom distance (~2x, `/arpgcam`).
+
 ### 4.8 All professions (m1b)
 - Primary-profession limit 2 → 11: `MaxPrimaryTradeSkill = 11` (config, no core patch; set by `write-confs.ps1`). ArpgUI professions panel
   (spellbook only shows 2 primaries).
@@ -306,6 +317,12 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
 
 - *Mount shop (owner 2026-11-26, change `m2b-mount-shop`):* the companion's dialogue sells the 64 reputation mounts for gold
   (`Arpg.MountShop.Price` 5000, per-row override in `arpg_mount_shop`), no reputation needed. First of the planned gold sinks.
+
+- **Guardrails (m9-stacks-trainer, owner 2026-11-28 "my other professions were wiped"):** the client has only 2 profession
+  slots, so its trainer refuses a 3rd new profession and its "abandon" may hit the wrong one. The client's abandon is refused
+  (`Arpg.Professions.AllowClientAbandon` 0; `.professions abandon <name>` instead); every profession learned/removed is logged
+  ("[ARPG] <char> profession ..." in Server.log); the companion's "Class trainer" page teaches the Apprentice rank of any
+  missing profession. Higher ranks and recipes come from the normal profession trainers (they check the skill only).
 
 ### 4.9 Character creation (m6)
 - Any race with any class (e.g. Undead Monk): server SQL (playercreateinfo, spells, skills) + client `CharBaseInfo` patch.
