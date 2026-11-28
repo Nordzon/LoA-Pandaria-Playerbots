@@ -16,6 +16,7 @@
 */
 
 #include "Common.h"
+#include "ArpgHooks.h"   // ARPG
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -136,6 +137,9 @@ void WorldSession::HandleUnlearnSkillOpcode(WorldPacket& recvData)
     recvData >> skillId;
 
     if (!IsProfessionSkill(skillId))
+        return;
+
+    if (ArpgHooks::UnlearnSkillAllowed && !ArpgHooks::UnlearnSkillAllowed(GetPlayer(), skillId))   // ARPG: see ArpgHooks.h
         return;
 
     GetPlayer()->SetSkill(skillId, 0, 0, 0);

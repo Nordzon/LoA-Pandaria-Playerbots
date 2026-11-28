@@ -159,6 +159,8 @@ enum CharacterCustomizeFlags
 ArpgHooks::ItemBonusesFn ArpgHooks::ItemBonuses = nullptr; // ARPG: set by mod_arpg
 ArpgHooks::ItemSellPriceFn ArpgHooks::ItemSellPrice = nullptr; // ARPG: set by mod_arpg
 ArpgHooks::QuestClassAllowedFn ArpgHooks::QuestClassAllowed = nullptr; // ARPG: set by mod_arpg
+ArpgHooks::SkillChangedFn ArpgHooks::SkillChanged = nullptr; // ARPG: set by mod_arpg
+ArpgHooks::UnlearnSkillAllowedFn ArpgHooks::UnlearnSkillAllowed = nullptr; // ARPG: set by mod_arpg
 
 static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 
@@ -6324,6 +6326,10 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
 {
     if (!id)
         return;
+
+    if (ArpgHooks::SkillChanged)   // ARPG: see ArpgHooks.h (told before the change)
+        if (uint16 const arpgOld = GetPureSkillValue(id); arpgOld != newVal)
+            ArpgHooks::SkillChanged(this, id, arpgOld, newVal);
 
     uint16 currVal;
     SkillStatusMap::iterator itr = mSkillStatus.find(id);

@@ -67,6 +67,13 @@ namespace ArpgHooks
     // it (new race/class pairs borrow their starting zone's Warrior quests, m6-start-quests). Return true to allow.
     using QuestClassAllowedFn = bool (*)(Player const* player, uint32 questId);
     TC_GAME_API extern QuestClassAllowedFn QuestClassAllowed;
+    // Player::SetSkill: every skill add / change / removal (old value 0 = learned, new value 0 = removed). mod_arpg logs
+    // profession changes (m9-stacks-trainer, owner 2026-11-28: professions went missing).
+    using SkillChangedFn = void (*)(Player* player, uint32 skill, uint32 oldValue, uint32 newValue);
+    TC_GAME_API extern SkillChangedFn SkillChanged;
+    // CMSG_UNLEARN_SKILL (the client's "abandon profession"): return false to refuse it.
+    using UnlearnSkillAllowedFn = bool (*)(Player* player, uint32 skill);
+    TC_GAME_API extern UnlearnSkillAllowedFn UnlearnSkillAllowed;
 }
 
 #endif
