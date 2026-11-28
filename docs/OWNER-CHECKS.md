@@ -15,6 +15,14 @@ glow (2), mount vendor window (4), potion tooltip (5), blank bases use (7: "all 
 | Gold (6000 g) | target yourself, then `.modify money 60000000` |
 | Teleport | `.tele goldshire`, `.tele stormwind`, `.tele ValeofEternalBlossoms` |
 
+## E. New 2026-11-28 14:50 - gathering map (GatherMate2 + our own node database)
+1. Install GatherMate2 1.27-2 (the last 5.4.8 build): https://www.wowace.com/projects/gathermate2/files/817391 - unzip into
+   Interface\AddOns (folder GatherMate2). ArpgGatherData is already installed and needs it.
+2. Log in: chat says "ArpgGatherData: imported 45475 nodes ...". Open the world map / minimap: herb and ore icons everywhere.
+3. Check a few: does a marked node really stand there in game? `/arpggather` shows the status; `/arpggather import` re-imports.
+
+> Result:
+
 ## D. New 2026-11-28 afternoon - Champion camps, Superuniques in every zone
 **D1. Camps:** walk through a few monster camps (Wandering Isle is fine): each camp (about 100 yards across, 4+ monsters)
 has one Champion pack; after you kill it, the camp gets a new one about 10 minutes later. Even enough? Too many / too few?

@@ -1,0 +1,8 @@
+## Interface: 50400
+## Title: ArpgGatherData
+## Notes: Pandaria ARPG: every herb, ore, fishing pool and treasure spawned on our server, imported into GatherMate2 (1.27, the 5.4.8 build). /arpggather
+## Version: 0.1
+## Dependencies: GatherMate2
+## SavedVariables: ArpgGatherDB
+Data.lua
+ArpgGatherData.lua
