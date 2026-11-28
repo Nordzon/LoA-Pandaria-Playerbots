@@ -172,6 +172,7 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   menu/quest NPCs, scripted story NPCs, monsters friendly to the player, critters, rares, bosses, `arpg_champion_exclude`.
 - **Superuniques everywhere (owner 2026-11-28 "add rare monsters - several per zone"):** zones with < 5 rares get "Unique"
   versions of their toughest hostile monsters (ids 5000+); up to 3 alive per zone (`Arpg.Superunique.PerZone`).
+- **Rare-exclusive loot floor (m9-rare-loot-floor, owner 2026-11-28):** pooled rares (and so their Unique copies) drop their own exclusive items (<= 3 sources: mounts, toys, pets, special gear) at least 30% (`arpg_rare_loot_floor` keeps stock chances).
 - **Level bands** (owner 2026-11-22, `arpg_monster_band`): Champion and Superunique level offset, health, damage, affix count and ability set grow with the player's level so early characters can kill them (1-14: Champion +0 / 2.0x / 1.15x / 1 soft affix; Superunique +1 / 3.0x / 1.2x, no must-interrupt; full numbers from 35/60). Affix damage is a % of the player's max health. A Champion kill restores 20% health and power (`Arpg.Champion.HealthOrbPct`), a Superunique 40%. Table: `docs/BALANCE.md` §14.
 - **Superuniques:** 1–2 per zone, **every zone**. Most data-driven (existing model + SQL ability kit, one generic C++ script);
   Pandaria's hand-scripted (MoP rare elites are good candidates). Player level +3, patrol path (`waypoint_data`),

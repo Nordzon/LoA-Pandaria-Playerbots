@@ -96,6 +96,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-28 — m9-rare-loot-floor: 164 rare-exclusive drops (mounts/toys/pets) of pooled rares floored at 30% (stock kept in arpg_rare_loot_floor), live via .reload; 31-superuniques PASS.
 - 2026-11-28 — ArpgNPCScan helper addon (600 Superuniques watched, 456 replaced rares ignored in _NPCScan); owner add-on list doc (minimap/quests/coords). Superunique copies keep the rare's loot + achievement credit (KillCredit).
 - 2026-11-28 — m9-stacks-trainer (999 stacks, companion class trainer, profession guard, camera) + m9-champion-camps (camps, stand-in Superuniques everywhere, PerZone 3): ALL OK 38 GM files, pushed. SPEC 4.3/4.7/4.8 updated.
 - 2026-11-28 — m9-charms/shrines/goblins/rifts specced + built overnight; ALL OK 35 GM files / 101 unit tests 05:04 (fixed: Describe link clash, Warlock-only pouch, charm values, lingering rift scaling, instances/hour 60).

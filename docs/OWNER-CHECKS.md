@@ -21,6 +21,7 @@ has one Champion pack; after you kill it, the camp gets a new one about 10 minut
 (Numbers: `Arpg.Champion.CampSize` 100, `CampMin` 4, `CampRespawn` 600.)
 **D2. Never Champions:** quest givers, sparring trainees, Training Targets, story NPCs. If you still see one, tell me its name
 (I add it to the exclusion list, no rebuild needed).
+**D4. Rare loot:** Unique versions of rares drop their own mounts/toys/pets about a third of the time (164 items raised to 30%, e.g. Thundering Onyx Cloud Serpent reins). Too generous?
 **D3. Superuniques:** on the Wandering Isle "Unique Pei-Wu Tiger", "Unique Deepscale Ravager", "Unique Darkened Horror" and
 two more show up (up to 3 at a time per zone; the zone chat announces them). Every zone now has at least 5 in its pool.
 
