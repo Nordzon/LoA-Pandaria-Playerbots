@@ -13,6 +13,7 @@ class Item;
 class Player;
 struct Loot;
 class Map;
+struct TrainerSpellData;
 enum class ItemPickupSourceType : uint8;
 
 namespace ArpgHooks
@@ -74,6 +75,10 @@ namespace ArpgHooks
     // CMSG_UNLEARN_SKILL (the client's "abandon profession"): return false to refuse it.
     using UnlearnSkillAllowedFn = bool (*)(Player* player, uint32 skill);
     TC_GAME_API extern UnlearnSkillAllowedFn UnlearnSkillAllowed;
+    // SendTrainerList / HandleTrainerBuySpellOpcode: the trainer spells a creature offers this player (null = its own). mod_arpg
+    // serves profession trainer lists from the companion (m10-companion-professions; npc_trainer ignores entries >= 200000).
+    using TrainerSpellsFn = TrainerSpellData const* (*)(Player* player, Creature* trainer);
+    TC_GAME_API extern TrainerSpellsFn TrainerSpells;
 }
 
 #endif

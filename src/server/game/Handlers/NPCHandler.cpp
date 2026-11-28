@@ -36,6 +36,9 @@
 #include "ScriptMgr.h"
 #include "CreatureAI.h"
 #include "SpellInfo.h"
+#include "ArpgHooks.h"   // ARPG
+
+ArpgHooks::TrainerSpellsFn ArpgHooks::TrainerSpells = nullptr; // ARPG: set by mod_arpg
 
 #ifdef ELUNA
 #include "HookMgr.h"
@@ -234,6 +237,9 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle,
     }
 
     TrainerSpellData const* trainer_spells = multiple ? sObjectMgr->GetNpcTrainerSpells(mTrainer) : unit->GetTrainerSpells();
+    if (!multiple && ArpgHooks::TrainerSpells)   // ARPG: see ArpgHooks.h
+        if (TrainerSpellData const* arpg = ArpgHooks::TrainerSpells(GetPlayer(), unit))
+            trainer_spells = arpg;
     if (!trainer_spells)
     {
         TC_LOG_DEBUG("network", "WORLD: SendTrainerList - Training spells not found for creature (GUID: %u Entry: %u)",
@@ -374,6 +380,9 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
 
     // check present spell in trainer spell list
     TrainerSpellData const* trainer_spells = unit->GetTrainerSpells();
+    if (ArpgHooks::TrainerSpells)   // ARPG: see ArpgHooks.h
+        if (TrainerSpellData const* arpg = ArpgHooks::TrainerSpells(GetPlayer(), unit))
+            trainer_spells = arpg;
     if (!trainer_spells)
     {
         SendTrainerBuyFailed(guid, spellId, 0);
