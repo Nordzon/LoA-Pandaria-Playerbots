@@ -1,0 +1,8 @@
+## Interface: 50400
+## Title: ArpgNPCScan
+## Notes: Pandaria ARPG: adds every Superunique ("Unique <name>") to _NPCScan's watch list and ignores the rares they replace.
+## Version: 0.1
+## Dependencies: _NPCScan
+## SavedVariables: ArpgNPCScanDB
+Data.lua
+ArpgNPCScan.lua
