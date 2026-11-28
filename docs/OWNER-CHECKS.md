@@ -4,7 +4,7 @@ Work top-down; write the result under each section (`> Result: ...`; "ok" or "no
 the client as **`Wow-64-all.exe`** (stock `Wow-64.exe` ignores our patch: plain blues, no new race-class pairs). Commands go in
 the chat box exactly as written.
 
-**Confirmed and removed:** companion + dialogue, salvage/catalysts, Champion/Unique tags and drops, Paragon, professions panel,
+**Confirmed and removed:** charms + Charm Pouch (B1, "working really well"), companion + dialogue, salvage/catalysts, Champion/Unique tags and drops, Paragon, professions panel,
 any weapon, character creation, catalysts, potion effects, mount purchase, client patch retest (0b), loot beam + Champion
 glow (2), mount vendor window (4), potion tooltip (5), blank bases use (7: "all of these" - built, see 1 below).
 
@@ -14,6 +14,19 @@ glow (2), mount vendor window (4), potion tooltip (5), blank bases use (7: "all 
 | Set level (1-90) | `.character level Lokond 20` |
 | Gold (6000 g) | target yourself, then `.modify money 60000000` |
 | Teleport | `.tele goldshire`, `.tele stormwind`, `.tele ValeofEternalBlossoms` |
+
+## F. New 2026-11-28 16:15 - companion Professions (trainers + recipes for gold) - live now
+1. Right-click the companion -> **Professions**: one line per profession you know (also Cooking, First Aid, Fishing).
+2. Pick one -> **"<Profession> trainer (all ranks and recipes)"**: a normal trainer window with every rank and recipe that
+   any trainer of that profession teaches (stock prices). Learn something: it works like a real trainer.
+3. Same menu -> **"Reputation recipes for gold"** (Jewelcrafting 3 pages, Leatherworking 2): recipes that normally need
+   reputation, tokens or dailies; no reputation needed here. Buy one and use it: you learn it.
+4. Prices (gold, by the recipe's required skill): up to 300: 25 / 375: 75 / 450: 150 / 525: 300 / 600: 600; epic x2.
+   Too cheap or too dear? (Changed in a table, no rebuild.)
+5. Morda: Leatherworking was a skill without its spell; it now shows here too (trainer -> Apprentice), or use
+   Class trainer -> Learn a new profession.
+
+> Result:
 
 ## E. New 2026-11-28 14:50 - gathering map (GatherMate2 + our own node database)
 1. Install GatherMate2 1.27-2 (the last 5.4.8 build): https://www.wowace.com/projects/gathermate2/files/817391 - unzip into
@@ -58,21 +71,9 @@ game's own confirm box), Learn Dual Specialization (level 30+, 10 g), Proving Gr
 
 > Result:
 
-## B. New 2026-11-28 (built overnight) - charms, shrines, Treasure Goblins, rifts
+## B. New 2026-11-28 (built overnight) - shrines, Treasure Goblins, rifts (charms confirmed)
 Start `Wow-64-all.exe` fresh: ArpgUI got a new file (rift timer), and the new items come from the server (no patch needed).
 Any character works; Nordana is fine. Commands below use Nordana; swap in your character's name.
-
-**B1. Charm Pouch + charms**
-1. Log in: you get a **Charm Pouch** (blue bag, 8 slots), straight into a free bag slot, otherwise into your bags. If it's
-   in your bags, drag it into a bag slot.
-2. Get charms: `.arpg charm give Nordana grand`, `.arpg charm give Nordana small`, `.arpg charm give Nordana coin`. They go
-   straight into the pouch. Open your character sheet: stats / gold find go up.
-3. Drag a charm out of the pouch into a normal bag: its stats go away within a second. Drag it back: they return. Only
-   charms fit in the pouch.
-4. Tooltip: does a charm show its lines ("+N Stamina", "x% Magic Find"...)? If not, tell me. The lines still work, they're
-   just not shown on a non-gear item yet.
-5. Feel: are charm stats too small or too big? (A Grand Charm line is about a third to half of a ring's affix line.)
-6. Drops: charms drop now and then (Champions 6%, Superuniques 20%, bosses 12%, normal mobs 0.3%).
 
 **B2. Shrines**
 1. `.arpg shrine spawn Nordana` (random) or `.arpg shrine spawn Nordana 6` (Fortune). A Pandaren shrine appears in front of you.
