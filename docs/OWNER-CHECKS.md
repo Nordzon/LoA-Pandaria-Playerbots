@@ -16,7 +16,8 @@ glow (2), mount vendor window (4), potion tooltip (5), blank bases use (7: "all 
 | Teleport | `.tele goldshire`, `.tele stormwind`, `.tele ValeofEternalBlossoms` |
 
 ## F. New 2026-11-28 16:15 - companion Professions (trainers + recipes for gold) - live now
-1. Right-click the companion -> **Professions**: one line per profession you know (also Cooking, First Aid, Fishing).
+1. Right-click the companion -> **Professions**: all 14 (11 + Cooking, First Aid, Fishing); known ones show your skill,
+   others "(not learned)" with **Learn Apprentice <name>** inside.
 2. Pick one -> **"<Profession> trainer (all ranks and recipes)"**: a normal trainer window with every rank and recipe that
    any trainer of that profession teaches (stock prices). Learn something: it works like a real trainer.
 3. Same menu -> **"Reputation recipes for gold"** (Jewelcrafting 3 pages, Leatherworking 2): recipes that normally need

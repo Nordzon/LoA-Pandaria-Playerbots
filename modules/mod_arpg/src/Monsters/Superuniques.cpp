@@ -116,7 +116,12 @@ namespace
         Arpg::Settings const& s = sArpgConfig.Get();
         int effective = Arpg::Core::LootLevel(int(p->GetLevel()), Arpg::Loot::ZoneLevelsFor(zone, c->GetAreaId()), s.scaleZoneCapAbove, false);
         uint8 level = uint8(std::max<int>(c->GetLevel(), Arpg::Core::MonsterLevel(band, effective, int(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)))));
-        Arpg::Scaling::Pin(c, level, band.healthMult, band.damageMult);
+        // A creature whose template health multiplier is huge (scripted event monsters, world-boss rares: Darkened Horror x272,
+        // Garr x150) counts as at most Arpg.Superunique.MaxHealthMod before our band multiplier (owner 2026-11-28: 232k hp
+        // Superunique on the Wandering Isle).
+        float const maxMod = s.m9.specialMaxHealthMod;
+        float const modCap = (maxMod > 0.0f && c->GetCreatureTemplate()->ModHealth > maxMod) ? maxMod / c->GetCreatureTemplate()->ModHealth : 1.0f;
+        Arpg::Scaling::Pin(c, level, band.healthMult * modCap, band.damageMult);
         if (s.superuniqueScale > 0.0f)
             c->SetObjectScale(c->GetObjectScale() * s.superuniqueScale);
         Live live;

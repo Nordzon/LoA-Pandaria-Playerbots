@@ -625,7 +625,10 @@ namespace Arpg::Monsters
         uint32 baseEntry = c->GetEntry();
         if (s.championEntryOffset && baseEntry < s.championEntryOffset && sObjectMgr->GetCreatureTemplate(baseEntry + s.championEntryOffset))
             c->UpdateEntry(baseEntry + s.championEntryOffset);
-        Arpg::Scaling::Pin(c, level, band.healthMult, band.damageMult);
+        // Same cap as Superuniques: a template health multiplier above Arpg.Superunique.MaxHealthMod counts as that cap.
+        float const maxMod = sArpgConfig.Get().m9.specialMaxHealthMod;
+        float const modCap = (maxMod > 0.0f && c->GetCreatureTemplate()->ModHealth > maxMod) ? maxMod / c->GetCreatureTemplate()->ModHealth : 1.0f;
+        Arpg::Scaling::Pin(c, level, band.healthMult * modCap, band.damageMult);
         ChampionInfo info;
         info.band = band;
         info.level = level;

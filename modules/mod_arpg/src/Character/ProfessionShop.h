@@ -21,7 +21,7 @@ namespace Arpg::Character
     std::string LoadProfessionShop();
     void InstallProfessionShop();
 
-    // Professions the character knows that the shop serves (11 primaries, Cooking, First Aid, Fishing), menu order.
+    // Professions the shop serves (11 primaries, Cooking, First Aid, Fishing), menu order; known or not.
     std::vector<uint32> ShopSkills(Player* player);
     std::string SkillName(uint32 skill);
     // Opens the profession's trainer window on the companion. out = reply on failure.

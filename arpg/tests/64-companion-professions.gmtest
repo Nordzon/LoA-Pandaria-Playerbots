@@ -37,5 +37,7 @@
 > .arpg test learnall Arpgtest
 ? professions=11 of 11
 
+> .arpg lootpet off Arpgtest
+? ok lootpet off
 > .arpg config set Arpg.Test.RecordEvents 0
 ? ok

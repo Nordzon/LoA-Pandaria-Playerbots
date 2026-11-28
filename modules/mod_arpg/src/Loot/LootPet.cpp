@@ -393,13 +393,10 @@ namespace
             // Professions (m10-companion-professions): profession -> its trainer window + recipe pages for gold.
             if (action == ACT_PROFESSIONS)
             {
-                std::vector<uint32> skills = Arpg::Character::ShopSkills(player);
-                for (uint32 skill : skills)
-                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, Arpg::Character::SkillName(skill), GOSSIP_SENDER_MAIN,
-                        ACT_PROF_SKILL_BASE + skill);
-                if (skills.empty())
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "(No professions yet: Class trainer -> Learn a new profession)",
-                        GOSSIP_SENDER_MAIN, ACT_TRAINER);
+                for (uint32 skill : Arpg::Character::ShopSkills(player))
+                    AddGossipItemFor(player, GOSSIP_ICON_TRAINER, Arpg::Character::SkillName(skill) + (player->HasSkill(skill) ?
+                        " (" + std::to_string(player->GetPureSkillValue(skill)) + "/" + std::to_string(player->GetPureMaxSkillValue(skill)) + ")" :
+                        std::string(" (not learned)")), GOSSIP_SENDER_MAIN, ACT_PROF_SKILL_BASE + skill);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
                 return true;
             }
@@ -407,6 +404,11 @@ namespace
             {
                 uint32 const skill = action - ACT_PROF_SKILL_BASE;
                 std::string const name = Arpg::Character::SkillName(skill);
+                // A primary profession not known (or a bare skill without its spell): learn it here; the client's own trainer
+                // refuses a third one (two profession slots). Secondary ones are learned in the trainer window.
+                for (auto const& pr : Arpg::Character::LearnableProfessions(player))
+                    if (pr.second == skill)
+                        AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Learn Apprentice " + name, GOSSIP_SENDER_MAIN, ACT_PROF_BASE + skill);
                 AddGossipItemFor(player, GOSSIP_ICON_TRAINER, name + " trainer (all ranks and recipes)", GOSSIP_SENDER_MAIN,
                     ACT_PROF_TRAIN_BASE + skill);
                 if (sArpgConfig.Get().m9.recipeShop)

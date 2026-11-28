@@ -5,4 +5,5 @@
 - [x] 1.4 `sql/tools/gen_recipe_shop.py` -> sql 2026_11_28_05 (copies, hotfix rows, vendors, prices)
 - [x] 1.5 `.arpg test profshop`, `.arpg test setskill`, GM test 64; test 34 flags 0x3C021091
 - [x] 2.1 Full run green (ALL OK 39 GM files 16:27), commit
+- [x] 2.2 All 14 professions listed ("(not learned)"), "Learn Apprentice <name>" in each unknown primary (owner 2026-11-28)
 - [ ] 3.1 Owner: trainer windows per profession, recipe pages, prices feel "not easy but bearable"

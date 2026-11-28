@@ -4,6 +4,11 @@ The single source of truth for where work stands. Every session starts by readin
 updating **Now** and adding a **Log** line. If this file and memory disagree, this file wins.
 
 ## Now
+- **NOW (2026-11-28 17:15, owner playing Morda; server up with the 16:59 build):** today after m9: m10-companion-professions
+  (Professions menu: all 14, trainers with all ranks/recipes via `ArpgHooks::TrainerSpells`, 996 rep/token recipes for gold),
+  ArpgNPCScan + ArpgGatherData client addons, rare-exclusive loot floor 30%, health cap for Superuniques/Champions. Tests-only
+  run 17:13 after test fixes (00/31/34/64). **Next:** if green commit + push; open: TomTom "outdated" (all tocs say 50400 -
+  check TomTom\libs), add-on pack for friends (not started), OWNER-CHECKS C-F; archive m9-*/m10 after owner checks.
 - **NOW (2026-11-28 13:10):** **m9-stacks-trainer** + **m9-champion-camps** done: **ALL OK 38 GM files 13:05**, 103 unit
   tests, committed + pushed; server up with both. Live: 999 stacks (hotfix rows), companion "Class trainer" (resets, Dual Spec,
   Proving Grounds, learn any profession), profession guard (client abandon refused + "[ARPG] <char> profession ..." log),
@@ -96,6 +101,8 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-28 — arpg_health_fix (Darkened Horror Health_mod 272 -> 1, live via .reload creature_template; stock kept). Tests-only run ALL OK 39 GM files 17:24.
+- 2026-11-28 — Companion Professions lists all 14 (learn Apprentice inside); health cap for Superuniques/Champions (Darkened Horror x272 -> 232k hp Unique on the Wandering Isle), stand-ins skip Health_mod > 3 (137 left). Tests 00/31/34/64 hardened (companion off at run start).
 - 2026-11-28 — m10-companion-professions: companion Professions -> per-profession trainer (all ranks/recipes, hook ArpgHooks::TrainerSpells) + 996 rep/token recipes for gold (13 vendor pages, arpg_recipe_price): ALL OK 39 GM files 16:27, pushed.
 - 2026-11-28 — ArpgGatherData addon: 45,475 nodes from our world DB (herbs 23,084, ore 17,622, fishing 2,848, treasure 1,921) injected into GatherMate2 1.27-2 (last 5.4.8 build; Data v23.2 is the matching official DB). Not yet tried in the client.
 - 2026-11-28 — m9-rare-loot-floor: 164 rare-exclusive drops (mounts/toys/pets) of pooled rares floored at 30% (stock kept in arpg_rare_loot_floor), live via .reload; 31-superuniques PASS.

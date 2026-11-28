@@ -12,5 +12,8 @@
 - [x] 2.2 Native rare despawn only for real rares; `Arpg.Superunique.PerZone` 3
 - [x] 2.3 Apply SQL + `gen_monster_tags.py` ("Unique <name>" copies for the stand-ins), restart, full run
 
+## 2b. Health cap (owner 2026-11-28: 232k-hp Unique Darkened Horror, template Health_mod 272)
+- [x] 2b.1 Stand-ins skip Health_mod > 3; Superuniques/Champions count Health_mod as at most `Arpg.Superunique.MaxHealthMod` (10)
+
 ## 3. Owner checks
 - [ ] 3.1 OWNER-CHECKS D: Wandering Isle camps feel even, no quest NPC Champions, Superuniques show up

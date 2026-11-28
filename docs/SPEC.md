@@ -170,6 +170,7 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   2% / 5% roll (`Arpg.Champion.Chance` now 0, still usable as extra): each 100-yd square with >= 4 eligible monsters holds one
   Champion, a new one 10 min after it is gone (`Arpg.Champion.Camps/CampSize/CampMin/CampRespawn`). Never Champions:
   menu/quest NPCs, scripted story NPCs, monsters friendly to the player, critters, rares, bosses, `arpg_champion_exclude`.
+- **Health cap (owner 2026-11-28):** a template `Health_mod` above `Arpg.Superunique.MaxHealthMod` (10) counts as 10 for Superuniques and Champions (scripted event monsters / world-boss rares: Darkened Horror x272, Garr x150); stand-ins skip `Health_mod` > 3.
 - **Superuniques everywhere (owner 2026-11-28 "add rare monsters - several per zone"):** zones with < 5 rares get "Unique"
   versions of their toughest hostile monsters (ids 5000+); up to 3 alive per zone (`Arpg.Superunique.PerZone`).
 - **Rare-exclusive loot floor (m9-rare-loot-floor, owner 2026-11-28):** pooled rares (and so their Unique copies) drop their own exclusive items (<= 3 sources: mounts, toys, pets, special gear) at least 30% (`arpg_rare_loot_floor` keeps stock chances).

@@ -81,7 +81,7 @@ hostile = hostile_factions()
 cand = q("SELECT c.zoneId, t.entry, t.faction, t.maxlevel, c.guid, c.map, c.position_x, c.position_y, c.position_z, c.orientation "
          "FROM creature c JOIN creature_template t ON t.entry = c.id "
          "WHERE c.map IN (%s) AND t.`rank` IN (0, 1) AND c.zoneId <> 0 AND c.zoneId NOT IN (%s) AND t.npcflag = 0 AND t.npcflag2 = 0 "
-         "AND t.type <> 8 AND t.ScriptName = '' AND t.entry <= %d AND t.unit_flags & 0x302 = 0 ORDER BY c.zoneId, t.entry, c.guid"
+         "AND t.type <> 8 AND t.ScriptName = '' AND t.entry <= %d AND t.unit_flags & 0x302 = 0 AND t.Health_mod <= 3 ORDER BY c.zoneId, t.entry, c.guid"
          % (OPEN_WORLD_MAPS, ','.join(str(z) for z in HAND_MADE_ZONES), MAX_BASE_ENTRY))
 stand = {}
 for zone, entry, faction, maxlevel, guid, mp, x, y, z, o in cand:

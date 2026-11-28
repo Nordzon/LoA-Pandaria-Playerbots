@@ -13,6 +13,9 @@
 ? ok
 > .arpg config set Arpg.Champion.Camps 0
 ? ok
+# The companion starts off (a leftover "on" from an earlier run would loot every test kill; 34 counts its corpses).
+> .arpg lootpet off Arpgtest
+? ok lootpet off
 
 # Every creature entry fits the 20 bits a MoP creature GUID has for it (else the client shows nothing; 2026-11-26).
 > .arpg test entries

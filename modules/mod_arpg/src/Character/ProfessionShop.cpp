@@ -130,12 +130,12 @@ namespace Arpg::Character
         ArpgHooks::TrainerSpells = &ServeTrainer;
     }
 
-    std::vector<uint32> ShopSkills(Player* player)
+    std::vector<uint32> ShopSkills(Player* /*player*/)
     {
+        // All of them (owner 2026-11-28: "show them all and allow me to (re)learn as required").
         std::vector<uint32> out;
         for (auto const& s : Skills)
-            if (player->HasSkill(s.first))
-                out.push_back(s.first);
+            out.push_back(s.first);
         return out;
     }
 

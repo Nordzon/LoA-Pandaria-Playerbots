@@ -70,6 +70,7 @@ namespace Arpg
         bool allowClientAbandon = false;    // Arpg.Professions.AllowClientAbandon (0 = the client's abandon is refused)
         bool companionProfessions = true;   // Arpg.Companion.ProfessionTrainer (companion "Professions": trainers per profession)
         bool recipeShop = true;             // Arpg.Companion.RecipeShop (reputation / token recipes for gold per profession)
+        float specialMaxHealthMod = 10.0f;  // Arpg.Superunique.MaxHealthMod (template Health_mod cap for Superuniques/Champions; 0 = off)
         uint32_t professionCost = 10;       // Arpg.Companion.ProfessionCost (copper for an Apprentice rank, as trainers)
         uint32_t professionLevel = 5;       // Arpg.Companion.ProfessionLevel
 
@@ -141,6 +142,7 @@ namespace Arpg
             allowClientAbandon = f.GetBool("Arpg.Professions.AllowClientAbandon", false);
             companionProfessions = f.GetBool("Arpg.Companion.ProfessionTrainer", true);
             recipeShop = f.GetBool("Arpg.Companion.RecipeShop", true);
+            specialMaxHealthMod = std::max(0.0f, f.GetFloat("Arpg.Superunique.MaxHealthMod", 10.0f));
             professionCost = uint32_t(std::max(0, f.GetInt("Arpg.Companion.ProfessionCost", 10)));
             professionLevel = uint32_t(std::clamp(f.GetInt("Arpg.Companion.ProfessionLevel", 5), 1, 90));
 
@@ -155,7 +157,8 @@ namespace Arpg
             for (char const* p : { "Arpg.Charms.", "Arpg.Shrine.", "Arpg.Goblin.", "Arpg.Rift.", "Arpg.Stacks.",
                                   "Arpg.Companion.Trainer", "Arpg.Companion.DualSpecCost", "Arpg.Professions.AllowClientAbandon",
                                   "Arpg.Companion.ProfessionCost", "Arpg.Companion.ProfessionLevel", "Arpg.Champion.Camp",
-                                  "Arpg.Companion.ProfessionTrainer", "Arpg.Companion.RecipeShop" })
+                                  "Arpg.Companion.ProfessionTrainer", "Arpg.Companion.RecipeShop",
+                                  "Arpg.Superunique.MaxHealthMod" })
                 if (key.rfind(p, 0) == 0)
                     return true;
             return false;
