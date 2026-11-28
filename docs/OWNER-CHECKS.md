@@ -15,6 +15,45 @@ glow (2), mount vendor window (4), potion tooltip (5), blank bases use (7: "all 
 | Gold (6000 g) | target yourself, then `.modify money 60000000` |
 | Teleport | `.tele goldshire`, `.tele stormwind`, `.tele ValeofEternalBlossoms` |
 
+## B. New 2026-11-28 (built overnight) - charms, shrines, Treasure Goblins, rifts
+Start `Wow-64-all.exe` fresh: ArpgUI got a new file (rift timer), and the new items come from the server (no patch needed).
+Any character works; Nordana is fine. Commands below use Nordana; swap in your character's name.
+
+**B1. Charm Pouch + charms**
+1. Log in: you get a **Charm Pouch** (blue bag, 8 slots), straight into a free bag slot, otherwise into your bags. If it's
+   in your bags, drag it into a bag slot.
+2. Get charms: `.arpg charm give Nordana grand`, `.arpg charm give Nordana small`, `.arpg charm give Nordana coin`. They go
+   straight into the pouch. Open your character sheet: stats / gold find go up.
+3. Drag a charm out of the pouch into a normal bag: its stats go away within a second. Drag it back: they return. Only
+   charms fit in the pouch.
+4. Tooltip: does a charm show its lines ("+N Stamina", "x% Magic Find"...)? If not, tell me. The lines still work, they're
+   just not shown on a non-gear item yet.
+5. Feel: are charm stats too small or too big? (A Grand Charm line is about a third to half of a ring's affix line.)
+6. Drops: charms drop now and then (Champions 6%, Superuniques 20%, bosses 12%, normal mobs 0.3%).
+
+**B2. Shrines**
+1. `.arpg shrine spawn Nordana` (random) or `.arpg shrine spawn Nordana 6` (Fortune). A Pandaren shrine appears in front of you.
+2. Click it: you get a buff for 2 minutes and the shrine disappears. Check the buff tooltip shows the right number
+   (Frenzied 20% haste, Combat 15% damage, Protection 20% less damage, Fleeting 30% speed, Enlightened 25% XP, Fortune).
+3. While clearing, roughly every 100 kills a shrine appears by itself at a corpse (at most one per 4 minutes).
+
+**B3. Treasure Goblin**
+1. `.arpg goblin spawn Nordana`: a Treasure Goblin appears about 15 yards away ("A Treasure Goblin appears!").
+2. Hit it: it runs. Let it run 30 seconds: "escaped through a portal", gone. Spawn another and kill it fast: gold, 4+ gear
+   items, essences, maybe a charm or catalyst.
+3. In the wild it shows up about once per 250 kills (at most every 10 minutes). Does it run sensibly, or get stuck on walls?
+
+**B4. Rifts** (any level; the Deadmines or a Pandaria dungeon)
+1. Right-click your companion -> **Open a Rift (your key: 1)** -> "Rift level 1". (Or type `.rift open 1`.)
+2. Enter a 5-man dungeon: chat says "Rift level 1 opened: par time 25:00 ...", and a timer line shows at the top of the
+   screen (ArpgUI).
+3. Kill the last boss: "Rift level 1 complete in mm:ss: key +N". Reward items go into your bags. `.rift info` shows your key.
+4. Try a higher level: monsters get tougher (+10% health and +7% damage per level, compounding); from level 2 a run is
+   Fortified (tougher trash) or Tyrannical (tougher bosses).
+5. Feel: par times OK? Rewards worth it?
+
+> Result:
+
 ## A2. New 2026-11-27 22:05 - starting quests for new race/class pairs (Nordana)
 1. Nordana: go to Ilthalaine (or Melithar Staghelm): "Simple Sigil" is offered - take it, it's done at once.
 2. Hand it in to Alyissia (the Warrior trainer in Aldrassil): "Learning New Techniques" - also done on accept; hand it in.

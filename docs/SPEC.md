@@ -182,6 +182,17 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   health. They only act while a real player is near (~100 yd).
   Loot: guaranteed blue + own Unique at **10%** with bad-luck protection (+5% per kill without it, reset on drop; `Arpg.Superunique.UniqueChance`, `.UniqueBadLuckStep`). **One counter shared by all Superuniques** (owner 2026-11-27, `.SharedBadLuck` 1): any Superunique kill without a Unique raises it, so a Unique comes within 19 Superunique kills whichever ones they are. Boss ladders stay per boss.
 
+### 4.3c Shrines and Treasure Goblins (owner 2026-11-28, changes m9-shrines, m9-goblins)
+- **Shrines:** a real player's kill raises a shrine at the corpse with `Arpg.Shrine.KillChance` (1%), at most every
+  `Arpg.Shrine.Cooldown` (240 s), gone after 180 s; open world and 5-man dungeons/rifts. Six kinds (`arpg_shrine`, 120 s):
+  Frenzied +20% haste, Combat +15% damage, Protection -20% damage taken, Fleeting +30% run speed, Enlightened +25% kill XP,
+  Fortune +50% magic and gold find. Each buff is an existing client spell with our amount/duration (real tooltip numbers);
+  the user and the group within 40 yd get it.
+- **Treasure Goblins:** an open-world kill summons one with `Arpg.Goblin.KillChance` (0.4%, cooldown 600 s), 15 yd away, the
+  player's level, 8x health. It never fights, flees when hit or approached and escapes 30 s after the first hit (no loot);
+  untouched it leaves after 180 s. Killed: gold (3000 copper x level), 4 affixed gear items (blue 50%, epic 10%), 6
+  essences, catalyst 25%, charm 35%, Goblin's Lucky Coin 5%; mates get their own share.
+
 ### 4.3b Potions (m3b, owner 2026-11-22)
 - Existing potion items (Minor .. Major Healing / Mana, Minor/Major Rejuvenation, Alchemist's Rejuvenation) heal / restore a
   **% of max health / resource**: healing 10-20% by tier; mana potions restore mana %, **energy and focus at half that %,
@@ -201,7 +212,12 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
   max(attack power, spell power)**; heal/absorb powers scale on max health. Each Unique item instance stores its power tier
   and both rolled numbers (`item_instance_arpg_unique`). Tooltip line from client patch rows per (power, tier, chance step 1%,
   magnitude step 5%), "- Perfect" when both numbers roll their maximum. Runs on the effect-affix machinery (Loot/AffixEffects).
-- Charms: stats while in bags (scan on login/bag change → auras); same charm doesn't stack.
+- **Charms (owner 2026-11-28, change m9-charms):** every character gets one **Charm Pouch** (720000, soul-bag-type container:
+  only charms fit, 8 slots); a charm's lines count **only while it sits in the equipped pouch**. Small / Large / Grand Charm
+  (720001-3, green/blue/purple) roll 1 / 2 / 3 lines from `arpg_charm_affix` when they reach the bags (flat stats = a share of
+  a ring's B at the loot level; magic find, gold find, XP, move speed, armour, elite damage/reduction). Unique charms
+  (orange, one each): Heart of the Pandaren (Superuniques, 2%), Goblin's Lucky Coin (Treasure Goblins, 5%), Riftwalker's Sigil
+  (rift level 10+, 10%); fixed lines in `arpg_charm_unique`. Drops by monster kind (`Arpg.Charms.Drop*`, sizes 70/25/5).
 
 ### 4.5 Paragon (m4)
 - From 90, XP goes to `character_paragon`. XP for next level = `Base × Growth^level` (config).
@@ -220,6 +236,15 @@ affix has a per-affix internal cooldown (`Arpg.Affix.ProcIcdMs`, 1000) so fast w
 - **Dungeon level selector:** the player picks the level a dungeon runs at (dungeon min level … own level; companion gossip or `.arpg dungeon level <char> <n>`, remembered per dungeon); creatures and loot (B, affix tiers) follow the chosen level.
 - **Paragon raises raid loot tier:** Ascended affix tiers T6/T7/T8 (110/120/130% of T5) need raid tier 3/5/7 **and** Paragon 25/60/110 (`docs/BALANCE.md` §12).
 - **Raids are the endgame tier** (owner 2026-11-22): every raid scales to the leader's level, then party size (solo: 10% health, 25% damage of 10-man normal), then a per-raid tier multiplier `1 + 0.15 × tier` from `arpg_raid_tier` (tiers 1–7: Classic → Siege of Orgrimmar, with recommended Paragon). Paragon power is how you climb tiers; loot affixes roll for your level so old raids stay useful. Details: `docs/BALANCE.md` §6.
+
+- **Rifts (owner 2026-11-28, change m9-rifts):** timed, levelled runs of any 5-man dungeon. Key per character (starts 1);
+  open a level 1..key at the companion ("Open a Rift") or `.rift open <n>` (old instances reset); the next 5-man dungeon is
+  the rift. Monsters x `Arpg.Rift.HealthGrowth`^level (1.10) health, x `DamageGrowth`^level (1.07) damage on top of party
+  scaling; from level 2 Fortified (trash +20%/+30%) or Tyrannical (bosses +30%/+15%). Par per dungeon (`arpg_rift_dungeon`,
+  default 25 min), +10 s per death, chat at 50/75/90%. The final boss (`instance_encounters.lastEncounterDungeon`) ends it:
+  key +3 (<= 60% of par), +2 (<= 80%), +1 (in time), 0 (late); best level kept. Rewards: 2 + level/3 gear items (max 8,
+  boss-loot rolls, epic 10% + 3%/level), gold, Paragon XP at 90, charm 20% + 2%/level, Riftwalker's Sigil from level 10;
+  late runs half, no charms.
 
 | Party size | Health | Damage |
 | --- | --- | --- |

@@ -4,6 +4,15 @@ The single source of truth for where work stands. Every session starts by readin
 updating **Now** and adding a **Log** line. If this file and memory disagree, this file wins.
 
 ## Now
+- **NOW (2026-11-28 04:15, overnight, owner asleep; check-ins :13/:43, wrap-up 09:07):** four new changes built in one go
+  (owner: "spec out and start building while I'm asleep"): **m9-charms** (Charm Pouch 720000 granted at login, charms
+  720001-3 + Unique charms 720010-12, lines count only inside the equipped pouch), **m9-shrines** (6 shrine buffs, kill roll
+  1%), **m9-goblins** (Treasure Goblin 1000010: flees, escapes after 30 s, loot shower), **m9-rifts** (key per character,
+  companion "Open a Rift", growth^level scaling, par time, final boss -> key +3/+2/+1/0, rewards; ArpgUI timer `Rift.lua`).
+  Tests 58-61 + 7 unit tests (101). **ALL OK 35 GM files 05:04**, committed + pushed. Fixes on the way: pouch was a
+  Warlock-only soul bag copy; charm values x3 (lines were +1-2 at level 60); finished rifts kept scaling a re-used instance
+  (now erased); `AccountInstancesPerHour` 5 -> 60 in write-confs (every rift is a fresh instance). **Next:** owner checks
+  OWNER-CHECKS B (tooltip lines on charms, feel of numbers, goblin pathing, rift par times); then archive the four.
 - **NOW (2026-11-27 17:40, owner playing as account NORDON - no restarts/kicks without asking):** change **m8-friends**
   (mates play over Tailscale). Done without a restart: `backup-db.ps1` (auth + characters, before every rebuild; first backup
   17:23) + rebuild-and-test refuses to restart with real players online (`-Force`); sign-up page `arpg/signup/signup.py` +
@@ -45,6 +54,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | 6 | m6-start-quests | done, ALL OK, verified on Nordana; archive with A |
 | 6 | m6-any-weapon-skills | **active**: built, ALL OK, live, client patch installed; owner check A |
 | 8 | m8-friends | **active**: sign-up, network, kit, backups done; multiplayer rules wait for owner |
+| 9 | m9-charms, m9-shrines, m9-goblins, m9-rifts | **active**: built + GM tests; owner checks OWNER-CHECKS B |
 | – | multiplayer with friends (client updater, Tailscale, group rules) | idea |
 | – | loot pet gathers herbs/ore | idea |
 
@@ -70,6 +80,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-28 — m9-charms/shrines/goblins/rifts specced + built overnight; ALL OK 35 GM files / 101 unit tests 05:04 (fixed: Describe link clash, Warlock-only pouch, charm values, lingering rift scaling, instances/hour 60).
 - 2026-11-27 — Owner: Nordana's dagger affix lines back after relog (login repair works).
 - 2026-11-27 — Fixed: Superuniques dropped from tracking when a real player was on another map; main-hand unequip wiped affix lines (upstream clearing disabled + login repair). ALL OK 31 files.
 - 2026-11-27 — m6-start-quests: new race/class pairs borrow the Warrior's starting-zone class quests (Nordana stuck in Shadowglen); upstream hook in SatisfyQuestClass.
