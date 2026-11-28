@@ -101,6 +101,7 @@ updating **Now** and adding a **Log** line. If this file and memory disagree, th
 | SSH | Git uses Windows OpenSSH (`core.sshCommand`); github.com host key accepted |
 
 ## Log (newest first, one line each)
+- 2026-11-28 17:40 — Owner: auto-attack (also /startattack) stopped after the live Scale.Enabled 0/1 toggle + .arpg reload at 17:24 while fighting a scaled Darkened Horror; /reload did not help, relog fixed it. Watch: avoid toggling scaling with the owner in combat; if it recurs, check HandleAttackSwingOpcode refusals.
 - 2026-11-28 — arpg_health_fix (Darkened Horror Health_mod 272 -> 1, live via .reload creature_template; stock kept). Tests-only run ALL OK 39 GM files 17:24.
 - 2026-11-28 — Companion Professions lists all 14 (learn Apprentice inside); health cap for Superuniques/Champions (Darkened Horror x272 -> 232k hp Unique on the Wandering Isle), stand-ins skip Health_mod > 3 (137 left). Tests 00/31/34/64 hardened (companion off at run start).
 - 2026-11-28 — m10-companion-professions: companion Professions -> per-profession trainer (all ranks/recipes, hook ArpgHooks::TrainerSpells) + 996 rep/token recipes for gold (13 vendor pages, arpg_recipe_price): ALL OK 39 GM files 16:27, pushed.
